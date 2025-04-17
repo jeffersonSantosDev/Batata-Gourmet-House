@@ -70,25 +70,40 @@
 </head>
 
 <body>
-    <!-- Header/Navigation -->
-    <header class="bg-[#5e3c23] text-white sticky top-0 z-50 shadow-lg">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center">
-                <img src="imagens/logoModerno_websiste-removebg-preview.png" alt="Batata Gourmet House Logo"
-                    class="h-11 mr-4">
-                <h1 class="text-xl font-bold">Batata Gourmet House</h1>
-            </div>
-            <nav class="hidden md:flex space-x-6">
-                <a href="#home" class="hover:text-[#d28b4b] transition">Início</a>
-                <a href="#about" class="hover:text-[#d28b4b] transition">Sobre</a>
-                <a href="#products" class="hover:text-[#d28b4b] transition">Produtos</a>
-                <a href="#contact" class="hover:text-[#d28b4b] transition">Contato</a>
-            </nav>
-            <button class="md:hidden text-2xl">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-    </header>
+<!-- Header/Navigation -->
+<header class="bg-[#5e3c23] text-white sticky top-0 z-50 shadow-lg">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center">
+        <img src="imagens/logoModerno_websiste-removebg-preview.png" alt="Batata Gourmet House Logo"
+          class="h-11 mr-4">
+        <h1 class="text-xl font-bold">Batata Gourmet House</h1>
+      </div>
+  
+      <!-- Desktop Menu -->
+      <nav class="hidden md:flex space-x-6">
+        <a href="#home" class="hover:text-[#d28b4b] transition">Início</a>
+        <a href="#about" class="hover:text-[#d28b4b] transition">Sobre</a>
+        <a href="#products" class="hover:text-[#d28b4b] transition">Produtos</a>
+        <a href="#contact" class="hover:text-[#d28b4b] transition">Contato</a>
+      </nav>
+  
+      <!-- Mobile Menu Button -->
+      <button id="menu-toggle" class="md:hidden text-2xl focus:outline-none">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  
+    <!-- Mobile Menu -->
+    <nav id="mobile-menu" class="md:hidden hidden absolute top-[64px] left-0 w-full bg-[#4a2f1b] text-white px-4 py-4 space-y-4 shadow-md transition-all duration-500 ease-in-out transform scale-y-0 origin-top z-50">
+        <a href="#home" class="block text-lg font-medium hover:text-[#d28b4b] transition">Início</a>
+        <a href="#about" class="block text-lg font-medium hover:text-[#d28b4b] transition">Sobre</a>
+        <a href="#products" class="block text-lg font-medium hover:text-[#d28b4b] transition">Produtos</a>
+        <a href="#contact" class="block text-lg font-medium hover:text-[#d28b4b] transition">Contato</a>
+      </nav>
+      
+      
+  </header>
+
 
     <!-- Hero Section -->
     <section id="home" class="hero-section text-white py-20 md:py-32 px-4 text-center">
@@ -97,7 +112,7 @@
                 em explosões de sabor! <span class="text-[#d28b4b]">🥔🔥</span></h1>
             <p class="text-xl mb-8">Descubra o verdadeiro sabor gourmet em cada mordida!</p>
             <div class="flex flex-col md:flex-row justify-center gap-4">
-                <a href="https://wa.me/5511985305905?text=Olá!%20Quero%20montar%20minha%20batata%20gourmet!"
+                <a href="https://wa.me/5511985305905?text=Oi!%20Quero%20uma%20batata%20bem%20recheada%2C%20feita%20sob%20medida%20pra%20mim!%20Pode%20me%20ajudar%3F"
                     class="bg-[#d28b4b] hover:bg-[#c47d3a] text-white font-bold py-3 px-6 rounded-full transition flex items-center justify-center gap-2"
                     target="_blank" rel="noopener noreferrer">
                     <i class="fab fa-whatsapp"></i> Monte sua Batata Agora
@@ -112,7 +127,7 @@
     </section>
 
     <!-- About Section -->
-    <section id="about" class="py-16 bg-white">
+    <!-- <section id="about" class="py-16 bg-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-bold text-[#5e3c23] mb-4">Conheça a Batata Gourmet House</h2>
@@ -155,8 +170,49 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> -->
 
+    <section id="about" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-[#5e3c23] mb-4">Conheça a Batata Gourmet House</h2>
+                <div class="w-20 h-1 bg-[#d28b4b] mx-auto"></div>
+            </div>
+    
+            <div class="flex flex-col md:flex-row items-center gap-8">
+                <div class="md:w-1/2">
+                    <img src="imagens/batata_icone_open_watts.jpg" alt="Batata Recheada Gourmet"
+                        class="rounded-lg shadow-lg w-full">
+                </div>
+                <div class="md:w-1/2">
+                    <p class="text-lg mb-6 text-gray-700">
+                        Bem-vindo à Batata Gourmet House! Aqui, cada batata recheada é preparada com carinho, recheios
+                        generosos e ingredientes selecionados.
+                    </p>
+                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                        <li class="flex items-center"><i class="fas fa-check text-[#d28b4b] mr-2"></i> Batatas grandes e cremosas</li>
+                        <li class="flex items-center"><i class="fas fa-check text-[#d28b4b] mr-2"></i> Recheios exclusivos</li>
+                        <li class="flex items-center"><i class="fas fa-check text-[#d28b4b] mr-2"></i> Combos para 1 ou 2 pessoas</li>
+                        <li class="flex items-center"><i class="fas fa-check text-[#d28b4b] mr-2"></i> Opções com frango, bacon, catupiry</li>
+                    </ul>
+                    <p class="text-lg mb-6 text-gray-700">
+                        Tudo com molhos artesanais e um toque especial que só quem prova entende! Monte sua combinação ideal e surpreenda-se.
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <div class="bg-[#f5e6d3] p-4 rounded-lg flex-1 min-w-[200px]">
+                            <h3 class="font-bold text-[#5e3c23] mb-2">Recheios Artesanais</h3>
+                            <p class="text-sm">Molhos e combinações feitas na hora, com ingredientes frescos</p>
+                        </div>
+                        <div class="bg-[#f5e6d3] p-4 rounded-lg flex-1 min-w-[200px]">
+                            <h3 class="font-bold text-[#5e3c23] mb-2">Entrega Rápida</h3>
+                            <p class="text-sm">Peça pelo iFood ou WhatsApp e receba quentinha na sua porta</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
     <!-- Products Section -->
     <section id="products" class="py-16 bg-[#f5e6d3]">
         <div class="container mx-auto px-4">
@@ -170,59 +226,62 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Product 1 -->
                 <div class="product-card bg-white rounded-lg overflow-hidden shadow-md transition duration-300">
-                    <img src="https://images.unsplash.com/photo-1586816918975-3c3066e90c1f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+                    <img src="imagens/brocolisBacon_png.png"
                         alt="Batata no Pote" class="w-full h-48 object-cover">
                     <div class="p-6">
-                        <h3 class="text-xl font-bold text-[#5e3c23] mb-2">Batata no Pote</h3>
-                        <p class="text-gray-600 mb-4">Crocante por fora, macia por dentro, com seus ingredientes
+                        <h3 class="text-xl font-bold text-[#5e3c23] mb-2">Brócolis com Bacon - Explosão de Sabor</h3>
+                        <p class="text-gray-600 mb-4">Brócolis com Bacon: 600g de puro sabor com brócolis refogado, muçarela, batata inglesa, requeijão, cebolinha, bacon crocante e alho frito — um dos nossos campeões de venda!
                             favoritos.</p>
                         <div class="flex justify-between items-center">
-                            <span class="font-bold text-[#d28b4b]">A partir de R$ 18,90</span>
-                            <button
-                                class="bg-[#5e3c23] hover:bg-[#4a2f1b] text-white py-2 px-4 rounded-full text-sm transition">
-                                Personalizar
-                            </button>
+                            <span class="font-bold text-[#d28b4b]">A partir de R$ 35,99</span>
+                            <a href="https://wa.me/5511985305905?text=Oi!%20Quero%20uma%20batata%20bem%20recheada%2C%20feita%20sob%20medida%20pra%20mim!%20Pode%20me%20ajudar%3F" target="_blank">
+                                <button class="bg-[#5e3c23] hover:bg-[#4a2f1b] text-white py-2 px-4 rounded-full text-sm transition">
+                                    Pedir
+                                </button>
+                            </a> 
                         </div>
                     </div>
                 </div>
 
                 <!-- Product 2 -->
                 <div class="product-card bg-white rounded-lg overflow-hidden shadow-md transition duration-300">
-                    <img src="https://images.unsplash.com/photo-1560958089-b8a1929cea89?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80"
+                    <img src= "imagens/strogonofffrango.png" 
                         alt="Batata Recheada" class="w-full h-48 object-cover">
                     <div class="p-6">
-                        <h3 class="text-xl font-bold text-[#5e3c23] mb-2">Batata Recheada</h3>
-                        <p class="text-gray-600 mb-4">Recheios incríveis que vão te surpreender em cada mordida.</p>
+                        <h3 class="text-xl font-bold text-[#5e3c23] mb-2">Strogonoff de Frango 600g - Receita Cremosa e Irresistível</h3>
+                        <p class="text-gray-600 mb-4">Strogonoff de Frango: cerca de 600g de sabor com frango cremoso, requeijão, batata inglesa cozida e cebolinha fresca — uma explosão de sabor sem batata palha!</p>
                         <div class="flex justify-between items-center">
-                            <span class="font-bold text-[#d28b4b]">A partir de R$ 22,90</span>
-                            <button
-                                class="bg-[#5e3c23] hover:bg-[#4a2f1b] text-white py-2 px-4 rounded-full text-sm transition">
-                                Personalizar
-                            </button>
+                            <span class="font-bold text-[#d28b4b]">A partir de R$ 32,90</span>
+                            <a href="https://wa.me/5511985305905?text=Oi!%20Quero%20uma%20batata%20bem%20recheada%2C%20feita%20sob%20medida%20pra%20mim!%20Pode%20me%20ajudar%3F" target="_blank">
+                                <button class="bg-[#5e3c23] hover:bg-[#4a2f1b] text-white py-2 px-4 rounded-full text-sm transition">
+                                    Pedir
+                                </button>
+                            </a> 
                         </div>
                     </div>
                 </div>
 
                 <!-- Product 3 -->
                 <div class="product-card bg-white rounded-lg overflow-hidden shadow-md transition duration-300">
-                    <img src="https://images.unsplash.com/photo-1603105037880-88090c12b4d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80"
+                    <img src="imagens/CalabresacomMussarela.png"
                         alt="Batata Rosti" class="w-full h-48 object-cover">
                     <div class="p-6">
-                        <h3 class="text-xl font-bold text-[#5e3c23] mb-2">Batata Rosti</h3>
-                        <p class="text-gray-600 mb-4">Tradição suíça com um toque brasileiro de sabor.</p>
+                        <h3 class="text-xl font-bold text-[#5e3c23] mb-2">>Batata Calabresa com Mussarela - Sabor Incrível em Cada Mordida.</h3>
+                        <p class="text-gray-600 mb-4">Batata Calabresa com Mussarela: cerca de 600g de puro sabor com batatas crocantes, calabresa acebolada e mussarela derretida — uma explosão irresistível da linha Tradicionais!</p>
                         <div class="flex justify-between items-center">
-                            <span class="font-bold text-[#d28b4b]">A partir de R$ 20,90</span>
-                            <button
-                                class="bg-[#5e3c23] hover:bg-[#4a2f1b] text-white py-2 px-4 rounded-full text-sm transition">
-                                Personalizar
-                            </button>
+                            <span class="font-bold text-[#d28b4b]">A partir de R$  33,06</span>
+                            <a href="https://wa.me/5511985305905?text=Oi!%20Quero%20uma%20batata%20bem%20recheada%2C%20feita%20sob%20medida%20pra%20mim!%20Pode%20me%20ajudar%3F" target="_blank">
+                                <button class="bg-[#5e3c23] hover:bg-[#4a2f1b] text-white py-2 px-4 rounded-full text-sm transition">
+                                    Pedir
+                                </button>
+                            </a> 
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="text-center mt-12">
-                <a href="https://wa.me/55SEUNUMERO?text=Olá!%20Quero%20montar%20minha%20batata%20gourmet!"
+                <a href="https://wa.me/5511985305905?text=Oi!%20Quero%20uma%20batata%20bem%20recheada%2C%20feita%20sob%20medida%20pra%20mim!%20Pode%20me%20ajudar%3F"  target="_blank"
                     class="inline-block bg-[#d28b4b] hover:bg-[#c47d3a] text-white font-bold py-3 px-8 rounded-full transition">
                     Ver Cardápio Completo
                 </a>
@@ -296,7 +355,7 @@
                             <i class="fas fa-star-half-alt"></i>
                         </div>
                     </div>
-                    <p class="text-gray-700 mb-4">"Adoro poder personalizar minha batata com os ingredientes que eu
+                    <p class="text-gray-700 mb-4">"Adoro poder Pedir minha batata com os ingredientes que eu
                         gosto. O atendimento pelo WhatsApp é super rápido!"</p>
                     <div class="flex items-center">
                         <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Cliente"
@@ -318,7 +377,7 @@
             <p class="text-xl mb-8 max-w-2xl mx-auto">Escolha sua batata favorita e personalize com seus ingredientes
                 preferidos!</p>
             <div class="flex flex-col md:flex-row justify-center gap-4">
-                <a href="https://wa.me/55SEUNUMERO?text=Olá!%20Quero%20montar%20minha%20batata%20gourmet!"
+                <a href="https://wa.me/5511985305905?text=Oi!%20Quero%20uma%20batata%20bem%20recheada%2C%20feita%20sob%20medida%20pra%20mim!%20Pode%20me%20ajudar%3F"  target="_blank"
                     class="bg-[#d28b4b] hover:bg-[#c47d3a] text-white font-bold py-3 px-8 rounded-full transition flex items-center justify-center gap-2">
                     <i class="fab fa-whatsapp"></i> Falar no WhatsApp
                 </a>
@@ -341,15 +400,15 @@
                     <div class="flex space-x-4">
                         <a href="#" class="text-white hover:text-[#d28b4b] text-xl"><i class="fab fa-instagram"></i></a>
                         <a href="#" class="text-white hover:text-[#d28b4b] text-xl"><i class="fab fa-facebook"></i></a>
-                        <a href="#" class="text-white hover:text-[#d28b4b] text-xl"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://wa.me/5511985305905?text=Oi!%20Quero%20uma%20batata%20bem%20recheada%2C%20feita%20sob%20medida%20pra%20mim!%20Pode%20me%20ajudar%3F"   target="_blank" class="text-white hover:text-[#d28b4b] text-xl"><i class="fab fa-whatsapp"></i></a>
                     </div>
                 </div>
 
                 <div>
                     <h3 class="text-xl font-bold mb-4">Horário de Funcionamento</h3>
-                    <p class="mb-2">Segunda a Sexta: 11h - 22h</p>
-                    <p class="mb-2">Sábado: 11h - 23h</p>
-                    <p>Domingo: 12h - 21h</p>
+                    <p class="mb-2">Segunda a Sexta: 18h - 23h</p>
+                    <p class="mb-2">Sábado: 12h - 23h</p>
+                    <p>Domingo: 12h - 23h</p>
                 </div>
 
                 <div>
@@ -364,11 +423,11 @@
 
                 <div>
                     <h3 class="text-xl font-bold mb-4">Contato</h3>
-                    <p class="mb-2 flex items-center"><i class="fas fa-phone-alt mr-2"></i> (XX) XXXX-XXXX</p>
+                    <p class="mb-2 flex items-center"><i class="fas fa-phone-alt mr-2"></i> (11) 98530-5905</p>
                     <p class="mb-2 flex items-center"><i class="fas fa-envelope mr-2"></i>
-                        contato@batatagourmethouse.com</p>
-                    <p class="flex items-center"><i class="fas fa-map-marker-alt mr-2"></i> Rua das Batatas, 123 -
-                        Centro</p>
+                        jefferson.vianasantos@outlook.com</p>
+                    <p class="flex items-center"><i class="fas fa-map-marker-alt mr-2"></i> Rua Melchior giola , 388 -
+                        zona sul - morumbi</p>
                 </div>
             </div>
 
@@ -386,7 +445,7 @@
     </footer>
 
     <!-- Floating WhatsApp Button -->
-    <a href="https://wa.me/55SEUNUMERO?text=Olá!%20Quero%20montar%20minha%20batata%20gourmet!"
+    <a href="https://wa.me/5511985305905?text=Oi!%20Quero%20uma%20batata%20bem%20recheada%2C%20feita%20sob%20medida%20pra%20mim!%20Pode%20me%20ajudar%3F"  target="_blank"
         class="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-lg floating-button z-50">
         <i class="fab fa-whatsapp"></i>
     </a>
@@ -405,11 +464,35 @@
             observer.observe(el);
         });
 
-        // Mobile menu toggle (would need more implementation)
-        document.querySelector('header button').addEventListener('click', function () {
-            // Implement mobile menu toggle functionality here
-            console.log('Mobile menu clicked');
-        });
+        const toggleButton = document.getElementById('menu-toggle');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  toggleButton.addEventListener('click', () => {
+    if (mobileMenu.classList.contains('hidden')) {
+      mobileMenu.classList.remove('hidden');
+      setTimeout(() => {
+        mobileMenu.classList.remove('scale-y-0');
+        mobileMenu.classList.add('scale-y-100');
+      }, 10);
+    } else {
+      mobileMenu.classList.remove('scale-y-100');
+      mobileMenu.classList.add('scale-y-0');
+      setTimeout(() => {
+        mobileMenu.classList.add('hidden');
+      }, 300);
+    }
+  });
+
+  document.querySelectorAll('#mobile-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+      mobileMenu.classList.remove('scale-y-100');
+      mobileMenu.classList.add('scale-y-0');
+      setTimeout(() => {
+        mobileMenu.classList.add('hidden');
+      }, 300);
+    });
+  });   
+ 
     </script>
 </body>
 
