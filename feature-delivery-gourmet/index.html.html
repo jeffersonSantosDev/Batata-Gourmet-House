@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Batata Gourmet House</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <!-- HERO -->
+  <div class="hero"></div>
+
+  <!-- STORE INFO (só isso dentro de store-block) -->
+  <div class="store-block">
+    <div class="logo-wrapper">
+      <img src="imagens/logo.jpg" alt="Logo Batata Gourmet House" class="logo-hero" />
+    </div>
+    <span class="status aberto">Aberto</span>
+    <div class="store-info">
+      <h1>Batata Gourmet House</h1>
+      <p class="tagline">Batatas recheadas!</p>
+      <div class="ellipsis">…</div>
+    </div>
+  </div>
+
+  <!-- AGORA o wrapper sticky está FORA do store-block -->
+  <div class="search-category-wrapper">
+    <!-- busca + botões -->
+    <div class="search-nav">
+      <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Pesquisar produtos por nome ou descrição"
+        />
+      </div>
+      <div class="action-buttons">
+        <button class="btn orders">
+          <i class="fas fa-ticket-alt"></i> Meus Pedidos
+        </button>
+        <button class="btn info">
+          <i class="fas fa-shipping-fast"></i> Tempo e Taxa
+        </button>
+      </div>
+    </div>
+    <!-- categorias -->
+    <nav class="category-nav">
+      <ul id="category-nav-list">
+        <li class="active">Todos</li>
+        <li>Batatas</li>
+        <li>Bebidas</li>
+        <li>Sobremesas</li>
+        <li>Molhos</li>
+        <li>Acompanhamentos</li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- PRODUTOS -->
+  <main class="products-section"> 
+    <div id="products-container"></div>
+  </main>
+
+  <!-- CARRINHO -->
+  <div class="cart-bar" id="cart-bar">
+    <i class="fas fa-shopping-cart"></i>
+    <span id="cart-count">(0) Veja meu carrinho</span>
+  </div>
+
+  <script src="js/script.js"></script>
+</body>
+</html>

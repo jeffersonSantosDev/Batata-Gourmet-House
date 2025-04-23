@@ -31,44 +31,7 @@
     <title>Batata Gourmet House - Transformamos batatas em explosões de sabor!</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f5e6d3;
-        }
-
-        .hero-section {
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1512152272829-e313959e212e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80');
-            background-size: cover;
-            background-position: center;
-        }
-
-        .product-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-
-        .floating-button {
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(0px);
-            }
-
-            50% {
-                transform: translateY(-10px);
-            }
-
-            100% {
-                transform: translateY(0px);
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
@@ -117,8 +80,7 @@
                 <a href="https://wa.me/5511985305905?text=Oi!%20Quero%20uma%20batata%20bem%20recheada%2C%20feita%20sob%20medida%20pra%20mim!%20Pode%20me%20ajudar%3F"
                     class="bg-[#d28b4b] hover:bg-[#c47d3a] text-white font-bold py-3 px-6 rounded-full transition flex items-center justify-center gap-2"
                     target="_blank" rel="noopener noreferrer">
-                    <i class="fab fa-whatsapp"></i> Monte sua Batata Agora
-                </a>
+                    <i class="fas fa-utensils"></i>Peça sua Batata Agora</a>
                 <a href="https://www.ifood.com.br/delivery/sao-paulo-sp/batata-gourmet-house-paraisopolis/ecd061c7-7b03-43d9-ae92-5649ef251b3c?UTM_Medium=share"
                     class="bg-[#2f4f4f] hover:bg-[#1e3e3e] text-white font-bold py-3 px-6 rounded-full transition flex items-center justify-center gap-2"
                     target="_blank" rel="noopener noreferrer">
@@ -127,53 +89,7 @@
             </div>
         </div>
     </section>
-
-    <!-- About Section -->
-    <!-- <section id="about" class="py-16 bg-white">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-[#5e3c23] mb-4">Conheça a Batata Gourmet House</h2>
-                <div class="w-20 h-1 bg-[#d28b4b] mx-auto"></div>
-            </div>
-
-            <div class="flex flex-col md:flex-row items-center gap-8">
-                <div class="md:w-1/2">
-                    <img src="" alt="Batatas Gourmet"
-                        class="rounded-lg shadow-lg w-full">
-                </div>
-                <div class="md:w-1/2">
-                    <p class="text-lg mb-6 text-gray-700">
-                        Bem-vindo à Batata Gourmet House! Aqui, cada batata é preparada com carinho e criatividade.
-                        Servimos:
-                    </p>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                        <li class="flex items-center"><i class="fas fa-check text-[#d28b4b] mr-2"></i> Batata no pote
-                        </li>
-                        <li class="flex items-center"><i class="fas fa-check text-[#d28b4b] mr-2"></i> Batata recheada
-                        </li>
-                        <li class="flex items-center"><i class="fas fa-check text-[#d28b4b] mr-2"></i> Batata rosti</li>
-                        <li class="flex items-center"><i class="fas fa-check text-[#d28b4b] mr-2"></i> Combos especiais
-                        </li>
-                    </ul>
-                    <p class="text-lg mb-6 text-gray-700">
-                        Tudo com molhos artesanais e ingredientes fresquinhos! Monte sua combinação ideal com frango,
-                        bacon, cheddar e muito mais.
-                    </p>
-                    <div class="flex flex-wrap gap-4">
-                        <div class="bg-[#f5e6d3] p-4 rounded-lg flex-1 min-w-[200px]">
-                            <h3 class="font-bold text-[#5e3c23] mb-2">Ingredientes frescos</h3>
-                            <p class="text-sm">Selecionados diariamente para garantir qualidade</p>
-                        </div>
-                        <div class="bg-[#f5e6d3] p-4 rounded-lg flex-1 min-w-[200px]">
-                            <h3 class="font-bold text-[#5e3c23] mb-2">Molhos artesanais</h3>
-                            <p class="text-sm">Preparados na casa com receitas exclusivas</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section> -->
-
+ 
     <section id="about" class="py-16 bg-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-12">
@@ -452,50 +368,7 @@
         <i class="fab fa-whatsapp"></i>
     </a>
 
-    <script>
-        // Simple animation for elements when they come into view
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animate__animated', 'animate__fadeInUp');
-                }
-            });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.product-card, .hero-section h1, .hero-section p').forEach(el => {
-            observer.observe(el);
-        });
-
-        const toggleButton = document.getElementById('menu-toggle');
-  const mobileMenu = document.getElementById('mobile-menu');
-
-  toggleButton.addEventListener('click', () => {
-    if (mobileMenu.classList.contains('hidden')) {
-      mobileMenu.classList.remove('hidden');
-      setTimeout(() => {
-        mobileMenu.classList.remove('scale-y-0');
-        mobileMenu.classList.add('scale-y-100');
-      }, 10);
-    } else {
-      mobileMenu.classList.remove('scale-y-100');
-      mobileMenu.classList.add('scale-y-0');
-      setTimeout(() => {
-        mobileMenu.classList.add('hidden');
-      }, 300);
-    }
-  });
-
-  document.querySelectorAll('#mobile-menu a').forEach(link => {
-    link.addEventListener('click', () => {
-      mobileMenu.classList.remove('scale-y-100');
-      mobileMenu.classList.add('scale-y-0');
-      setTimeout(() => {
-        mobileMenu.classList.add('hidden');
-      }, 300);
-    });
-  });   
- 
-    </script>
+    <script src="js/scriptLandpage.js"></script>
 </body>
 
 </html>
