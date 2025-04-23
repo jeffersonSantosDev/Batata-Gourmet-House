@@ -28,9 +28,15 @@ body {
 /* HERO */
 .hero {
   width: 100%;
-  height: 200px;
-  background: url("https://www.batatagourmethouse.com.br/imagens/logoCapa.png") 
-  no-repeat center center / cover;
+  height: 200px;      /* ou o que você precisar */
+  overflow: hidden;   /* oculta tudo que sair do "container" */
+}
+
+.hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;  /* faz a imagem cobrir toda a área, cortando o excesso */
+  display: block;     /* remove gap de linha em alguns navegadores */
 }
 
 /* STORE INFO */
