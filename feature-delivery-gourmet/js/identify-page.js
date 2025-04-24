@@ -7,11 +7,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const nameEl     = document.getElementById("name");
     const errW       = document.getElementById("whatsappError");
     const errN       = document.getElementById("nameError");
+    const backBtn = document.getElementById("backBtn");
+
   
     // Para onde voltar depois do cadastro
     const params     = new URLSearchParams(location.search);
     const retorno    = params.get("return") || "index.html";
   
+    backBtn.addEventListener("click", () => {
+        // se houver histórico, volta; senão, joga na página de retorno
+        if (history.length > 1) history.back();
+        else window.location.href = returnPage;
+      });
+      
     // Máscara de WhatsApp
     whatsappEl.addEventListener("keydown", e => {
       const ok = ["Backspace","ArrowLeft","ArrowRight","Delete","Tab"];
