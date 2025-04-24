@@ -72,7 +72,7 @@ function openOrdersModal() {
  * Abre a tela/modal de Tempo & Taxa
  */
 function openScheduleModal() {
-  alert("Abrindo tela de Tempo & Taxa...");
+  window.location.href = "edit-address.html"
 }
 
   

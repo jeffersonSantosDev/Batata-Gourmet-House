@@ -1,3 +1,5 @@
+/* css/orders-list.css */
+
 :root {
     --primary:    #ffffff;
     --text-dark:  #2c3e50;
@@ -25,48 +27,44 @@
     color: var(--text-dark);
   }
   
-  /* ====== HEADER ====== */
+  /* ===== HEADER (idéntico ao order.css) ===== */
   .pedidos-header {
     display: flex;
     align-items: center;
     background: var(--primary);
     padding: 1rem;
     box-shadow: 0 1px 4px var(--shadow);
-    border-bottom: 1px solid var(--border);
+    /* mantive sem borda inferior, igual ao order.css */
   }
   
-  .back-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    background: var(--btn-bg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 1.25rem;
-    color: var(--secondary);
+  .pedidos-header .back-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;        /* igual ao order.css */
     cursor: pointer;
-    transition: background 0.2s;
-    margin-right: 0.75rem;
-  }
-  .back-btn:hover {
-    background: var(--btn-hover);
+    margin-right: 1rem;       /* igual ao order.css */
+    color: var(--text-dark);  
   }
   
-  .pedidos-title {
-    font-size: 1.5rem;
-    font-weight: 700;
+  .pedidos-header .back-btn:hover {
+    /* opcional: leve mudança de cor no hover */
+    color: var(--secondary);
   }
   
-  /* ====== CONTAINER ====== */
+  .pedidos-header .pedidos-title {
+    font-size: 1.25rem;       /* igual ao .order-title */
+    font-weight: 600;
+    color: var(--text-dark);
+  }
+  
+  /* ===== CONTAINER ===== */
   .pedidos-container {
     max-width: 600px;
     margin: 1.5rem auto;
     padding: 0 1rem;
   }
   
-  /* ====== TABELA ====== */
+  /* ===== TABELA ===== */
   .orders-table {
     width: 100%;
     border-collapse: collapse;
@@ -74,6 +72,7 @@
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 8px var(--shadow);
+    margin-top: 1rem;
   }
   .orders-table thead {
     background: var(--bg-light);
@@ -93,7 +92,7 @@
     font-weight: 700;
   }
   
-  /* ====== LINK “Ver Pedido” ====== */
+  /* ===== BUTTON “Ver Pedido” ===== */
   .pedido-link {
     display: inline-block;
     padding: 0.4rem 0.75rem;
@@ -111,7 +110,7 @@
     color: #fff;
   }
   
-  /* ====== “Sem pedidos” ====== */
+  /* ===== “SEM PEDIDOS” ===== */
   .no-pedidos {
     text-align: center;
     color: #666;
@@ -119,7 +118,7 @@
     font-size: 1rem;
   }
   
-  /* ====== RESPONSIVO ====== */
+  /* ===== RESPONSIVO ===== */
   @media (max-width: 480px) {
     .pedidos-container {
       padding: 0 0.5rem;
