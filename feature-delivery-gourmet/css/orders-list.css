@@ -1,0 +1,132 @@
+:root {
+    --primary:    #ffffff;
+    --text-dark:  #2c3e50;
+    --secondary:  #d28b4b;
+    --border:     #e2e2e2;
+    --bg-light:   #f8f7f3;
+    --btn-bg:     #ffffff;
+    --btn-hover:  #f0f0f0;
+    --shadow:     rgba(0,0,0,0.05);
+  }
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .hidden {
+    display: none;
+  }
+  
+  body {
+    font-family: "Poppins", sans-serif;
+    background: var(--bg-light);
+    color: var(--text-dark);
+  }
+  
+  /* ====== HEADER ====== */
+  .pedidos-header {
+    display: flex;
+    align-items: center;
+    background: var(--primary);
+    padding: 1rem;
+    box-shadow: 0 1px 4px var(--shadow);
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--btn-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 1.25rem;
+    color: var(--secondary);
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-right: 0.75rem;
+  }
+  .back-btn:hover {
+    background: var(--btn-hover);
+  }
+  
+  .pedidos-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+  
+  /* ====== CONTAINER ====== */
+  .pedidos-container {
+    max-width: 600px;
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+  }
+  
+  /* ====== TABELA ====== */
+  .orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--primary);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+  .orders-table thead {
+    background: var(--bg-light);
+  }
+  .orders-table th,
+  .orders-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .orders-table th {
+    font-weight: 600;
+    color: var(--text-dark);
+  }
+  .orders-table td:nth-child(2) {
+    color: var(--secondary);
+    font-weight: 700;
+  }
+  
+  /* ====== LINK “Ver Pedido” ====== */
+  .pedido-link {
+    display: inline-block;
+    padding: 0.4rem 0.75rem;
+    background: var(--primary);
+    color: var(--secondary);
+    border: 1px solid var(--secondary);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+  }
+  .pedido-link:hover {
+    background: var(--secondary);
+    color: #fff;
+  }
+  
+  /* ====== “Sem pedidos” ====== */
+  .no-pedidos {
+    text-align: center;
+    color: #666;
+    margin-top: 1.5rem;
+    font-size: 1rem;
+  }
+  
+  /* ====== RESPONSIVO ====== */
+  @media (max-width: 480px) {
+    .pedidos-container {
+      padding: 0 0.5rem;
+    }
+    .orders-table th,
+    .orders-table td {
+      padding: 0.5rem;
+    }
+  }
+  

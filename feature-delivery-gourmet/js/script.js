@@ -1,12 +1,12 @@
 // ——— DADOS ———
 const products = [
-  { id: 1, name: "Calabresa",           description: "Batata recheada de calabresa e mussarelaBatata recheada de calabresa e mussarela", price: 12.00, image: "imagens/itemCardapio.jpg",       typeMenu: "Batatas" },
-  { id: 2, name: "Calabresa com Bacon", description: "Batata recheada de calabresa e bacon ",     price: 15.00, image: "imagens/itemCardapio.jpg",typeMenu: "Batatas" },
-  { id: 3, name: "Carne",              description: "Batata recheada de carne e mussarela",      price: 15.00, image: "imagens/itemCardapio.jpg",          typeMenu: "Batatas" },
-  { id: 4, name: "Refrigerante",       description: "Refrigerante sabor cola 350ml",             price:  5.00, image: "imagens/itemCardapio.jpg",  typeMenu: "Bebidas" },
-  { id: 5, name: "Água Mineral",       description: "Água mineral 500ml",                        price:  4.00, image: "imagens/itemCardapio.jpg",          typeMenu: "Bebidas" },
-  { id: 6, name: "Brownie",            description: "Brownie de chocolate com nozes",             price:  8.00, image: "imagens/itemCardapio.jpg",       typeMenu: "Sobremesas" },
-  { id: 6, name: "Batata + Refri", description: "Batata recheada de carne e mussarela",             price:  8.00, image: "imagens/itemCardapio.jpg",       typeMenu: "Combos" },
+  { id: 1, name: "Calabresa",           description: "Batata recheada de calabresa e mussarelaBatata recheada de calabresa e mussarela", price: 12.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
+  { id: 2, name: "Calabresa com Bacon", description: "Batata recheada de calabresa e bacon ",     price: 15.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
+  { id: 3, name: "Carne",               description: "Batata recheada de carne e mussarela",      price: 15.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
+  { id: 4, name: "Refrigerante",        description: "Refrigerante sabor cola 350ml",             price:  5.00, image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
+  { id: 5, name: "Água Mineral",        description: "Água mineral 500ml",                        price:  4.00, image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
+  { id: 6, name: "Brownie",             description: "Brownie de chocolate com nozes",             price:  8.00, image: "imagens/itemCardapio.jpg", typeMenu: "Sobremesas" },
+  { id: 7, name: "Batata + Refri",      description: "Combo Batata + Refrigerante",                price: 18.00, image: "imagens/itemCardapio.jpg", typeMenu: "Combos" },
 ];
 
 // estado
@@ -17,46 +17,66 @@ let currentSearch   = "";
 const productsContainer = document.getElementById("products-container");
 const searchInput       = document.querySelector(".search-input");
 const categoryItems     = document.querySelectorAll("#category-nav-list li");
-const ordersBtn = document.querySelector(".btn.orders");
+const ordersBtn   = document.querySelector(".btn.orders");
+const scheduleBtn = document.querySelector(".btn.info");
 
 // init
 document.addEventListener("DOMContentLoaded", () => {
-  // clicar nas categorias
- 
+  // “Meus Pedidos”
+  ordersBtn.addEventListener("click", () => {
+        // chama a função global do identify.js
+        if (window.identifyUser()) {
+          openOrdersModal();
+        }
+      });
 
-  if (ordersBtn) {
-    ordersBtn.addEventListener("click", () => {
-      window.location.href = "identify.html";
-    });
-  } 
+      
+      scheduleBtn.addEventListener("click", () => {      
+        if (window.identifyUser()) {      
+          openScheduleModal();      
+          }      
+        });
 
+  // categorias
   categoryItems.forEach(li => {
     li.addEventListener("click", () => {
-      // troca a classe active
       categoryItems.forEach(el => el.classList.remove("active"));
       li.classList.add("active");
-  
-      // atualiza filtro e re-renderiza
+
       currentCategory = li.textContent;
       renderProducts();
-  
-      // faz scroll suave até a search-nav
+
       const searchNav = document.querySelector(".search-nav");
-      if (searchNav) {
-        searchNav.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+      searchNav && searchNav.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   });
 
-  // digitar na busca
+  // busca
   searchInput.addEventListener("input", () => {
     currentSearch = searchInput.value.trim().toLowerCase();
     renderProducts();
   });
 
-  // primeira chamada
+  // primeira renderização
   renderProducts();
 });
+
+/**
+ * Abre o modal de pedidos (implemente sua lógica aqui)
+ */
+function openOrdersModal() {
+  window.location.href = "orders-list.html";
+}
+
+/**
+ * Abre a tela/modal de Tempo & Taxa
+ */
+function openScheduleModal() {
+  alert("Abrindo tela de Tempo & Taxa...");
+}
+
+  
+ 
 
 function renderProducts() {
   productsContainer.innerHTML = "";
@@ -72,7 +92,6 @@ function renderProducts() {
     return;
   }
 
-  // agrupa
   const byCat = filtered.reduce((acc, p) => {
     (acc[p.typeMenu] ||= []).push(p);
     return acc;
@@ -97,7 +116,7 @@ function renderProducts() {
         <div class="product-details">
           <h3 class="product-name">${prod.name}</h3>
           <p class="product-description">${prod.description}</p>
-          <span class="product-price">${prod.price.toFixed(2)} AED</span>
+          <span class="product-price">R$ ${prod.price.toFixed(2).replace(".", ",")}</span>
         </div>
         <img src="${prod.image}" alt="${prod.name}" class="product-image"/>
       `;
