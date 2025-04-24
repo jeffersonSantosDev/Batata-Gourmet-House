@@ -6,6 +6,7 @@ const products = [
   { id: 4, name: "Refrigerante",       description: "Refrigerante sabor cola 350ml",             price:  5.00, image: "imagens/itemCardapio.jpg",  typeMenu: "Bebidas" },
   { id: 5, name: "Água Mineral",       description: "Água mineral 500ml",                        price:  4.00, image: "imagens/itemCardapio.jpg",          typeMenu: "Bebidas" },
   { id: 6, name: "Brownie",            description: "Brownie de chocolate com nozes",             price:  8.00, image: "imagens/itemCardapio.jpg",       typeMenu: "Sobremesas" },
+  { id: 6, name: "Batata + Refri", description: "Batata recheada de carne e mussarela",             price:  8.00, image: "imagens/itemCardapio.jpg",       typeMenu: "Combos" },
 ];
 
 // estado
@@ -16,10 +17,19 @@ let currentSearch   = "";
 const productsContainer = document.getElementById("products-container");
 const searchInput       = document.querySelector(".search-input");
 const categoryItems     = document.querySelectorAll("#category-nav-list li");
+const ordersBtn = document.querySelector(".btn.orders");
 
 // init
 document.addEventListener("DOMContentLoaded", () => {
   // clicar nas categorias
+ 
+
+  if (ordersBtn) {
+    ordersBtn.addEventListener("click", () => {
+      window.location.href = "identify.html";
+    });
+  } 
+
   categoryItems.forEach(li => {
     li.addEventListener("click", () => {
       // troca a classe active

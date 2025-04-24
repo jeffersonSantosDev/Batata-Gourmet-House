@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Status do Pedido — Batata Gourmet House</title>
+  <link rel="stylesheet" href="./css/order.css"/>
+
+  <!-- SweetAlert 1.x -->
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <script defer src="./js/order.js"></script>
+</head>
+<body>
+  <header class="order-header">
+    <button class="back-btn" id="backBtn">←</button>
+    <h1 class="order-title">Status do Pedido</h1>
+  </header>
+
+  <main class="order-container">
+    <section class="order-info">
+      <div class="status-timeline" id="statusTimeline"></div>
+
+      <div class="order-header-block">
+        <h2 class="order-number">
+          Pedido <span id="orderNumber">—</span>
+        </h2>
+        <span class="status-pill" id="orderStatus">—</span>
+      </div>
+      <div class="order-meta">
+        <time id="orderDate">—</time>
+        <p class="order-step" id="orderStep">—</p>
+      </div>
+    </section>
+
+    <section class="order-items">
+      <table>
+        <thead>
+          <tr><th>ITENS</th><th>PREÇO</th></tr>
+        </thead>
+        <tbody id="itemsList"></tbody>
+      </table>
+    </section>
+
+    <section class="order-summary">
+      <div class="summary-line">
+        <span>Pedido</span>
+        <span id="subtotal">+ R$ 0,00</span>
+      </div>
+      <div class="summary-line">
+        <span>Entrega</span>
+        <span id="deliveryFee">+ R$ 0,00</span>
+      </div>
+      <div class="summary-total">
+        <span>TOTAL</span>
+        <span id="total">R$ 0,00</span>
+      </div>
+    </section>
+
+    <section class="order-delivery">
+      <h3>Entrega</h3>
+      <p id="deliveryAddress">—</p>
+    </section>
+
+    <section class="order-payment">
+      <h3>Pagamento</h3>
+      <p id="paymentMethod">—</p>
+    </section>
+  </main>
+</body>
+</html>

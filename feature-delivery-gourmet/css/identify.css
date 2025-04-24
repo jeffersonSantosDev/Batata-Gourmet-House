@@ -1,0 +1,144 @@
+:root {
+    --primary: #fff;
+    --text-dark: #2c3e50;
+    --secondary: #d28b4b;
+    --border: #e2e2e2;
+    --bg-light: #f8f7f3;
+    --shadow: rgba(0,0,0,0.1);
+  }
+  
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body {
+    font-family:Poppins,sans-serif;
+    background:var(--bg-light);
+    color:var(--text-dark);
+    min-height:100vh;
+  }
+  
+  /* HEADER */
+  .identify-header {
+    display:flex; align-items:center;
+    background:var(--primary);
+    padding:1rem;
+    box-shadow:0 1px 4px var(--shadow);
+  }
+  .back-btn {
+    background:none; border:none;
+    font-size:1.5rem; cursor:pointer;
+    margin-right:1rem;
+  }
+  .identify-title {
+    font-size:1.25rem; font-weight:600;
+  }
+  
+  /* FORM */
+  .identify-container {
+    padding:1.5rem;
+    display:flex; justify-content:center;
+  }
+  .identify-form {
+    width:100%; max-width:360px;
+    background:var(--primary);
+    border-radius:8px;
+    box-shadow:0 2px 8px var(--shadow);
+    padding:1.5rem;
+  }
+  .identify-label {
+    display:block;
+    font-weight:500;
+    margin-bottom:4px;
+  }
+  .required { color:var(--secondary); }
+  
+  .identify-input {
+    width:100%;
+    padding:8px 12px;
+    margin-bottom:4px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    font-size:1rem;
+  }
+  .identify-input:focus {
+    outline:none; border-color:var(--secondary);
+  }
+  
+  .error-text {
+    color:#d02828;
+    font-size:0.85rem;
+    margin-bottom:0.75rem;
+  }
+  .hidden { display:none; }
+  
+  .identify-note {
+    font-style:italic;
+    font-size:0.85rem;
+    color:#666;
+    margin:0 0 1rem;
+  }
+  
+  .identify-submit {
+    width:100%;
+    padding:0.75rem;
+    background:var(--secondary);
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    font-weight:600;
+    cursor:pointer;
+    transition:background 0.2s;
+  }
+  .identify-submit:hover {
+    background:#b2763d;
+  }
+  
+  /* ORDERS SCREEN */
+  .orders-screen {
+    max-width:360px; margin:2rem auto;
+    background:var(--primary);
+    border-radius:8px;
+    box-shadow:0 2px 8px var(--shadow);
+  }
+  .orders-header {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:1rem; border-bottom:1px solid var(--border);
+  }
+  .orders-title { font-size:1.25rem; font-weight:600; }
+  .orders-close {
+    background:none; border:none;
+    font-size:1.25rem; cursor:pointer;
+  }
+  .orders-body {
+    overflow-y:auto; max-height:300px;
+  }
+  .orders-table {
+    width:100%; border-collapse:collapse;
+  }
+  .orders-table th,
+  .orders-table td {
+    padding:0.75rem 1rem;
+    border-bottom:1px solid var(--bg-light);
+  }
+  .orders-table th {
+    background:var(--bg-light); font-weight:600;
+  }
+  .orders-table td:nth-child(2) {
+    text-align:right;
+  }
+  .orders-table a {
+    font-size:0.85rem;
+    color:var(--secondary);
+    text-decoration:none;
+  }
+  /* ========== Ajuste de fonte do SweetAlert 1.x ========== */
+/* o texto principal fica dentro de <p class="lead"> */
+.sweet-alert .lead {
+    font-size: 0.9rem !important;
+    line-height: 1.4;
+    color: var(--text-dark) !important;
+  }
+  
+  /* opcional: pouco mais de espaçamento entre título e texto */
+  .sweet-alert h2 {
+    margin-bottom: 0.5em !important;
+  }
+  

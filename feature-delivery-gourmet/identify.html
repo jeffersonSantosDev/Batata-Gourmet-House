@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Identificação | Batata Gourmet House</title>
+  <link href="./css/identify.css" rel="stylesheet"/>
+  <!-- SweetAlert 1.x -->
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <script defer src="./js/identify..js"></script>
+</head>
+<body>
+
+  <!-- TELA DE IDENTIFICAÇÃO -->
+  <section id="identifyScreen" class="identify-screen">
+    <header class="identify-header">
+      <button class="back-btn" id="backBtn">←</button>
+      <h1 class="identify-title">Identificação</h1>
+    </header>
+    <main class="identify-container">
+      <form class="identify-form" id="identifyForm" novalidate>
+        <label for="whatsapp" class="identify-label">
+          Seu WhatsApp <span class="required">*</span>
+        </label>
+        <input
+          type="tel"
+          id="whatsapp"
+          class="identify-input"
+          placeholder="(00) 91234-5678"
+          inputmode="numeric"
+          pattern="\d*"
+        />
+        <p id="whatsappError" class="error-text hidden">
+          Digite um WhatsApp válido (10–11 dígitos).
+        </p>
+
+        <label for="name" class="identify-label">
+          Seu Nome <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="name"
+          class="identify-input"
+          placeholder="Ex: João Silva"
+        />
+        <p id="nameError" class="error-text hidden">
+          O nome deve ter ao menos 3 caracteres.
+        </p>
+
+        <p class="identify-note">
+          • Digite suas informações para um atendimento ágil e personalizado.
+        </p>
+
+        <button type="submit" class="identify-submit">
+          Avançar
+        </button>
+      </form>
+    </main>
+  </section>
+
+  <!-- TELA DE ÚLTIMOS PEDIDOS -->
+  <section id="ordersScreen" class="orders-screen hidden">
+    <header class="orders-header">
+      <h2 class="orders-title">Últimos Pedidos</h2>
+      <button id="closeOrders" class="orders-close">×</button>
+    </header>
+    <div class="orders-body">
+      <table class="orders-table">
+        <thead>
+          <tr><th>Data</th><th>Total</th><th></th></tr>
+        </thead>
+        <tbody id="ordersTable"></tbody>
+      </table>
+    </div>
+  </section>
+
+</body>
+</html>
