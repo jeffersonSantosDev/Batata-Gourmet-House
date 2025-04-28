@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Detalhe do Produto | Batata Gourmet House</title>
+  <!-- Fontes & Ícones -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  <!-- Seu CSS específico -->
+  <link rel="stylesheet" href="css/product-detail.css"/>
+  <!-- SweetAlert (opcional, para confirmações) -->
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <!-- Sua função global de identificação -->
+  <script defer src="js/utils.js"></script>
+  <script defer src="js/identify.js"></script>
+  <!-- Lógica desta página -->
+  <script defer src="js/product-detail.js"></script>
+
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="detail-header">
+    <button id="backBtn" class="back-btn">←</button>
+    <h1 id="detailTitle" class="detail-title">Produto</h1>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="detail-main">
+
+    <!-- ADICIONAIS -->
+    <section class="addons-section">
+      <div class="addons-header">
+        <h2>Adicionais</h2>
+        <span class="badge">Opcional</span>
+      </div>
+      <p class="addons-sub">Escolha até 3 opções</p>
+      <ul id="addonsList" class="addons-list"></ul>
+    </section>
+
+    <!-- DESCRIÇÃO E IMAGEM -->
+    <section class="product-info">
+      <img id="detailImage" class="product-img" src="imagens/itemCardapio.jpg" alt="Imagem do produto"/>
+      <p id="detailDesc" class="product-desc"></p>
+    </section>
+
+    <!-- OBSERVAÇÕES -->
+    <section class="notes-section">
+      <label for="notes">Observações</label>
+      <textarea id="notes" class="notes-input" placeholder="Ex.: Sem maionese..."></textarea>
+    </section>
+
+  </main>
+
+  <!-- FOOTER: quantidade + botão -->
+  <footer class="detail-footer">
+    <div class="qty-controls">
+      <button class="qty-btn" id="mainMinus">−</button>
+      <span id="mainQty" class="qty">1</span>
+      <button class="qty-btn" id="mainPlus">+</button>
+    </div>
+    <button id="addCartBtn" class="btn add-cart-btn">
+      Adicionar R$ <span id="finalPrice">0,00</span>
+    </button>
+  </footer>
+
+</body>
+</html>

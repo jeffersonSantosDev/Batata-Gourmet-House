@@ -6,7 +6,7 @@
   --info-green: #00cc44;
   --border: #e2e2e2;
   --bg-light: #f8f7f3;
-  --store-bg: rgb(245, 230, 211);
+  --store-bg: rgb(230, 212, 190);
   --btn-bg: #ffffff;
   --btn-hover: #f0f0f0;
   --shadow: rgba(0, 0, 0, 0.1);
@@ -374,4 +374,174 @@ body {
   .action-buttons .btn {
     flex: 1 1 0;
   }
+}
+
+ /* ===== Ajuste modal ===== */
+
+
+
+ /* ===== MODAL DE INFORMAÇÕES ===== */
+/* garante que o overlay e o container capturem TODAS as interações */
+#modal-overlay,
+#modal-container {
+  pointer-events: auto;
+  /* impede que um scroll “escape” para o fundo */
+  overscroll-behavior: contain;
+}
+
+/* (opcional para navegadores mais antigos) */
+#modal-overlay {
+  touch-action: none;
+}
+
+ #modal-overlay.hidden,
+ #modal-container.hidden {
+   display: none !important;
+ }
+ #modal-container {
+  display: flex;
+  /* … */
+}
+#modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 100;
+  pointer-events: auto;   
+}
+
+#modal-container {
+  position: fixed; inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 101;
+}
+
+#modal-content {
+  position: relative;
+  background: var(--bg-light);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  color: var(--text-dark);
+  text-align: center;
+}
+
+#modal-close {
+  position: absolute;
+  top: 0.5rem; right: 0.5rem;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-dark);
+}
+
+/* cabeçalhos dentro do modal */
+#modal-content h2 {
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+}
+#modal-content h3 {
+  margin: 1rem 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+/* lista de horários */
+#schedule-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+#schedule-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.95rem;
+}
+#schedule-list li:last-child {
+  border-bottom: none;
+}
+
+body.modal-open {
+  overflow: hidden;      /* bloqueia scroll vertical e horizontal */
+  height: 100vh;         /* impede quicadas na posição */
+}
+
+#modal-container,
+#modal-content {
+  overscroll-behavior: contain; /* captura todo overscroll dentro do modal */
+}
+
+/* ===== SCHEDULE MODAL ===== */
+#schedule-overlay.hidden,
+#schedule-container.hidden {
+  display: none !important;
+}
+
+#schedule-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 100;
+  pointer-events: auto;
+}
+
+#schedule-container {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 101;
+  overscroll-behavior: contain;
+}
+
+#schedule-content {
+  position: relative;
+  background: var(--bg-light);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  color: var(--text-dark);
+  text-align: center;
+}
+
+#schedule-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-dark);
+}
+
+#schedule-content h2 {
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+}
+
+#schedule-only-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+#schedule-only-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.95rem;
+}
+#schedule-only-list li:last-child {
+  border-bottom: none;
 }

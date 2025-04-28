@@ -53,13 +53,17 @@
     <div class="logo-wrapper">
       <img src="https://www.batatagourmethouse.com.br/imagens/logo.jpg" alt="Logo Batata Gourmet House" class="logo-hero" />
     </div>
-    <span class="status aberto">Aberto</span>
+    <span class="status aberto">
+      <i class="fas fa-store"></i> Aberto
+    </span>
     <div class="store-info">
       <h1>Batata Gourmet House</h1>
       <p class="tagline">Batatas recheadas!</p>
       <div class="ellipsis">…</div>
     </div>
   </div>
+
+ 
 
   <!-- AGORA o wrapper sticky está FORA do store-block -->
   <div class="search-category-wrapper">
@@ -105,10 +109,46 @@
     <i class="fas fa-shopping-cart"></i>
     <span id="cart-count">(0) Veja meu carrinho</span>
   </div>
-  <script src="js/utils.js"></script>
-  <script src="js/identify.js"></script>
-  <script src="js/script.js"></script>
+
   
 
+    <!-- ====== MODAL DE INFORMAÇÕES E HORÁRIOS ====== -->
+    <div id="modal-overlay" class="hidden"></div>
+
+    <div id="modal-container" class="hidden">
+      <div id="modal-content">
+        <button id="modal-close" aria-label="Fechar">&times;</button>
+        <h2>Informações da Loja</h2>
+        <p><strong>Batata Gourmet House</strong></p>
+        <p>Endereço:Melchior Giolla, 388 – SP</p>
+        <p>Telefone: (11) 98530-5905</p> 
+      </div>
+    </div>
+    <!-- ====== FIM DO MODAL ====== -->
+
+
+    <!-- ===== SCHEDULE MODAL (HORÁRIOS) ===== -->
+<div id="schedule-overlay" class="hidden"></div>
+
+<div id="schedule-container" class="hidden">
+  <div id="schedule-content">
+    <button id="schedule-close" aria-label="Fechar">&times;</button>
+    <h2>Horário de Funcionamento</h2>
+    <ul id="schedule-only-list">
+      <li><span>Segunda:</span>   <span>18:00 até 23:59</span></li>
+      <li><span>Terça:</span>     <span>18:00 até 23:59</span></li>
+      <li><span>Quarta:</span>    <span>18:00 até 23:59</span></li>
+      <li><span>Quinta:</span>    <span>18:00 até 23:59</span></li>
+      <li><span>Sexta:</span>     <span>18:00 até 23:59</span></li>
+      <li><span>Sábado:</span>    <span>18:00 até 23:59</span></li>
+      <li><span>Domingo:</span>   <span>18:00 até 23:59</span></li>
+    </ul>
+  </div>
+</div>
+<!-- ===== FIM SCHEDULE MODAL ===== -->
+
+    <script src="js/utils.js"></script>
+  <script src="js/identify.js"></script>
+  <script src="js/script.js"></script>
 </body>
 </html>

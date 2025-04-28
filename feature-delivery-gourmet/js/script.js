@@ -1,41 +1,136 @@
 // ——— DADOS ———
 const products = [
-  { id: 1, name: "Calabresa",           description: "Batata recheada de calabresa e mussarelaBatata recheada de calabresa e mussarela", price: 12.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
-  { id: 2, name: "Calabresa com Bacon", description: "Batata recheada de calabresa e bacon ",     price: 15.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
-  { id: 3, name: "Carne",               description: "Batata recheada de carne e mussarela",      price: 15.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
-  { id: 4, name: "Refrigerante",        description: "Refrigerante sabor cola 350ml",             price:  5.00, image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
-  { id: 5, name: "Água Mineral",        description: "Água mineral 500ml",                        price:  4.00, image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
-  { id: 6, name: "Brownie",             description: "Brownie de chocolate com nozes",             price:  8.00, image: "imagens/itemCardapio.jpg", typeMenu: "Sobremesas" },
-  { id: 7, name: "Batata + Refri",      description: "Combo Batata + Refrigerante",                price: 18.00, image: "imagens/itemCardapio.jpg", typeMenu: "Combos" },
+  { id: 1,  name: "Calabresa",                     description: "Batata recheada de calabresa e mussarela",                   price: 12.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
+  { id: 2,  name: "Calabresa com Bacon",           description: "Batata recheada de calabresa e bacon",                      price: 15.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
+  { id: 3,  name: "Carne",                         description: "Batata recheada de carne e mussarela",                       price: 15.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
+  { id: 4,  name: "Refrigerante",                  description: "Refrigerante sabor cola 350ml",                             price: 5.00,  image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
+  { id: 5,  name: "Água Mineral",                  description: "Água mineral 500ml",                                       price: 4.00,  image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
+  { id: 6,  name: "Brownie",                       description: "Brownie de chocolate com nozes",                            price: 8.00,  image: "imagens/itemCardapio.jpg", typeMenu: "Sobremesas" },
+  { id: 7,  name: "Batata + Refri",                description: "Combo Batata + Refrigerante",                               price: 18.00, image: "imagens/itemCardapio.jpg", typeMenu: "Combos" },
+  // 30 produtos adicionais
+  { id: 8,  name: "Batata Napolitana",             description: "Batata com molho de tomate, mussarela e orégano",           price: 17.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
+  { id: 9,  name: "Batata Parmesão",               description: "Batata com mussarela, parmesão e bacon crocante",           price: 18.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
+  { id: 10, name: "Batata Mexicana",               description: "Batata com carne temperada, cheddar e jalapeños",           price: 19.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
+  { id: 11, name: "Frango com Catupiry",           description: "Batata recheada de frango desfiado e catupiry",             price: 16.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
+  { id: 12, name: "Quatro Queijos",                description: "Batata com mussarela, gorgonzola, provolone e parmesão",    price: 20.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
+  { id: 13, name: "Calabresa Picante",             description: "Batata com calabresa, pimenta biquinho e queijo",           price: 17.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
+  { id: 14, name: "Batata à Portuguesa",           description: "Batata com presunto, ervilha, ovo de codorna e mussarela",  price: 18.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
+  { id: 15, name: "Batata Vegetariana",            description: "Batata com mix de legumes assados e queijo vegetal",         price: 16.50, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
+  { id: 16, name: "Batata Trufada",                description: "Batata com creme de trufa e lascas de parmesão",             price: 23.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
+  { id: 17, name: "Batata Mediterrânea",           description: "Batata com azeitonas, tomate seco e rúcula fresca",         price: 19.50, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
+  { id: 18, name: "Batata BBQ",                    description: "Batata com pulled chicken ao molho barbecue e cheddar",      price: 21.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
+  { id: 19, name: "Batata Carbonara",              description: "Batata com bacon, ovo pochê e parmesão",                     price: 20.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
+  { id: 20, name: "Batata Mexidinha",              description: "Batata com ovos mexidos, bacon e queijo derretido",         price: 18.50, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
+  { id: 21, name: "Suco de Laranja Natural",       description: "Suco espremido na hora, sem adição de açúcar",              price: 6.00,  image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
+  { id: 22, name: "Suco de Abacaxi com Hortelã",   description: "Suco refrescante de abacaxi batido com folhas de hortelã",  price: 7.00,  image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
+  { id: 23, name: "Limonada Siciliana",           description: "Limonada rosa com limão siciliano e toque de framboesa",    price: 6.50,  image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
+  { id: 24, name: "Chá Gelado de Pêssego",         description: "Chá preto gelado com pedacinhos de pêssego",                price: 5.50,  image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
+  { id: 25, name: "Refrigerante Dieta",            description: "Versão zero açúcar do refrigerante sabor cola 350ml",        price: 5.00,  image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
+  { id: 26, name: "Água com Gás",                  description: "Água mineral com gás 500ml",                                price: 5.00,  image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
+  { id: 27, name: "Cerveja Pilsen 350ml",          description: "Cerveja leve estilo pilsen, gelada e refrescante",          price: 8.00,  image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
+  { id: 28, name: "Cerveja Artesanal IPA 350ml",   description: "Cerveja artesanal India Pale Ale, sabor intenso",           price: 12.00, image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
+  { id: 29, name: "Vitamina de Morango",          description: "Leite batido com morangos frescos e mel",                   price: 9.00,  image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
+  { id: 30, name: "Milkshake de Ovomaltine",       description: "Milkshake cremoso com achocolatado Ovomaltine",             price: 12.00, image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
+  { id: 31, name: "Brownie com Sorvete",           description: "Brownie quentinho servido com bola de sorvete de creme",    price: 14.00, image: "imagens/itemCardapio.jpg", typeMenu: "Sobremesas" },
+  { id: 32, name: "Petit Gateau",                  description: "Bolinho de chocolate com recheio cremoso e sorvete",        price: 16.00, image: "imagens/itemCardapio.jpg", typeMenu: "Sobremesas" },
+  { id: 33, name: "Cheesecake de Frutas Vermelhas",description: "Cheesecake cremoso com calda de frutas vermelhas",          price: 15.00, image: "imagens/itemCardapio.jpg", typeMenu: "Sobremesas" },
+  { id: 34, name: "Torta de Limão",                description: "Torta com massa crocante e recheio de creme de limão",      price: 13.00, image: "imagens/itemCardapio.jpg", typeMenu: "Sobremesas" },
+  { id: 35, name: "Mousse de Maracujá",            description: "Mousse aerado de maracujá com calda ácida",                 price: 12.00, image: "imagens/itemCardapio.jpg", typeMenu: "Sobremesas" },
+  { id: 36, name: "Combo Família",                 description: "3 batatas à escolha + 4 refrigerantes",                    price: 55.00, image: "imagens/itemCardapio.jpg", typeMenu: "Combos" },
+  { id: 37, name: "Combo Casal",                   description: "2 batatas à escolha + 2 bebidas",                          price: 40.00, image: "imagens/itemCardapio.jpg", typeMenu: "Combos" }
 ];
+
 
 // estado
 let currentCategory = "Todos";
-let currentSearch   = "";
+let currentSearch = "";
 
 // refs
 const productsContainer = document.getElementById("products-container");
-const searchInput       = document.querySelector(".search-input");
-const categoryItems     = document.querySelectorAll("#category-nav-list li");
-const ordersBtn   = document.querySelector(".btn.orders");
-const scheduleBtn = document.querySelector(".btn.info");
+const searchInput = document.querySelector(".search-input");
+const categoryItems = document.querySelectorAll("#category-nav-list li");
+const ordersBtn = document.querySelector(".btn.orders");
+const scheduleBtnTaxaTempo = document.querySelector(".btn.info");
+
+document.addEventListener('DOMContentLoaded', () => {
+  const ellipsis = document.querySelector('.ellipsis');
+  const overlay   = document.getElementById('modal-overlay');
+  const modal     = document.getElementById('modal-container');
+  const closeBtn  = document.getElementById('modal-close');
+  const content   = document.getElementById('modal-content');
+
+  function openModal() {
+    overlay.classList.remove('hidden');
+    modal.classList.remove('hidden');
+    document.body.classList.add('modal-open');  // <— trava scroll de fundo
+  }
+
+  function closeModal() {
+    overlay.classList.add('hidden');
+    modal.classList.add('hidden');
+    document.body.classList.remove('modal-open'); // <— libera scroll
+  }
+
+  closeModal();
+  ellipsis.addEventListener('click', openModal);
+  overlay  .addEventListener('click', closeModal);
+  closeBtn .addEventListener('click', closeModal);
+  content  .addEventListener('click', e => e.stopPropagation());
+});
+
 
 // init
 document.addEventListener("DOMContentLoaded", () => {
+
+
+  // ===== CONTROLE DO SCHEDULE MODAL =====
+  const storeBadge      = document.querySelector('.status.aberto');
+  const schOverlay      = document.getElementById('schedule-overlay');
+  const schContainer    = document.getElementById('schedule-container');
+  const schCloseBtn     = document.getElementById('schedule-close');
+  const schContent      = document.getElementById('schedule-content');
+
+  function openScheduleModal() {
+    schOverlay.classList.remove('hidden');
+    schContainer.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+  }
+  function closeScheduleModal() {
+    schOverlay.classList.add('hidden');
+    schContainer.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+  }
+
+  // dispara ao clicar no badge de “Aberto”
+  storeBadge.addEventListener('click', openScheduleModal);
+
+  // fecha ao clicar no overlay ou no “×”
+  schOverlay .addEventListener('click', closeScheduleModal);
+  schCloseBtn.addEventListener('click', closeScheduleModal);
+
+  // impede clique interno de fechar
+  schContent.addEventListener('click', e => e.stopPropagation());
+
+
+
+  // modal loja aberta fechada
+
+
+ 
   // “Meus Pedidos”
   ordersBtn.addEventListener("click", () => {
-        // chama a função global do identify.js
-        if (window.identifyUser()) {
-          openOrdersModal();
-        }
-      });
+    // chama a função global do identify.js
+    if (window.identifyUser()) {
+      openOrdersModal();
+    }
+  });
 
-      
-      scheduleBtn.addEventListener("click", () => {      
-        if (window.identifyUser()) {      
-          openScheduleModal();      
-          }      
-        });
+
+  scheduleBtnTaxaTempo.addEventListener("click", () => {
+    if (window.identifyUser()) {
+      openActivityAddress();
+    }
+  });
 
   // categorias
   categoryItems.forEach(li => {
@@ -71,19 +166,19 @@ function openOrdersModal() {
 /**
  * Abre a tela/modal de Tempo & Taxa
  */
-function openScheduleModal() {
+function openActivityAddress() {
   window.location.href = "edit-address.html"
 }
 
-  
- 
+
+
 
 function renderProducts() {
   productsContainer.innerHTML = "";
   const filtered = products.filter(p => {
-    const matchCat  = currentCategory === "Todos" || p.typeMenu === currentCategory;
+    const matchCat = currentCategory === "Todos" || p.typeMenu === currentCategory;
     const matchText = p.name.toLowerCase().includes(currentSearch)
-                   || p.description.toLowerCase().includes(currentSearch);
+      || p.description.toLowerCase().includes(currentSearch);
     return matchCat && matchText;
   });
 
@@ -120,6 +215,11 @@ function renderProducts() {
         </div>
         <img src="${prod.image}" alt="${prod.name}" class="product-image"/>
       `;
+      card.setAttribute("data-id", prod.id);
+      // quando clicar no card, vai para a página de detalhe
+      card.addEventListener("click", () => {
+        window.location.href = `product-detail.html?id=${prod.id}`;
+      });
       list.appendChild(card);
     });
 
@@ -127,3 +227,9 @@ function renderProducts() {
     productsContainer.appendChild(bloco);
   });
 }
+
+
+  
+
+
+

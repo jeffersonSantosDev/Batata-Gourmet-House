@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batata Gourmet House - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f7f3;
+        }
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        .status-received {
+            background-color: #e2e2e2;
+            color: #2c3e50;
+        }
+        .status-preparing {
+            background-color: #f39c12;
+            color: white;
+        }
+        .status-on-the-way {
+            background-color: #d28b4b;
+            color: white;
+        }
+        .status-delivered {
+            background-color: #2ecc71;
+            color: white;
+        }
+        .card-shadow {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .input-focus:focus {
+            border-color: #d28b4b;
+            box-shadow: 0 0 0 1px #d28b4b;
+        }
+    </style>
+</head>
+<body class="text-[#2c3e50]">
+    <!-- Login Page -->
+    <div id="login-page" class="min-h-screen flex items-center justify-center bg-[#f8f7f3]">
+        <div class="w-full max-w-md p-8 space-y-8 bg-white rounded-lg card-shadow">
+            <div class="text-center">
+                <img src="imagens/logo_boot.png" alt="Batata Gourmet House" class="mx-auto h-12">
+                <h2 class="mt-6 text-2xl font-bold">Painel Administrativo</h2>
+            </div>
+            <form class="mt-8 space-y-6" id="login-form">
+                <div class="rounded-md shadow-sm space-y-4">
+                    <div>
+                        <label for="email" class="sr-only">E-mail</label>
+                        <input id="email" name="email" type="email" autocomplete="email" required 
+                            class="relative block w-full px-3 py-2 border border-[#e2e2e2] rounded-md input-focus placeholder-gray-400 focus:outline-none"
+                            placeholder="E-mail">
+                    </div>
+                    <div>
+                        <label for="password" class="sr-only">Senha</label>
+                        <input id="password" name="password" type="password" autocomplete="current-password" required 
+                            class="relative block w-full px-3 py-2 border border-[#e2e2e2] rounded-md input-focus placeholder-gray-400 focus:outline-none"
+                            placeholder="Senha">
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit" 
+                            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#d28b4b] hover:bg-[#b8773a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#d28b4b]">
+                        Entrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="hidden min-h-screen">
+        <!-- Mobile Header -->
+        <div class="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white shadow-sm p-4 flex justify-between items-center">
+            <button id="mobile-menu-button" class="text-[#2c3e50]">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <img src="imagens/logo_boot.png" alt="Batata Gourmet House" class="h-8">
+            <div class="w-6"></div> <!-- Spacer for alignment -->
+        </div>
+
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar fixed top-0 left-0 bottom-0 z-30 w-64 bg-white shadow-lg transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+            <div class="flex items-center justify-center h-16 px-4 border-b border-[#e2e2e2]">
+                <img src="imagens/logo_boot.png" alt="Batata Gourmet House" class="h-10">
+            </div>
+            <div class="p-4">
+                <div class="flex items-center p-3 bg-[#f8f7f3] rounded-lg">
+                    <div class="w-10 h-10 rounded-full bg-[#d28b4b] flex items-center justify-center text-white">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium">Admin</p>
+                        <p class="text-xs text-gray-500">admin@batatagourmet.com</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="mt-2 px-2">
+                <a href="#" class="dashboard-link flex items-center p-3 text-sm font-medium rounded-lg hover:bg-[#f8f7f3] text-[#d28b4b] bg-[#f8f7f3]">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    Dashboard
+                </a>
+                <a href="#" class="orders-link flex items-center p-3 text-sm font-medium rounded-lg hover:bg-[#f8f7f3] text-[#2c3e50]">
+                    <i class="fas fa-shopping-bag mr-3"></i>
+                    Pedidos
+                </a>
+                <a href="#" class="products-link flex items-center p-3 text-sm font-medium rounded-lg hover:bg-[#f8f7f3] text-[#2c3e50]">
+                    <i class="fas fa-utensils mr-3"></i>
+                    Produtos
+                </a>
+                <a href="#" class="categories-link flex items-center p-3 text-sm font-medium rounded-lg hover:bg-[#f8f7f3] text-[#2c3e50]">
+                    <i class="fas fa-tags mr-3"></i>
+                    Categorias
+                </a>
+                <a href="#" class="users-link flex items-center p-3 text-sm font-medium rounded-lg hover:bg-[#f8f7f3] text-[#2c3e50]">
+                    <i class="fas fa-users mr-3"></i>
+                    Clientes
+                </a>
+                <a href="#" class="addresses-link flex items-center p-3 text-sm font-medium rounded-lg hover:bg-[#f8f7f3] text-[#2c3e50]">
+                    <i class="fas fa-map-marker-alt mr-3"></i>
+                    Endereços
+                </a>
+                <a href="#" class="reports-link flex items-center p-3 text-sm font-medium rounded-lg hover:bg-[#f8f7f3] text-[#2c3e50]">
+                    <i class="fas fa-chart-bar mr-3"></i>
+                    Relatórios
+                </a>
+                <a href="#" class="settings-link flex items-center p-3 text-sm font-medium rounded-lg hover:bg-[#f8f7f3] text-[#2c3e50]">
+                    <i class="fas fa-cog mr-3"></i>
+                    Configurações
+                </a>
+            </nav>
+            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-[#e2e2e2]">
+                <button id="logout-button" class="w-full flex items-center justify-center p-2 text-sm font-medium rounded-lg hover:bg-[#f8f7f3] text-[#2c3e50]">
+                    <i class="fas fa-sign-out-alt mr-2"></i>
+                    Sair
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="lg:ml-64">
+            <!-- Top Navigation -->
+            <header class="hidden lg:block bg-white shadow-sm">
+                <div class="flex items-center justify-between px-6 py-4">
+                    <h1 class="text-xl font-bold">Dashboard</h1>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <button class="p-2 rounded-full hover:bg-[#f8f7f3]">
+                                <i class="fas fa-bell text-[#2c3e50]"></i>
+                                <span class="absolute top-0 right-0 w-2 h-2 bg-[#2ecc71] rounded-full"></span>
+                            </button>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-[#d28b4b] flex items-center justify-center text-white">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <span class="ml-2 text-sm font-medium">Admin</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <main class="pt-16 lg:pt-0 px-4 pb-6">
+                <!-- Dashboard Page -->
+                <div id="dashboard-page" class="space-y-6">
+                    <!-- KPI Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-white p-6 rounded-lg card-shadow">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500">Pedidos Hoje</p>
+                                    <p class="text-2xl font-bold mt-1">24</p>
+                                </div>
+                                <div class="p-3 rounded-full bg-[#f8f7f3] text-[#d28b4b]">
+                                    <i class="fas fa-shopping-bag text-xl"></i>
+                                </div>
+                            </div>
+                            <p class="text-xs text-[#2ecc71] mt-2">+12% em relação a ontem</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg card-shadow">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500">Receita Total</p>
+                                    <p class="text-2xl font-bold mt-1">R$ 1.245,80</p>
+                                </div>
+                                <div class="p-3 rounded-full bg-[#f8f7f3] text-[#2ecc71]">
+                                    <i class="fas fa-dollar-sign text-xl"></i>
+                                </div>
+                            </div>
+                            <p class="text-xs text-[#2ecc71] mt-2">+8% em relação a ontem</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg card-shadow">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500">Pedidos em Aberto</p>
+                                    <p class="text-2xl font-bold mt-1">8</p>
+                                </div>
+                                <div class="p-3 rounded-full bg-[#f8f7f3] text-[#f39c12]">
+                                    <i class="fas fa-clock text-xl"></i>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2">2 em preparo, 6 recebidos</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg card-shadow">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500">Clientes Cadastrados</p>
+                                    <p class="text-2xl font-bold mt-1">156</p>
+                                </div>
+                                <div class="p-3 rounded-full bg-[#f8f7f3] text-[#2c3e50]">
+                                    <i class="fas fa-users text-xl"></i>
+                                </div>
+                            </div>
+                            <p class="text-xs text-[#2ecc71] mt-2">+5 novos esta semana</p>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-lg card-shadow">
+                            <h3 class="font-bold mb-4">Vendas por Categoria (7 dias)</h3>
+                            <canvas id="categoryChart" height="250"></canvas>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg card-shadow">
+                            <h3 class="font-bold mb-4">Evolução de Receitas (30 dias)</h3>
+                            <canvas id="revenueChart" height="250"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Recent Orders -->
+                    <div class="bg-white rounded-lg card-shadow overflow-hidden">
+                        <div class="p-6 border-b border-[#e2e2e2]">
+                            <h3 class="font-bold">Pedidos Recentes</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-[#e2e2e2]">
+                                <thead class="bg-[#f8f7f3]">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Pedido</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Cliente</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Total</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-[#e2e2e2]">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium">#BGH-2023-0015</div>
+                                            <div class="text-xs text-gray-500">10/06/2023 19:30</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium">João Silva</div>
+                                            <div class="text-xs text-gray-500">(11) 98765-4321</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 py-1 text-xs rounded-full status-delivered">Entregue</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">R$ 42,90</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <button class="text-[#d28b4b] hover:text-[#b8773a] mr-2">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="text-gray-500 hover:text-gray-700">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium">#BGH-2023-0014</div>
+                                            <div class="text-xs text-gray-500">10/06/2023 18:45</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium">Maria Souza</div>
+                                            <div class="text-xs text-gray-500">(11) 91234-5678</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 py-1 text-xs rounded-full status-on-the-way">Saiu para entrega</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">R$ 38,50</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <button class="text-[#d28b4b] hover:text-[#b8773a] mr-2">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="text-gray-500 hover:text-gray-700">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium">#BGH-2023-0013</div>
+                                            <div class="text-xs text-gray-500">10/06/2023 17:20</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium">Carlos Oliveira</div>
+                                            <div class="text-xs text-gray-500">(11) 99876-5432</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 py-1 text-xs rounded-full status-preparing">Em preparo</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">R$ 55,80</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <button class="text-[#d28b4b] hover:text-[#b8773a] mr-2">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="text-gray-500 hover:text-gray-700">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium">#BGH-2023-0012</div>
+                                            <div class="text-xs text-gray-500">10/06/2023 16:10</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium">Ana Santos</div>
+                                            <div class="text-xs text-gray-500">(11) 98765-1234</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 py-1 text-xs rounded-full status-received">Recebido</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">R$ 29,90</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <button class="text-[#d28b4b] hover:text-[#b8773a] mr-2">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="text-gray-500 hover:text-gray-700">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium">#BGH-2023-0011</div>
+                                            <div class="text-xs text-gray-500">10/06/2023 15:30</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium">Pedro Costa</div>
+                                            <div class="text-xs text-gray-500">(11) 91234-8765</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 py-1 text-xs rounded-full status-delivered">Entregue</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">R$ 47,50</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <button class="text-[#d28b4b] hover:text-[#b8773a] mr-2">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="text-gray-500 hover:text-gray-700">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="px-6 py-3 bg-[#f8f7f3] text-right">
+                            <button class="text-sm font-medium text-[#d28b4b] hover:text-[#b8773a]">
+                                Ver todos os pedidos
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders Page (Hidden by default) -->
+                <div id="orders-page" class="hidden">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                        <h2 class="text-xl font-bold mb-4 md:mb-0">Gestão de Pedidos</h2>
+                        <div class="flex space-x-2">
+                            <div class="relative">
+                                <input type="text" placeholder="Buscar pedido..." class="pl-10 pr-4 py-2 border border-[#e2e2e2] rounded-lg input-focus focus:outline-none">
+                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                            </div>
+                            <select class="border border-[#e2e2e2] rounded-lg px-4 py-2 input-focus focus:outline-none">
+                                <option>Todos status</option>
+                                <option>Recebido</option>
+                                <option>Em preparo</option>
+                                <option>Saiu para entrega</option>
+                                <option>Entregue</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg card-shadow overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-[#e2e2e2]">
+                                <thead class="bg-[#f8f7f3]">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Pedido</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Cliente</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Endereço</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Data/Hora</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Total</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-[#e2e2e2]">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-[#d28b4b]">#BGH-2023-0015</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium">João Silva</div>
+                                            <div class="text-xs text-gray-500">(11) 98765-4321</div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="text-sm">Vila Mariana, SP</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm">10/06/2023</div>
+                                            <div class="text-xs text-gray-500">19:30</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 py-1 text-xs rounded-full status-delivered">Entregue</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">R$ 42,90</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <button class="text-[#d28b4b] hover:text-[#b8773a] mr-2">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="text-gray-500 hover:text-gray-700">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <!-- More rows would be here in a real application -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="px-6 py-3 bg-[#f8f7f3] flex items-center justify-between">
+                            <div class="text-sm text-gray-500">
+                                Mostrando 1 a 10 de 25 pedidos
+                            </div>
+                            <div class="flex space-x-1">
+                                <button class="px-3 py-1 border border-[#e2e2e2] rounded bg-white text-sm">Anterior</button>
+                                <button class="px-3 py-1 border border-[#e2e2e2] rounded bg-[#d28b4b] text-white text-sm">1</button>
+                                <button class="px-3 py-1 border border-[#e2e2e2] rounded bg-white text-sm">2</button>
+                                <button class="px-3 py-1 border border-[#e2e2e2] rounded bg-white text-sm">3</button>
+                                <button class="px-3 py-1 border border-[#e2e2e2] rounded bg-white text-sm">Próximo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Page (Hidden by default) -->
+                <div id="products-page" class="hidden">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                        <h2 class="text-xl font-bold mb-4 md:mb-0">Gestão de Produtos</h2>
+                        <div class="flex space-x-2">
+                            <div class="relative">
+                                <input type="text" placeholder="Buscar produto..." class="pl-10 pr-4 py-2 border border-[#e2e2e2] rounded-lg input-focus focus:outline-none">
+                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                            </div>
+                            <button class="bg-[#d28b4b] hover:bg-[#b8773a] text-white px-4 py-2 rounded-lg flex items-center">
+                                <i class="fas fa-plus mr-2"></i>
+                                Novo Produto
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg card-shadow overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-[#e2e2e2]">
+                                <thead class="bg-[#f8f7f3]">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Imagem</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Nome</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Categoria</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Preço</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-[#e2e2e2]">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="w-10 h-10 rounded-md bg-gray-200 overflow-hidden">
+                                                <img src="https://via.placeholder.com/100x100.png?text=Batata" alt="Produto" class="w-full h-full object-cover">
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="text-sm font-medium">Batata Recheada Frango Catupiry</div>
+                                            <div class="text-xs text-gray-500 truncate max-w-xs">Batata assada recheada com frango desfiado e catupiry</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm">Salgadas</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">R$ 22,90</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 py-1 text-xs rounded-full bg-[#2ecc71] text-white">Ativo</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <button class="text-[#d28b4b] hover:text-[#b8773a] mr-2">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-red-500 hover:text-red-700">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <!-- More rows would be here in a real application -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="px-6 py-3 bg-[#f8f7f3] flex items-center justify-between">
+                            <div class="text-sm text-gray-500">
+                                Mostrando 1 a 10 de 15 produtos
+                            </div>
+                            <div class="flex space-x-1">
+                                <button class="px-3 py-1 border border-[#e2e2e2] rounded bg-white text-sm">Anterior</button>
+                                <button class="px-3 py-1 border border-[#e2e2e2] rounded bg-[#d28b4b] text-white text-sm">1</button>
+                                <button class="px-3 py-1 border border-[#e2e2e2] rounded bg-white text-sm">2</button>
+                                <button class="px-3 py-1 border border-[#e2e2e2] rounded bg-white text-sm">Próximo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other pages would be here (Categories, Users, Addresses, Reports, Settings) -->
+                <!-- For brevity, they're not included in this example but would follow the same pattern -->
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Toggle mobile menu
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        });
+
+        // Simulate login
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            document.getElementById('login-page').classList.add('hidden');
+            document.getElementById('admin-dashboard').classList.remove('hidden');
+            initializeCharts();
+        });
+
+        // Logout
+        document.getElementById('logout-button').addEventListener('click', function() {
+            document.getElementById('login-page').classList.remove('hidden');
+            document.getElementById('admin-dashboard').classList.add('hidden');
+        });
+
+        // Navigation links
+        const navLinks = document.querySelectorAll('nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all links
+                navLinks.forEach(l => l.classList.remove('text-[#d28b4b]', 'bg-[#f8f7f3]'));
+                
+                // Add active class to clicked link
+                this.classList.add('text-[#d28b4b]', 'bg-[#f8f7f3]');
+                
+                // Hide all pages
+                document.querySelectorAll('main > div').forEach(page => {
+                    page.classList.add('hidden');
+                });
+                
+                // Show the corresponding page
+                const pageId = this.className.split(' ')[0].replace('-link', '-page');
+                document.getElementById(pageId).classList.remove('hidden');
+            });
+        });
+
+        // Initialize charts
+        function initializeCharts() {
+            // Category Chart
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            const categoryChart = new Chart(categoryCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Salgadas', 'Doces', 'Especiais', 'Vegetarianas'],
+                    datasets: [{
+                        label: 'Vendas',
+                        data: [45, 30, 15, 10],
+                        backgroundColor: [
+                            '#d28b4b',
+                            '#2ecc71',
+                            '#3498db',
+                            '#9b59b6'
+                        ],
+                        borderColor: [
+                            '#b8773a',
+                            '#27ae60',
+                            '#2980b9',
+                            '#8e44ad'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Revenue Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            const revenueChart = new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1 Jun', '5 Jun', '10 Jun', '15 Jun', '20 Jun', '25 Jun', '30 Jun'],
+                    datasets: [{
+                        label: 'Receita (R$)',
+                        data: [1200, 1900, 1500, 2000, 1800, 2500, 2200],
+                        fill: false,
+                        backgroundColor: '#d28b4b',
+                        borderColor: '#d28b4b',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
