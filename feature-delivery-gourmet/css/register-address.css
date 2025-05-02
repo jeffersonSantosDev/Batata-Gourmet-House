@@ -30,29 +30,42 @@ body {
 
 /* HEADER */
 .address-header {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  grid-template-rows: auto auto;
+  align-items: center;
   background: var(--primary);
   padding: 1rem;
   box-shadow: 0 1px 4px var(--shadow);
 }
+
 .address-header .back-btn {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  justify-self: start;
   background: none;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
   color: var(--text-dark);
-  margin-bottom: 0.5rem;
 }
+
 .address-header .back-btn:hover {
   color: var(--secondary);
 }
+
 .address-header .address-title {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
   font-size: 1.25rem;
   font-weight: 600;
-  margin-bottom: 0.25rem;
 }
+
 .address-header .address-subtitle {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: center;
   font-size: 0.9rem;
   color: #666;
 }
