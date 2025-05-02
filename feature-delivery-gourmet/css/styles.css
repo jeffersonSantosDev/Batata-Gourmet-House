@@ -27,35 +27,34 @@ body {
 
 /* HERO */
 .hero {
-  width: 100%;
-  height: 200px;      /* ou o que você precisar */
-  overflow: hidden;   /* oculta tudo que sair do "container" */
+  width: 100vw;
+  max-width: 100%;
+  height: 200px;
+  margin-left: calc(-50vw + 50%);
+  overflow: hidden;
 }
-
 .hero img {
   width: 100%;
   height: 100%;
-  object-fit: cover;  /* faz a imagem cobrir toda a área, cortando o excesso */
-  display: block;     /* remove gap de linha em alguns navegadores */
+  object-fit: cover;
+  display: block;
 }
 
 /* STORE INFO */
 .store-block {
   position: relative;
   background: var(--store-bg);
-  margin: -60px 1rem 0;
-  padding-top: 80px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px var(--shadow);
+  margin: -78px 0 0;
+  padding: 50px 1rem 1rem;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 -9px 6px var(--shadow);
 }
-
 .logo-wrapper {
   position: absolute;
   top: 0;
   left: 50%;
   transform: translate(-50%, -50%);
 }
-
 .logo-hero {
   width: 120px;
   height: 120px;
@@ -65,7 +64,6 @@ body {
   background: var(--primary);
   box-shadow: 0 4px 12px var(--shadow);
 }
-
 .status {
   position: absolute;
   top: 16px;
@@ -75,32 +73,25 @@ body {
   font-size: 0.8rem;
   font-weight: 600;
 }
-
 .status.aberto {
   background: var(--highlight);
   color: #fff;
 }
-
 .status.fechado {
-  background: #e53e3e; /* vermelho */
+  background: #e53e3e;
   color: #fff;
 }
-
-
 .store-info {
   text-align: center;
   margin-top: 8px;
 }
-
 .store-info h1 {
   font-size: 1.75rem;
 }
-
 .store-info .tagline {
   font-size: 1rem;
   color: #555;
 }
-
 .ellipsis {
   text-align: center;
   font-size: 1.5rem;
@@ -125,13 +116,11 @@ body {
   gap: 1rem;
   padding: 1rem 1rem;
 }
-
 .search-bar {
   position: relative;
   width: 100%;
   max-width: 400px;
 }
-
 .search-bar i {
   position: absolute;
   top: 50%;
@@ -139,7 +128,6 @@ body {
   transform: translateY(-50%);
   color: #aaa;
 }
-
 .search-input {
   width: 100%;
   padding: 8px 12px 8px 36px;
@@ -147,23 +135,15 @@ body {
   border-radius: 6px;
   background: var(--btn-bg);
 }
-
 .search-input::placeholder {
   color: #999;
 }
-
 .action-buttons {
   display: flex;
   gap: 0.5rem;
   width: 100%;
   max-width: 400px;
 }
-
-.action-buttons .btn {
-  flex: 1;
-  justify-content: center;
-}
-
 .btn {
   display: flex;
   align-items: center;
@@ -177,11 +157,9 @@ body {
   cursor: pointer;
   transition: background 0.2s;
 }
-
 .btn i {
   font-size: 1.1rem;
 }
-
 .btn:hover {
   background: var(--btn-hover);
 }
@@ -191,7 +169,6 @@ body {
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
-
 .category-nav ul {
   display: flex;
   gap: 1rem;
@@ -199,13 +176,11 @@ body {
   padding: 0.5rem 1rem;
   overflow-x: auto;
   white-space: nowrap;
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
 }
-
 .category-nav ul::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
+  display: none;
 }
-
 .category-nav li {
   position: relative;
   padding: 0.5rem 0;
@@ -214,7 +189,6 @@ body {
   color: var(--text-dark);
   transition: color 0.2s;
 }
-
 .category-nav li::after {
   content: "";
   position: absolute;
@@ -225,28 +199,24 @@ body {
   background: transparent;
   transition: background 0.2s;
 }
-
 .category-nav li.active,
 .category-nav li:hover {
   color: var(--secondary);
 }
-
 .category-nav li.active::after,
 .category-nav li:hover::after {
   background: var(--secondary);
 }
 
-/* PRODUTOS (LISTAGEM) */
+/* PRODUTOS */
 .products-section {
   max-width: 1024px;
   margin: 2rem auto;
   padding: 0 1rem;
 }
-
 .category-block {
   margin-bottom: 2rem;
 }
-
 .category-title {
   display: flex;
   align-items: center;
@@ -255,35 +225,43 @@ body {
   font-weight: 700;
   color: var(--secondary);
 }
-
 .category-title::before {
   content: "▶";
 }
 
-.category-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+/* GRID 2 colunas NO DESKTOP */
+@media (min-width: 769px) {
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+/* MOBILE 1 coluna */
+@media (max-width: 768px) {
+  .category-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
 }
 
-/* === CARD & IMAGEM (MULTILINE ELLIPSIS) === */
+/* CARD */
 .product-card {
   display: flex;
   justify-content: space-between;
-  align-items: stretch; /* imagem preenche altura total */
+  align-items: stretch;
   background: var(--primary);
   border-radius: 12px;
-  overflow: hidden; /* recorta cantos */
+  overflow: hidden;
   box-shadow: 0 2px 8px var(--shadow);
   transition: transform 0.2s, box-shadow 0.2s;
   height: 125px; 
 }
-
 .product-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px var(--shadow);
 }
-
 .product-details {
   flex: 1;
   padding: 1rem;
@@ -291,33 +269,25 @@ body {
   flex-direction: column;
   justify-content: space-between;
 }
-
 .product-name {
   font-weight: 600;
-  margin-bottom: 4px;
 }
-
 .product-description {
   font-size: 0.9rem;
   color: #666;
-  /* multiline ellipsis */
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2; /* até 2 linhas */
+  -webkit-line-clamp: 2;
   overflow: hidden;
-  margin-bottom: 8px;
 }
-
 .product-price {
   color: var(--info-green);
   font-weight: 700;
 }
-
 .product-image {
   width: 120px;
-  height: 100%; /* cobre toda a altura do card */
+  height: 100%;
   object-fit: cover;
-  /* sem border-radius próprio */
 }
 
 /* CART BAR */
@@ -336,94 +306,21 @@ body {
   z-index: 10;
 }
 
-/* RESPONSIVO */
-@media (max-width: 768px) {
-  .hero {
-    height: 150px;
-  }
-  .store-block {
-    margin: -30px 0 0;
-    padding-top: 50px;
-    border-radius: 12px 12px 0 0;
-  }
-  .search-nav {
-    gap: 0.5rem;
-  }
-
-  /* Ajustes de tipografia nos cards */
-  .product-name {
-    font-size: 1rem;
-  }
-  .product-description {
-    font-size: 0.8rem;
-  }
-  .product-price {
-    font-size: 0.9rem;
-  }
-
-  /* Mantém as categorias com padding reduzido */
-  .category-nav ul {
-    padding: 0 0.4rem;
-  }
-
-  /* ===== Ajuste dos botões ===== */
-  .action-buttons {
-    display: flex;
-    flex-wrap: nowrap;       /* nunca quebra linha */
-    gap: 0.5rem;
-    width: 100%;
-    max-width: 400px;        /* ou o valor que você já usa */
-    margin: 0 auto;
-  }
-
-  /* Cada botão ocupa metade do espaço */
-  .action-buttons .btn {
-    flex: 1 1 0;
-  }
-}
-
- /* ===== Ajuste modal ===== */
-
-
-
- /* ===== MODAL DE INFORMAÇÕES ===== */
-/* garante que o overlay e o container capturem TODAS as interações */
-#modal-overlay,
-#modal-container {
-  pointer-events: auto;
-  /* impede que um scroll “escape” para o fundo */
-  overscroll-behavior: contain;
-}
-
-/* (opcional para navegadores mais antigos) */
-#modal-overlay {
-  touch-action: none;
-}
-
- #modal-overlay.hidden,
- #modal-container.hidden {
-   display: none !important;
- }
- #modal-container {
-  display: flex;
-  /* … */
-}
-#modal-overlay {
+/* MODALS */
+.hidden { display: none !important; }
+#modal-overlay, #schedule-overlay {
   position: fixed; inset: 0;
   background: rgba(0,0,0,0.4);
   z-index: 100;
-  pointer-events: auto;   
 }
-
-#modal-container {
+#modal-container, #schedule-container {
   position: fixed; inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 101;
 }
-
-#modal-content {
+#modal-content, #schedule-content {
   position: relative;
   background: var(--bg-light);
   border: 1px solid var(--border);
@@ -432,122 +329,14 @@ body {
   width: 90%;
   max-width: 400px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-  color: var(--text-dark);
   text-align: center;
 }
-
-#modal-close {
+#modal-close, #schedule-close {
   position: absolute;
   top: 0.5rem; right: 0.5rem;
   background: transparent;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: var(--text-dark);
 }
-
-/* cabeçalhos dentro do modal */
-#modal-content h2 {
-  margin-bottom: 0.5rem;
-  font-size: 1.25rem;
-}
-#modal-content h3 {
-  margin: 1rem 0 0.5rem;
-  font-size: 1.1rem;
-}
-
-/* lista de horários */
-#schedule-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-#schedule-list li {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.95rem;
-}
-#schedule-list li:last-child {
-  border-bottom: none;
-}
-
-body.modal-open {
-  overflow: hidden;      /* bloqueia scroll vertical e horizontal */
-  height: 100vh;         /* impede quicadas na posição */
-}
-
-#modal-container,
-#modal-content {
-  overscroll-behavior: contain; /* captura todo overscroll dentro do modal */
-}
-
-/* ===== SCHEDULE MODAL ===== */
-#schedule-overlay.hidden,
-#schedule-container.hidden {
-  display: none !important;
-}
-
-#schedule-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  z-index: 100;
-  pointer-events: auto;
-}
-
-#schedule-container {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 101;
-  overscroll-behavior: contain;
-}
-
-#schedule-content {
-  position: relative;
-  background: var(--bg-light);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1.5rem;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-  color: var(--text-dark);
-  text-align: center;
-}
-
-#schedule-close {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  background: transparent;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: var(--text-dark);
-}
-
-#schedule-content h2 {
-  margin-bottom: 0.75rem;
-  font-size: 1.25rem;
-}
-
-#schedule-only-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-#schedule-only-list li {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.95rem;
-}
-#schedule-only-list li:last-child {
-  border-bottom: none;
-}
+body.modal-open { overflow: hidden; height: 100vh; }

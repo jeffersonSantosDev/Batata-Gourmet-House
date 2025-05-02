@@ -7,7 +7,6 @@ const products = [
   { id: 5,  name: "Água Mineral",                  description: "Água mineral 500ml",                                       price: 4.00,  image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
   { id: 6,  name: "Brownie",                       description: "Brownie de chocolate com nozes",                            price: 8.00,  image: "imagens/itemCardapio.jpg", typeMenu: "Sobremesas" },
   { id: 7,  name: "Batata + Refri",                description: "Combo Batata + Refrigerante",                               price: 18.00, image: "imagens/itemCardapio.jpg", typeMenu: "Combos" },
-  // 30 produtos adicionais
   { id: 8,  name: "Batata Napolitana",             description: "Batata com molho de tomate, mussarela e orégano",           price: 17.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
   { id: 9,  name: "Batata Parmesão",               description: "Batata com mussarela, parmesão e bacon crocante",           price: 18.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
   { id: 10, name: "Batata Mexicana",               description: "Batata com carne temperada, cheddar e jalapeños",           price: 19.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
@@ -15,8 +14,8 @@ const products = [
   { id: 12, name: "Quatro Queijos",                description: "Batata com mussarela, gorgonzola, provolone e parmesão",    price: 20.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
   { id: 13, name: "Calabresa Picante",             description: "Batata com calabresa, pimenta biquinho e queijo",           price: 17.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
   { id: 14, name: "Batata à Portuguesa",           description: "Batata com presunto, ervilha, ovo de codorna e mussarela",  price: 18.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
-  { id: 15, name: "Batata Vegetariana",            description: "Batata com mix de legumes assados e queijo vegetal",         price: 16.50, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
-  { id: 16, name: "Batata Trufada",                description: "Batata com creme de trufa e lascas de parmesão",             price: 23.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
+  { id: 15, name: "Batata Vegetariana",            description: "Batata com mix de legumes assados e queijo vegetal",        price: 16.50, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
+  { id: 16, name: "Batata Trufada",                description: "Batata com creme de trufa e lascas de parmesão",            price: 23.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
   { id: 17, name: "Batata Mediterrânea",           description: "Batata com azeitonas, tomate seco e rúcula fresca",         price: 19.50, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
   { id: 18, name: "Batata BBQ",                    description: "Batata com pulled chicken ao molho barbecue e cheddar",      price: 21.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
   { id: 19, name: "Batata Carbonara",              description: "Batata com bacon, ovo pochê e parmesão",                     price: 20.00, image: "imagens/itemCardapio.jpg", typeMenu: "Batatas" },
@@ -25,7 +24,7 @@ const products = [
   { id: 22, name: "Suco de Abacaxi com Hortelã",   description: "Suco refrescante de abacaxi batido com folhas de hortelã",  price: 7.00,  image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
   { id: 23, name: "Limonada Siciliana",           description: "Limonada rosa com limão siciliano e toque de framboesa",    price: 6.50,  image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
   { id: 24, name: "Chá Gelado de Pêssego",         description: "Chá preto gelado com pedacinhos de pêssego",                price: 5.50,  image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
-  { id: 25, name: "Refrigerante Dieta",            description: "Versão zero açúcar do refrigerante sabor cola 350ml",        price: 5.00,  image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
+  { id: 25, name: "Refrigerante Dieta",            description: "Versão zero açúcar do refrigerante sabor cola 350ml",       price: 5.00,  image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
   { id: 26, name: "Água com Gás",                  description: "Água mineral com gás 500ml",                                price: 5.00,  image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
   { id: 27, name: "Cerveja Pilsen 350ml",          description: "Cerveja leve estilo pilsen, gelada e refrescante",          price: 8.00,  image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
   { id: 28, name: "Cerveja Artesanal IPA 350ml",   description: "Cerveja artesanal India Pale Ale, sabor intenso",           price: 12.00, image: "imagens/itemCardapio.jpg", typeMenu: "Bebidas" },
@@ -50,9 +49,9 @@ const productsContainer = document.getElementById("products-container");
 const searchInput = document.querySelector(".search-input");
 const categoryItems = document.querySelectorAll("#category-nav-list li");
 const ordersBtn = document.querySelector(".btn.orders");
-const scheduleBtnTaxaTempo = document.querySelector(".btn.info");
-let lastIntent = null;
+const scheduleBtn = document.querySelector(".btn.info");
 
+// FETCH LOJA
 async function fetchLojaInfo(lojaId) {
   const resp = await fetch('http://batatagourmethouse.runasp.net/api/Usuario/GetStatusById', {
     method: 'POST',
@@ -66,19 +65,11 @@ async function fetchLojaInfo(lojaId) {
 
 async function atualizarStatusLoja(lojaId) {
   const badge = document.getElementById('storeBadge');
-  if (!badge) {
-    console.error('#storeBadge não encontrado ao atualizar status');
-    return;
-  }
-
-  // Limpa classes antigas e mostra loading
   badge.textContent = '…';
   badge.classList.remove('aberto', 'fechado');
 
   try {
     const { aberta } = await fetchLojaInfo(lojaId);
-
-    // Atualiza cor, ícone e texto
     if (aberta) {
       badge.classList.add('aberto');
       badge.innerHTML = '<i class="fas fa-store"></i> Aberto';
@@ -86,128 +77,12 @@ async function atualizarStatusLoja(lojaId) {
       badge.classList.add('fechado');
       badge.innerHTML = '<i class="fas fa-store-slash"></i> Fechado';
     }
-  } catch (err) {
-    console.error(err);
+  } catch {
     badge.textContent = 'Erro';
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-
-
-  const ellipsis = document.querySelector('.ellipsis');
-  const overlay   = document.getElementById('modal-overlay');
-  const modal     = document.getElementById('modal-container');
-  const closeBtn  = document.getElementById('modal-close');
-  const content   = document.getElementById('modal-content');
-
-  function openModal() {
-    overlay.classList.remove('hidden');
-    modal.classList.remove('hidden');
-    document.body.classList.add('modal-open');  // <— trava scroll de fundo
-  }
-
-  function closeModal() {
-    overlay.classList.add('hidden');
-    modal.classList.add('hidden');
-    document.body.classList.remove('modal-open'); // <— libera scroll
-  }
-
-  closeModal();
-  ellipsis.addEventListener('click', openModal);
-  overlay  .addEventListener('click', closeModal);
-  closeBtn .addEventListener('click', closeModal);
-  content  .addEventListener('click', e => e.stopPropagation());
-});
-
-
-// init
-document.addEventListener("DOMContentLoaded", () => {
-
-
-  // ===== CONTROLE DO SCHEDULE MODAL =====
-  const storeBadge      = document.querySelector('.status.aberto');
-  const schOverlay      = document.getElementById('schedule-overlay');
-  const schContainer    = document.getElementById('schedule-container');
-  const schCloseBtn     = document.getElementById('schedule-close');
-  const schContent      = document.getElementById('schedule-content');
-
-  atualizarStatusLoja(1);
-
-
-  function openScheduleModal() {
-    schOverlay.classList.remove('hidden');
-    schContainer.classList.remove('hidden');
-    document.body.classList.add('modal-open');
-  }
-  function closeScheduleModal() {
-    schOverlay.classList.add('hidden');
-    schContainer.classList.add('hidden');
-    document.body.classList.remove('modal-open');
-  }
-
-  // dispara ao clicar no badge de “Aberto”
-  storeBadge.addEventListener('click', openScheduleModal);
-
-  // fecha ao clicar no overlay ou no “×”
-  schOverlay .addEventListener('click', closeScheduleModal);
-  schCloseBtn.addEventListener('click', closeScheduleModal);
-
-  // impede clique interno de fechar
-  schContent.addEventListener('click', e => e.stopPropagation());
-
-
-
-  // modal loja aberta fechada
- 
-  ordersBtn.addEventListener("click", () => {
-    if (identifyUser()) {
-      window.location.href = "orders-list.html";
-    } else {
-      window.location.href = "identify.html?return=orders-list.html";
-    }
-  });
-
-  scheduleBtn.addEventListener("click", () => {
-    if (identifyUser()) {
-      window.location.href = "edit-address.html";
-    } else {
-      window.location.href = "identify.html?return=edit-address.html";
-    }
-  });
-  
-
-
-  
-  // categorias
-  categoryItems.forEach(li => {
-    li.addEventListener("click", () => {
-      categoryItems.forEach(el => el.classList.remove("active"));
-      li.classList.add("active");
-
-      currentCategory = li.textContent;
-      renderProducts();
-
-      const searchNav = document.querySelector(".search-nav");
-      searchNav && searchNav.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  });
-
-  // busca
-  searchInput.addEventListener("input", () => {
-    currentSearch = searchInput.value.trim().toLowerCase();
-    renderProducts();
-  });
-
-  // primeira renderização
-  renderProducts();
-});
-
- 
-
-
-
-
+// RENDERIZA PRODUTOS
 function renderProducts() {
   productsContainer.innerHTML = "";
   const filtered = products.filter(p => {
@@ -216,29 +91,23 @@ function renderProducts() {
       || p.description.toLowerCase().includes(currentSearch);
     return matchCat && matchText;
   });
-
   if (!filtered.length) {
     productsContainer.innerHTML = "<p>Nenhum produto encontrado.</p>";
     return;
   }
-
   const byCat = filtered.reduce((acc, p) => {
     (acc[p.typeMenu] ||= []).push(p);
     return acc;
   }, {});
-
   Object.entries(byCat).forEach(([cat, items]) => {
     const bloco = document.createElement("div");
     bloco.className = "category-block";
-
     const h3 = document.createElement("h3");
     h3.className = "category-title";
     h3.textContent = cat;
     bloco.appendChild(h3);
-
     const list = document.createElement("div");
     list.className = "category-grid";
-
     items.forEach(prod => {
       const card = document.createElement("div");
       card.className = "product-card";
@@ -250,21 +119,86 @@ function renderProducts() {
         </div>
         <img src="${prod.image}" alt="${prod.name}" class="product-image"/>
       `;
-      card.setAttribute("data-id", prod.id);
-      // quando clicar no card, vai para a página de detalhe
+      card.dataset.id = prod.id;
       card.addEventListener("click", () => {
         window.location.href = `product-detail.html?id=${prod.id}`;
       });
       list.appendChild(card);
     });
-
     bloco.appendChild(list);
     productsContainer.appendChild(bloco);
   });
 }
 
+// MODAL INFO
+document.addEventListener('DOMContentLoaded', () => {
+  atualizarStatusLoja(1);
+  renderProducts();
 
-  
+  // Info modal
+  const ellipsis = document.querySelector('.ellipsis');
+  const overlay = document.getElementById('modal-overlay');
+  const modal = document.getElementById('modal-container');
+  const closeBtn = document.getElementById('modal-close');
+  function openModal() {
+    overlay.classList.remove('hidden');
+    modal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+  }
+  function closeModal() {
+    overlay.classList.add('hidden');
+    modal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+  }
+  ellipsis.addEventListener('click', openModal);
+  overlay.addEventListener('click', closeModal);
+  closeBtn.addEventListener('click', closeModal);
+  document.getElementById('modal-content').addEventListener('click', e => e.stopPropagation());
 
+  // Schedule modal
+  const badge = document.getElementById('storeBadge');
+  const schOverlay = document.getElementById('schedule-overlay');
+  const schContainer = document.getElementById('schedule-container');
+  const schCloseBtn = document.getElementById('schedule-close');
+  function openSchedule() {
+    schOverlay.classList.remove('hidden');
+    schContainer.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+  }
+  function closeSchedule() {
+    schOverlay.classList.add('hidden');
+    schContainer.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+  }
+  badge.addEventListener('click', openSchedule);
+  schOverlay.addEventListener('click', closeSchedule);
+  schCloseBtn.addEventListener('click', closeSchedule);
+  document.getElementById('schedule-content').addEventListener('click', e => e.stopPropagation());
 
+  // Navegação
+  ordersBtn.addEventListener("click", () => {
+    if (identifyUser()) window.location.href = "orders-list.html";
+    else window.location.href = "identify.html?return=orders-list.html";
+  });
+  scheduleBtn.addEventListener("click", () => {
+    if (identifyUser()) window.location.href = "edit-address.html";
+    else window.location.href = "identify.html?return=edit-address.html";
+  });
 
+  // Categorias
+  categoryItems.forEach(li => {
+    li.addEventListener("click", () => {
+      categoryItems.forEach(el => el.classList.remove("active"));
+      li.classList.add("active");
+      currentCategory = li.textContent;
+      renderProducts();
+      document.querySelector(".search-nav")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+
+  // Busca
+  searchInput.addEventListener("input", () => {
+    currentSearch = searchInput.value.trim().toLowerCase();
+    renderProducts();
+  });
+});
