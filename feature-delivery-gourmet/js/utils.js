@@ -2,6 +2,7 @@
  * Se a página vier de um reload (F5, CTRL+R, etc.), limpa o localStorage.
  * Deve ser chamado **antes** de qualquer outro código que dependa de localStorage.
  */
+
 function clearStorageOnReload() {
     // 1) Captura navegações do tipo “reload”
     const navEntries = performance.getEntriesByType("navigation");

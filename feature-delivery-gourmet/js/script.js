@@ -51,6 +51,7 @@ const searchInput = document.querySelector(".search-input");
 const categoryItems = document.querySelectorAll("#category-nav-list li");
 const ordersBtn = document.querySelector(".btn.orders");
 const scheduleBtnTaxaTempo = document.querySelector(".btn.info");
+let lastIntent = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   const ellipsis = document.querySelector('.ellipsis');
@@ -114,24 +115,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // modal loja aberta fechada
-
-
  
-  // “Meus Pedidos”
   ordersBtn.addEventListener("click", () => {
-    // chama a função global do identify.js
-    if (window.identifyUser()) {
-      openOrdersModal();
+    if (identifyUser()) {
+      window.location.href = "orders-list.html";
+    } else {
+      window.location.href = "identify.html?return=orders-list.html";
     }
   });
 
-
-  scheduleBtnTaxaTempo.addEventListener("click", () => {
-    if (window.identifyUser()) {
-      openActivityAddress();
+  scheduleBtn.addEventListener("click", () => {
+    if (identifyUser()) {
+      window.location.href = "edit-address.html";
+    } else {
+      window.location.href = "identify.html?return=edit-address.html";
     }
   });
+  
 
+
+  
   // categorias
   categoryItems.forEach(li => {
     li.addEventListener("click", () => {
@@ -156,19 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderProducts();
 });
 
-/**
- * Abre o modal de pedidos (implemente sua lógica aqui)
- */
-function openOrdersModal() {
-  window.location.href = "orders-list.html";
-}
-
-/**
- * Abre a tela/modal de Tempo & Taxa
- */
-function openActivityAddress() {
-  window.location.href = "edit-address.html"
-}
+ 
 
 
 

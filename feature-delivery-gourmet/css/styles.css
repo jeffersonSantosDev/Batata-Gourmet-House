@@ -1,12 +1,12 @@
 :root {
   --primary: #ffffff;
   --text-dark: #2c3e50;
-  --secondary: #d28b4b;
+  --secondary: #bb6d27;
   --highlight: #2ecc71;
   --info-green: #00cc44;
   --border: #e2e2e2;
   --bg-light: #f8f7f3;
-  --store-bg: rgb(230, 212, 190);
+  --store-bg: rgb(205 178 146);
   --btn-bg: #ffffff;
   --btn-hover: #f0f0f0;
   --shadow: rgba(0, 0, 0, 0.1);
@@ -117,7 +117,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  padding: 1rem 1rem 0;
+  padding: 1rem 1rem;
 }
 
 .search-bar {
@@ -205,7 +205,7 @@ body {
   padding: 0.5rem 0;
   cursor: pointer;
   font-size: 0.9rem;
-  color: #5a6b7d;
+  color: var(--text-dark);
   transition: color 0.2s;
 }
 

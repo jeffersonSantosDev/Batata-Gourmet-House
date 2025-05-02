@@ -172,3 +172,114 @@
     .summary-total { font-size:1rem; }
   }
   
+
+  .progress-container {
+    margin: 1.5rem 0 1rem;
+    width: 100%;
+    position: relative;
+    padding: 0 5px;
+  }
+  
+  .progress-bar {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+  }
+  
+  .progress-bar::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: 4px;
+    width: 100%;
+    background: var(--border);
+    transform: translateY(-50%);
+    z-index: 0;
+  }
+  
+  .progress {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: 4px;
+    background: var(--highlight);
+    z-index: 1;
+    transform: translateY(-50%);
+    width: 0;
+    transition: width 0.3s ease;
+  }
+  
+  .progress-step {
+    position: relative;
+    z-index: 2;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .progress-step.completed {
+    background: var(--highlight);
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--highlight);
+  }
+  
+  .progress-step::after {
+    content: attr(data-label);
+    position: absolute;
+    top: 34px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.75rem;
+    color: #999;
+    white-space: nowrap;
+    text-align: center;
+  }
+  
+  .progress-step.completed::after {
+    color: var(--highlight);
+    font-weight: 600;
+  }
+  
+
+  /*sss*/
+
+  .progress-step {
+    width: 20px;
+    height: 20px;
+    background-color: #ccc;
+    border-radius: 50%;
+    position: relative;
+    z-index: 2;
+    transition: background-color 0.3s ease;
+  }
+  
+  .progress-step.completed {
+    background-color: var(--highlight);
+    box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--highlight);
+  }
+  
+  .progress-step::after {
+    content: attr(data-label);
+    position: absolute;
+    top: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.75rem;
+    color: #888;
+  }
+  
+  .progress-step.completed::after {
+    color: var(--highlight);
+    font-weight: 600;
+  }
+  
+  .progress {
+    background-color: var(--highlight);
+  }
+    
