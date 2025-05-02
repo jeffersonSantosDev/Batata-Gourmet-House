@@ -54,7 +54,7 @@ const scheduleBtnTaxaTempo = document.querySelector(".btn.info");
 let lastIntent = null;
 
 async function fetchLojaInfo(lojaId) {
-  const resp = await fetch('https://localhost:62203/api/Usuario/GetStatusById', {
+  const resp = await fetch('http://batatagourmethouse.runasp.net/api/Usuario/GetStatusById', {
     method: 'POST',
     mode: 'cors',
     headers: { 'Content-Type': 'application/json' },
