@@ -81,6 +81,12 @@ body {
   color: #fff;
 }
 
+.status.fechado {
+  background: #e53e3e; /* vermelho */
+  color: #fff;
+}
+
+
 .store-info {
   text-align: center;
   margin-top: 8px;

@@ -53,7 +53,48 @@ const ordersBtn = document.querySelector(".btn.orders");
 const scheduleBtnTaxaTempo = document.querySelector(".btn.info");
 let lastIntent = null;
 
+async function fetchLojaInfo(lojaId) {
+  const resp = await fetch('https://localhost:62203/api/Usuario/GetStatusById', {
+    method: 'POST',
+    mode: 'cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: lojaId })
+  });
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return await resp.json();
+}
+
+async function atualizarStatusLoja(lojaId) {
+  const badge = document.getElementById('storeBadge');
+  if (!badge) {
+    console.error('#storeBadge não encontrado ao atualizar status');
+    return;
+  }
+
+  // Limpa classes antigas e mostra loading
+  badge.textContent = '…';
+  badge.classList.remove('aberto', 'fechado');
+
+  try {
+    const { aberta } = await fetchLojaInfo(lojaId);
+
+    // Atualiza cor, ícone e texto
+    if (aberta) {
+      badge.classList.add('aberto');
+      badge.innerHTML = '<i class="fas fa-store"></i> Aberto';
+    } else {
+      badge.classList.add('fechado');
+      badge.innerHTML = '<i class="fas fa-store-slash"></i> Fechado';
+    }
+  } catch (err) {
+    console.error(err);
+    badge.textContent = 'Erro';
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+
+
   const ellipsis = document.querySelector('.ellipsis');
   const overlay   = document.getElementById('modal-overlay');
   const modal     = document.getElementById('modal-container');
@@ -90,6 +131,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const schContainer    = document.getElementById('schedule-container');
   const schCloseBtn     = document.getElementById('schedule-close');
   const schContent      = document.getElementById('schedule-content');
+
+  atualizarStatusLoja(1);
+
 
   function openScheduleModal() {
     schOverlay.classList.remove('hidden');
