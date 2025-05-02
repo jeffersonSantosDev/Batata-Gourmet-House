@@ -48,18 +48,19 @@ body {
   font-weight: 600;
 }
 
-/* MAIN: centraliza e não estica demais */
+/* MAIN: centraliza e dá scroll interno */
 .address-main {
   flex: 1;
   display: flex;
   justify-content: center;
   padding: 1rem;
-  /* não faz o main crescer além do conteúdo */
+  overflow-y: auto;
   align-items: flex-start;
-  overflow: hidden;
 }
+.address-main::-webkit-scrollbar { display: none; }
+.address-main { scrollbar-width: none; -ms-overflow-style: none; }
 
-/* Card principal */
+/* CARD */
 .card {
   background: var(--primary);
   border-radius: 8px;
@@ -67,20 +68,12 @@ body {
   padding: 1.5rem;
   width: 100%;
   max-width: 480px;
-  /* limita a altura do cartão no desktop */
+  /* limita altura e permite scroll interno se necessário */
   max-height: calc(100vh - 200px);
-  /* se ultrapassar, adiciona scroll interno */
   overflow-y: auto;
 }
-
-/* remove scrollbar visível */
-.card::-webkit-scrollbar {
-  width: 0;
-}
-.card {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+.card::-webkit-scrollbar { width: 0; }
+.card { scrollbar-width: none; -ms-overflow-style: none; }
 
 /* NOTA e LINK */
 .address-note {
@@ -105,7 +98,7 @@ body {
   text-decoration: underline;
 }
 
-/* LISTA DE ENDEREÇOS dentro do card */
+/* LISTA */
 .address-list {
   list-style: none;
   margin: 0;
@@ -153,18 +146,12 @@ body {
   color: #666;
 }
 
-/* FOOTER */
-.address-footer {
-  padding: 1rem;
-  background: var(--primary);
-  box-shadow: 0 -1px 4px var(--shadow);
-  display: flex;
-  justify-content: center;
-}
+/* BOTÃO SALVAR no CARD */
 .save-btn {
+  display: block;
   width: 100%;
-  max-width: 480px;
   padding: 0.75rem;
+  margin-top: 1.5rem;
   background: var(--secondary);
   color: #fff;
   border: none;
@@ -181,12 +168,9 @@ body {
 /* RESPONSIVO */
 @media (max-width: 480px) {
   .card {
-    max-height: none;    /* no mobile, deixa crescer */
+    max-height: none;
     padding: 1rem;
     border-radius: 6px;
-  }
-  .address-main {
-    overflow-y: auto;    /* rolagem no main */
   }
   .address-item {
     flex-direction: column;
