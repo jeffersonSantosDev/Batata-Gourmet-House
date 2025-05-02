@@ -2,7 +2,7 @@
     "rewrites": [
       {
         "source": "/api/:path*",
-        "destination": "https://batatagourmethouse.runasp.net/api/:path*"
+        "destination": "http://batatagourmethouse.runasp.net/api/:path*"
       }
     ]
   }
