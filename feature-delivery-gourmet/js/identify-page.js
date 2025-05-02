@@ -65,8 +65,9 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       showLoading();
 
-      const response = await fetch("https://batatagourmethouse.runasp.net/api/Usuario/GetUserByWhatsApp", {
+      const response = await fetch("http://batatagourmethouse.runasp.net/api/Usuario/GetUserByWhatsApp", {
         method: "POST",
+        mode: "cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ numero: numeroFull })
       });

@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   try {
-    const response = await fetch("https://batatagourmethouse.runasp.net/api/Usuario/GetDetalhesPedido", {
+    const response = await fetch("http://batatagourmethouse.runasp.net/api/Usuario/GetDetalhesPedido", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ pedidoId })
