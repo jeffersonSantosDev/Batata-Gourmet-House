@@ -53,7 +53,7 @@ const scheduleBtn = document.querySelector(".btn.info");
 
 // FETCH LOJA
 async function fetchLojaInfo(lojaId) {
-  const resp = await fetch('http://batatagourmethouse.runasp.net/api/Usuario/GetStatusById', {
+  const resp = await fetch('/api/Usuario/GetStatusById', {
     method: 'POST',
     mode: 'cors',
     headers: { 'Content-Type': 'application/json' },

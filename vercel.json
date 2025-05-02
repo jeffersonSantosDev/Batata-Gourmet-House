@@ -1,0 +1,9 @@
+{
+    "rewrites": [
+      {
+        "source": "/api/:path*",
+        "destination": "http://batatagourmethouse.runasp.net/api/:path*"
+      }
+    ]
+  }
+  
