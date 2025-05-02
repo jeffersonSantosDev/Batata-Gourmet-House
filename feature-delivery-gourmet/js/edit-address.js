@@ -77,10 +77,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const userId   = localStorage.getItem('bgHouse_id');
 
   // Se não encontrar WhatsApp, redireciona à identificação
-  if (!whatsapp) {
-    window.location.href = 'identify.html';
-    return;
-  }
+  // if (!whatsapp) {
+  //   window.location.href = 'identify.html';
+  //   return;
+  // }
 
   try {
     // 2) Busca endereços
