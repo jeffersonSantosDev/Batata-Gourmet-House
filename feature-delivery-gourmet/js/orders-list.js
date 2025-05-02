@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const numero = localStorage.getItem("bgHouse_whatsapp");
 
     try {
-      const response = await fetch("http://batatagourmethouse.runasp.net/api/Usuario/GetPedidosByWhatsAppAsync", {
+      const response = await fetch("/api/Usuario/GetPedidosByWhatsAppAsync", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ numero })

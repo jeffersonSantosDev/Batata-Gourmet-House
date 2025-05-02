@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       showLoading();
 
-      const response = await fetch("http://batatagourmethouse.runasp.net/api/Usuario/GetUserByWhatsApp", {
+      const response = await fetch("/api/Usuario/GetUserByWhatsApp", {
         method: "POST",
         mode: "cors",
         headers: { "Content-Type": "application/json" },
@@ -130,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 1. Cria novo usuário se não houver ID
     if (!localId) {
       try {
-        const response = await fetch("https://batatagourmethouse.runasp.net/api/Usuario/AddUserByWhatsApp", {
+        const response = await fetch("/api/Usuario/AddUserByWhatsApp", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ nome: n, whatsApp: numeroFull })
@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 2. Se já existe, verifica se mudou e atualiza
     else if (n !== localNome || numeroFull !== localWhats) {
       try {
-        const response = await fetch("https://batatagourmethouse.runasp.net/api/Usuario/UpdateUserByWhatsApp", {
+        const response = await fetch("/api/Usuario/UpdateUserByWhatsApp", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
