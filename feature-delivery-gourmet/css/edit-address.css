@@ -181,3 +181,23 @@ body {
     align-self: flex-end;
   }
 }
+
+.address-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* título sempre no meio */
+  padding: 16px;           /* ajuste à sua necessidade */
+  background: #fff;        /* cor de fundo do header */
+}
+
+.back-btn {
+  position: absolute;
+  left: 16px;              /* distância da esquerda */
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.5rem;       /* tamanho da seta */
+  cursor: pointer;
+}
