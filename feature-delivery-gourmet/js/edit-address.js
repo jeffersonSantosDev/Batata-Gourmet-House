@@ -20,7 +20,7 @@
  */
 async function fetchUserAddresses(whatsapp) {
   const resp = await fetch(
-    'https://localhost:62203/api/Usuario/GetAddressesByWhatsApp',
+    '/api/Usuario/GetAddressesByWhatsApp',
     {
       method: 'POST',
       mode: 'cors',
@@ -57,6 +57,9 @@ function renderAddressList(addresses) {
           <strong>${addr.Bairro}, ${addr.Numero}</strong><br/>
           ${addr.Cidade} – ${addr.Uf}
           ${addr.Referencia ? `<br/><em>${addr.Referencia}</em>` : ''}
+          <br/><small>
+            ${addr.DistanciaKm.toFixed(1)} km • ${addr.TempoMinutos} min • R$ ${addr.Frete.toFixed(2)}
+          </small>
         </label>
       </div>
       <button class="menu-btn" data-id="${addr.Id}" aria-label="Opções">
@@ -66,6 +69,7 @@ function renderAddressList(addresses) {
     ul.appendChild(li);
   });
 }
+
 
 document.addEventListener('DOMContentLoaded', async () => {
   // 1) Recupera dados do localStorage
