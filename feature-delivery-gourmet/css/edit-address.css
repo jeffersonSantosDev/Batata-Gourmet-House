@@ -171,3 +171,22 @@ body {
     align-self: flex-end;
   }
 }
+
+/* Faz o main rolar internamente sem expandir o body */
+.address-main {
+  flex: 1;               /* já existia */
+  display: flex;         /* já existia */
+  justify-content: center;/* já existia */
+  overflow-y: auto;      /* novo: rolagem interna */
+}
+
+/* Opcional: esconde a scrollbar em WebKit (iOS/Chrome) */
+.address-main::-webkit-scrollbar {
+  display: none;
+}
+
+/* Para Android/Firefox */
+.address-main {
+  -ms-overflow-style: none;  /* IE/Edge */
+  scrollbar-width: none;     /* Firefox */
+}
