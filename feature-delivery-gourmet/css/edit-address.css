@@ -48,18 +48,18 @@ body {
   font-weight: 600;
 }
 
-/* MAIN: wrapper com scroll interno */
+/* MAIN: centraliza e não estica demais */
 .address-main {
   flex: 1;
   display: flex;
   justify-content: center;
-  overflow-y: auto;
   padding: 1rem;
+  /* não faz o main crescer além do conteúdo */
+  align-items: flex-start;
+  overflow: hidden;
 }
-.address-main::-webkit-scrollbar { display: none; }
-.address-main { scrollbar-width: none; -ms-overflow-style: none; }
 
-/* CARD estilo igual ao Identify */
+/* Card principal */
 .card {
   background: var(--primary);
   border-radius: 8px;
@@ -67,6 +67,19 @@ body {
   padding: 1.5rem;
   width: 100%;
   max-width: 480px;
+  /* limita a altura do cartão no desktop */
+  max-height: calc(100vh - 200px);
+  /* se ultrapassar, adiciona scroll interno */
+  overflow-y: auto;
+}
+
+/* remove scrollbar visível */
+.card::-webkit-scrollbar {
+  width: 0;
+}
+.card {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* NOTA e LINK */
@@ -168,8 +181,12 @@ body {
 /* RESPONSIVO */
 @media (max-width: 480px) {
   .card {
+    max-height: none;    /* no mobile, deixa crescer */
     padding: 1rem;
     border-radius: 6px;
+  }
+  .address-main {
+    overflow-y: auto;    /* rolagem no main */
   }
   .address-item {
     flex-direction: column;
