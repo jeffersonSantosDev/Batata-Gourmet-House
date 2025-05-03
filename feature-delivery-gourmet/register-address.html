@@ -31,10 +31,11 @@
           <input type="text" id="city" value="São Paulo" readonly />
         </div>
 
-        <!-- Localidade -->
+        <!-- Localidade (agora obrigatória) -->
         <div class="form-group">
-          <label for="locality">Localidade</label>
+          <label for="locality">Localidade <span class="required">*</span></label>
           <input type="text" id="locality" placeholder="Bairro, zona, etc."/>
+          <p id="localityError" class="error-text hidden">Preencha a localidade.</p>
         </div>
 
         <!-- Endereço -->
