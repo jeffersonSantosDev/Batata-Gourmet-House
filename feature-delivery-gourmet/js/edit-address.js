@@ -73,6 +73,11 @@ function renderAddressList(addresses) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // efeito de voltar na seta
+  document.getElementById('backBtn').addEventListener('click', () => {
+    history.length > 1 ? history.back() : window.location.href = 'index.html';
+  });
+
   const whatsapp = localStorage.getItem('bgHouse_whatsapp');
   const userId   = localStorage.getItem('bgHouse_id');
   if (!whatsapp) return window.location.href = 'identify.html';
