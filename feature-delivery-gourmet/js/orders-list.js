@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const backBtn = document.getElementById("backBtn"); 
     const tableBody = document.getElementById("ordersTableBody");
     const noPedidos = document.getElementById("noPedidos"); 
+    const loadingOverlay = document.getElementById("loadingOverlay");
 
     if (backBtn) {
       backBtn.addEventListener("click", () => { 
@@ -21,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.warn("Botão de voltar não encontrado");
     }
     const numero = localStorage.getItem("bgHouse_whatsapp");
-
+    howLoading();
     try {
       const response = await fetch("/api/Usuario/GetPedidosByWhatsAppAsync", {
         method: "POST",
@@ -34,10 +35,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       const pedidos = await response.json();
 
       if (!pedidos.length) {
+        hideLoading();
         noPedidos.classList.remove("hidden");
         return;
       }
-
+      hideLoading();
       pedidos.forEach(p => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -49,6 +51,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         tableBody.appendChild(tr);
       });
     } catch (err) {
+      hideLoading();
       console.error("Erro ao carregar pedidos:", err);
       swal("Erro", "Não foi possível carregar seus pedidos. Tente novamente mais tarde.", "error");
     }
@@ -56,3 +59,11 @@ document.addEventListener("DOMContentLoaded", async () => {
    
   }, 150); // pequeno delay para garantir que localStorage esteja disponível
 });
+
+function showLoading() {
+  loadingOverlay.classList.remove("hidden");
+}
+
+function hideLoading() {
+  loadingOverlay.classList.add("hidden");
+}
