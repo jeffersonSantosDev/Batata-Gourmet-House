@@ -170,3 +170,25 @@ body {
     border-radius: 6px;
   }
 }
+/* Botão Novo Endereço */
+.new-address-btn {
+  background: var(--highlight);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-bottom: 1rem;
+}
+.new-address-btn:hover {
+  background: var(--secondary);
+}
+
+/* Container dos controles */
+.address-controls {
+  display: flex;
+  justify-content: flex-end;
+}

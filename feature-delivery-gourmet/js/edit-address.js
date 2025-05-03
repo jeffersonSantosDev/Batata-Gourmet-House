@@ -71,11 +71,15 @@ function renderAddressList(addresses) {
     ul.appendChild(li);
   });
 }
-
 document.addEventListener('DOMContentLoaded', async () => {
   // efeito de voltar na seta
   document.getElementById('backBtn').addEventListener('click', () => {
     history.length > 1 ? history.back() : window.location.href = 'index.html';
+  });
+
+  // botão de criar novo endereço
+  document.getElementById('newAddressBtn').addEventListener('click', () => {
+    window.location.href = 'register-address.html'; // ou o arquivo de cadastro que você usa
   });
 
   const whatsapp = localStorage.getItem('bgHouse_whatsapp');
@@ -84,7 +88,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   try {
     const addresses = await fetchUserAddresses(whatsapp);
-    console.log('Endereços recebidos:', addresses);
     renderAddressList(addresses);
 
     document.getElementById('saveBtn').addEventListener('click', () => {
@@ -100,6 +103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.location.href = 'identify.html';
   }
 });
+
 
 /**
  * @typedef {Object} AddressDto
