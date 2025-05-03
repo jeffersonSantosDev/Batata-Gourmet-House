@@ -1,3 +1,4 @@
+const loadingOverlay = document.getElementById("loadingOverlay");
 document.addEventListener("DOMContentLoaded", async () => {
   setTimeout(async () => {
     if (!identifyUser()) {
@@ -10,7 +11,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const backBtn = document.getElementById("backBtn"); 
     const tableBody = document.getElementById("ordersTableBody");
     const noPedidos = document.getElementById("noPedidos"); 
-    const loadingOverlay = document.getElementById("loadingOverlay");
+   
 
     if (backBtn) {
       backBtn.addEventListener("click", () => { 
