@@ -1,17 +1,12 @@
-/**
- * @typedef {Object} AddressDto
- * @property {number} id
- * @property {number} usuarioId
- * @property {string} uf
- * @property {string} cidade
- * @property {string} bairro
- * @property {string} numero
- * @property {string} referencia
- * @property {boolean} padrao
- * @property {number} distanciaKm
- * @property {number} tempoMinutos
- * @property {number} frete
- */
+// ative o loader
+function showLoader() {
+  document.getElementById('loader').classList.remove('hidden');
+}
+
+// esconda o loader
+function hideLoader() {
+  document.getElementById('loader').classList.add('hidden');
+}
 
 /**
  * Busca os endereços do usuário via WhatsApp.
@@ -19,18 +14,20 @@
  * @returns {Promise<AddressDto[]>}
  */
 async function fetchUserAddresses(whatsapp) {
-  const resp = await fetch(
-    '/api/Usuario/GetAddressesByWhatsApp',
-    {
+  showLoader();
+  try {
+    const resp = await fetch('/api/Usuario/GetAddressesByWhatsApp', {
       method: 'POST',
       mode: 'cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ numero: whatsapp })
-    }
-  );
-  if (resp.status === 204) return [];
-  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-  return resp.json();
+    });
+    if (resp.status === 204) return [];
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    return await resp.json();
+  } finally {
+    hideLoader();
+  }
 }
 
 /**
@@ -78,7 +75,7 @@ function renderAddressList(addresses) {
 document.addEventListener('DOMContentLoaded', async () => {
   const whatsapp = localStorage.getItem('bgHouse_whatsapp');
   const userId   = localStorage.getItem('bgHouse_id');
-  // if (!whatsapp) return window.location.href = 'identify.html';
+  if (!whatsapp) return window.location.href = 'identify.html';
 
   try {
     const addresses = await fetchUserAddresses(whatsapp);
@@ -95,6 +92,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   } catch (err) {
     console.error('Erro ao buscar endereços:', err);
-    //window.location.href = 'identify.html';
+    window.location.href = 'identify.html';
   }
 });
+
+/**
+ * @typedef {Object} AddressDto
+ * @property {number} id
+ * @property {number} usuarioId
+ * @property {string} uf
+ * @property {string} cidade
+ * @property {string} bairro
+ * @property {string} numero
+ * @property {string} referencia
+ * @property {boolean} padrao
+ * @property {number} distanciaKm
+ * @property {number} tempoMinutos
+ * @property {number} frete
+ */

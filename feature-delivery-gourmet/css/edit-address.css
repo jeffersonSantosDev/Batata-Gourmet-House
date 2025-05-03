@@ -15,6 +15,34 @@
   padding: 0;
 }
 
+.hidden {
+  display: none !important;
+}
+
+/* Loader full-screen */
+.loader {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+.loader::before {
+  content: "";
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 5px solid var(--bg-light);
+  border-top-color: var(--secondary);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 body {
   font-family: "Poppins", sans-serif;
   background: var(--bg-light);
@@ -26,41 +54,47 @@ body {
 
 /* HEADER */
 .address-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  grid-template-rows: auto;
   align-items: center;
   background: var(--primary);
   padding: 1rem;
   box-shadow: 0 1px 4px var(--shadow);
 }
+
 .back-btn {
+  grid-column: 1;
+  justify-self: start;
   background: none;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  margin-right: 1rem;
   color: var(--text-dark);
 }
 .back-btn:hover {
   color: var(--secondary);
 }
+
 .address-title {
+  grid-column: 2;
+  justify-self: center;
   font-size: 1.25rem;
   font-weight: 600;
 }
 
-/* MAIN: centraliza e dá scroll interno */
+/* MAIN CONTENT */
 .address-main {
   flex: 1;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
   padding: 1rem;
   overflow-y: auto;
-  align-items: flex-start;
 }
 .address-main::-webkit-scrollbar { display: none; }
 .address-main { scrollbar-width: none; -ms-overflow-style: none; }
 
-/* CARD */
 .card {
   background: var(--primary);
   border-radius: 8px;
@@ -68,90 +102,53 @@ body {
   padding: 1.5rem;
   width: 100%;
   max-width: 480px;
-  /* limita altura e permite scroll interno se necessário */
   max-height: calc(100vh - 200px);
   overflow-y: auto;
 }
 .card::-webkit-scrollbar { width: 0; }
 .card { scrollbar-width: none; -ms-overflow-style: none; }
 
-/* NOTA e LINK */
 .address-note {
-  font-size: 0.9rem;
-  color: #666;
   margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: #555;
 }
 .divider {
   border: none;
-  height: 1px;
-  background: var(--border);
-  margin: 0.5rem 0 1rem;
-}
-.new-address {
-  display: inline-block;
-  font-size: 0.9rem;
-  color: var(--secondary);
-  text-decoration: none;
+  border-top: 1px solid var(--border);
   margin-bottom: 1rem;
 }
-.new-address:hover {
-  text-decoration: underline;
-}
-
-/* LISTA */
 .address-list {
   list-style: none;
   margin: 0;
   padding: 0;
 }
-.address-list li + li {
-  margin-top: 0.75rem;
-}
 .address-item {
-  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--primary);
-  border-radius: 6px;
-  box-shadow: 0 1px 4px var(--shadow);
-  padding: 0.75rem 1rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
 }
-.address-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px var(--shadow);
+.address-item:last-child {
+  border-bottom: none;
 }
-.address-info {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-.address-info input[type="radio"] {
-  accent-color: var(--secondary);
-}
-.address-info .details {
-  font-size: 0.9rem;
-  color: #555;
-  line-height: 1.2;
+.address-info label {
+  cursor: pointer;
 }
 .menu-btn {
   background: none;
   border: none;
-  font-size: 1.25rem;
-  color: #aaa;
+  font-size: 1.2rem;
   cursor: pointer;
-}
-.menu-btn:hover {
-  color: #666;
+  color: var(--text-dark);
 }
 
-/* BOTÃO SALVAR no CARD */
+/* BOTÃO SALVAR */
 .save-btn {
-  display: block;
+  margin-top: 1.5rem;
   width: 100%;
   padding: 0.75rem;
-  margin-top: 1.5rem;
   background: var(--secondary);
   color: #fff;
   border: none;
@@ -172,32 +169,4 @@ body {
     padding: 1rem;
     border-radius: 6px;
   }
-  .address-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-  .menu-btn {
-    align-self: flex-end;
-  }
-}
-
-.address-header {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center; /* título sempre no meio */
-  padding: 16px;           /* ajuste à sua necessidade */
-  background: #fff;        /* cor de fundo do header */
-}
-
-.back-btn {
-  position: absolute;
-  left: 16px;              /* distância da esquerda */
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  font-size: 1.5rem;       /* tamanho da seta */
-  cursor: pointer;
 }
