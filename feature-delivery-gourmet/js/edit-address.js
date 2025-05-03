@@ -1,20 +1,20 @@
 /**
  * @typedef {Object} AddressDto
- * @property {number} Id
- * @property {string} Uf
- * @property {string} Cidade
- * @property {string} Bairro
- * @property {string} Numero
- * @property {string} Referencia
- * @property {boolean} Padrao
- * @property {number} TempoMinutos
- * @property {number} DistanciaKm
- * @property {number} Frete
+ * @property {number} id
+ * @property {number} usuarioId
+ * @property {string} uf
+ * @property {string} cidade
+ * @property {string} bairro
+ * @property {string} numero
+ * @property {string} referencia
+ * @property {boolean} padrao
+ * @property {number} distanciaKm
+ * @property {number} tempoMinutos
+ * @property {number} frete
  */
 
 /**
- * Faz POST para obter endereços do usuário por WhatsApp.
- * Se receber 204, retorna array vazio.
+ * Busca os endereços do usuário via WhatsApp.
  * @param {string} whatsapp 
  * @returns {Promise<AddressDto[]>}
  */
@@ -41,6 +41,11 @@ function renderAddressList(addresses) {
   const ul = document.getElementById('addressList');
   ul.innerHTML = '';
 
+  if (addresses.length === 0) {
+    ul.innerHTML = '<li class="no-address">Nenhum endereço cadastrado.</li>';
+    return;
+  }
+
   addresses.forEach(addr => {
     const li = document.createElement('li');
     li.className = 'address-item';
@@ -49,20 +54,20 @@ function renderAddressList(addresses) {
         <input
           type="radio"
           name="selectedAddress"
-          id="addr-${addr.Id}"
-          value="${addr.Id}"
-          ${addr.Padrao ? 'checked' : ''}
+          id="addr-${addr.id}"
+          value="${addr.id}"
+          ${addr.padrao ? 'checked' : ''}
         />
-        <label for="addr-${addr.Id}">
-          <strong>${addr.Bairro}, ${addr.Numero}</strong><br/>
-          ${addr.Cidade} – ${addr.Uf}
-          ${addr.Referencia ? `<br/><em>${addr.Referencia}</em>` : ''}
-          <br/><small>
-            ${addr.DistanciaKm.toFixed(1)} km • ${addr.TempoMinutos} min • R$ ${addr.Frete.toFixed(2)}
+        <label for="addr-${addr.id}">
+          <strong>${addr.bairro}, ${addr.numero}</strong><br/>
+          ${addr.cidade} – ${addr.uf.toUpperCase()}<br/>
+          ${addr.referencia ? `<em>${addr.referencia}</em><br/>` : ''}
+          <small>
+            ${addr.distanciaKm.toFixed(1)} km • ${addr.tempoMinutos} min • R$ ${addr.frete.toFixed(2)}
           </small>
         </label>
       </div>
-      <button class="menu-btn" data-id="${addr.Id}" aria-label="Opções">
+      <button class="menu-btn" data-id="${addr.id}" aria-label="Opções">
         <i class="fas fa-ellipsis-v"></i>
       </button>
     `;
@@ -70,53 +75,26 @@ function renderAddressList(addresses) {
   });
 }
 
-
 document.addEventListener('DOMContentLoaded', async () => {
-  // 1) Recupera dados do localStorage
   const whatsapp = localStorage.getItem('bgHouse_whatsapp');
   const userId   = localStorage.getItem('bgHouse_id');
-
-  // Se não encontrar WhatsApp, redireciona à identificação
-  // if (!whatsapp) {
-  //   window.location.href = 'identify.html';
-  //   return;
-  // }
+  // if (!whatsapp) return window.location.href = 'identify.html';
 
   try {
-    // 2) Busca endereços
     const addresses = await fetchUserAddresses(whatsapp);
-
-    // Se não houver endereços cadastrados, redireciona também
-    if (!addresses.length) {
-      window.location.href = 'identify.html';
-      return;
-    }
-
-    // 3) Renderiza lista
+    console.log('Endereços recebidos:', addresses);
     renderAddressList(addresses);
 
-    // 4) Configura botão Salvar
     document.getElementById('saveBtn').addEventListener('click', () => {
       const sel = document.querySelector('input[name="selectedAddress"]:checked');
       if (!sel) {
         alert('Selecione um endereço.');
         return;
       }
-      const addressId = sel.value;
-      // Exemplo de redirecionamento para checkout
-      window.location.href = `checkout.html?userId=${userId}&addressId=${addressId}`;
-    });
-
-    // 5) Botões de menu
-    document.querySelectorAll('.menu-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const id = btn.dataset.id;
-        // abrir opções de editar/excluir
-      });
+      window.location.href = `checkout.html?userId=${userId}&addressId=${sel.value}`;
     });
   } catch (err) {
-    console.error(err);
-    // Em caso de erro de rede ou API, volta à identificação
-    window.location.href = 'identify.html';
+    console.error('Erro ao buscar endereços:', err);
+    //window.location.href = 'identify.html';
   }
 });
