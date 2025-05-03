@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.warn("Botão de voltar não encontrado");
     }
     const numero = localStorage.getItem("bgHouse_whatsapp");
-    howLoading();
+    showLoading();
     try {
       const response = await fetch("/api/Usuario/GetPedidosByWhatsAppAsync", {
         method: "POST",
