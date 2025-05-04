@@ -121,7 +121,115 @@
      * Renderiza a lista de endereços no UL.
      * @param {AddressDto[]} addresses 
      */
-    function renderAddressList(addresses) {
+     function renderAddressList(addresses) {
+  const ul = document.getElementById('addressList');
+  ul.innerHTML = '';
+
+  if (addresses.length === 0) {
+    ul.innerHTML = '<li class="no-address">Nenhum endereço cadastrado.</li>';
+    return;
+  }
+
+  addresses.forEach(addr => {
+    const li = document.createElement('li');
+    li.className = 'address-item';
+    li.style.position = 'relative';  // garante posição dos botões
+
+    li.innerHTML = `
+      <div class="address-info" style="padding-right:2.5rem;">
+        <input
+          type="radio"
+          name="selectedAddress"
+          id="addr-${addr.id}"
+          value="${addr.id}"
+          ${addr.padrao ? 'checked' : ''}
+        />
+        <label for="addr-${addr.id}" class="ml-2">
+          <strong>${addr.bairro}, ${addr.numero}</strong><br/>
+          ${addr.cidade} – ${addr.uf.toUpperCase()}<br/>
+          ${addr.referencia ? `<em>${addr.referencia}</em><br/>` : ''}
+          <small>
+            ${addr.distanciaKm.toFixed(1)} km • ${addr.tempoMinutos} min • R$ ${addr.frete.toFixed(2)}
+          </small>
+        </label>
+      </div>
+
+      <!-- Ícone de editar fixo -->
+      <button
+        class="edit-btn"
+        onclick="editAddress(${addr.id})"
+        title="Editar endereço"
+        style="
+          position:absolute;
+          top:1rem;
+          right:2.5rem;
+          background:none;
+          border:none;
+          cursor:pointer;
+          font-size:1rem;
+          color:#2980b9;
+        "
+      >
+        <i class="fas fa-edit"></i>
+      </button>
+
+      <!-- Botão de opções / excluir -->
+      <button
+        class="menu-btn"
+        data-id="${addr.id}"
+        aria-label="Opções"
+        style="
+          background:none;
+          border:none;
+          cursor:pointer;
+          position:absolute;
+          top:1rem;
+          right:1rem;
+          font-size:1.2rem;
+        "
+      >
+        <i class="fas fa-ellipsis-v"></i>
+      </button>
+
+      <div
+        class="dropdown"
+        id="dropdown-${addr.id}"
+        style="
+          display:none;
+          position:absolute;
+          right:1rem;
+          top:2.8rem;
+          background:#fff;
+          border:1px solid #ccc;
+          border-radius:6px;
+          box-shadow:0 2px 6px rgba(0,0,0,0.15);
+          z-index:10;
+        "
+      >
+        <button
+          class="dropdown-item"
+          onclick="deleteAddress(${addr.id})"
+          style="
+            padding:8px 16px;
+            width:100%;
+            text-align:left;
+            border:none;
+            background:none;
+            cursor:pointer;
+            color:#c0392b;
+          "
+        >
+          <i class="fas fa-trash-alt"></i> Excluir
+        </button>
+      </div>
+    `;
+
+    ul.appendChild(li);
+  });
+
+  // (o resto do seu código de toggle dropdown e bloqueio de "novo endereço" permanece igual)
+}
+
       const ul = document.getElementById('addressList');
       ul.innerHTML = '';
 
