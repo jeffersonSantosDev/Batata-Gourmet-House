@@ -68,8 +68,22 @@ function renderAddressList(addresses) {
         <button class="menu-btn" data-id="${addr.id}" aria-label="Opções">
           <i class="fas fa-ellipsis-v"></i>
         </button>
-        <div class="dropdown" id="dropdown-${addr.id}" style="display:none; position:absolute; right:0; top:30px; background:#fff; border:1px solid #ccc; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.15); z-index:10;">
-          <button class="dropdown-item" onclick="deleteAddress(${addr.id})" style="padding:8px 16px; border:none; background:none; cursor:pointer; color:#c0392b;">Excluir</button>
+        <div class="dropdown" id="dropdown-${addr.id}"
+             style="display:none; position:absolute; right:0; top:30px;
+                    background:#fff; border:1px solid #ccc; border-radius:6px;
+                    box-shadow:0 2px 6px rgba(0,0,0,0.15); z-index:10;">
+          <button class="dropdown-item"
+                  onclick="editAddress(${addr.id})"
+                  style="padding:8px 16px; border:none; background:none;
+                         cursor:pointer; color:#2980b9;">
+            Editar
+          </button>
+          <button class="dropdown-item"
+                  onclick="deleteAddress(${addr.id})"
+                  style="padding:8px 16px; border:none; background:none;
+                         cursor:pointer; color:#c0392b;">
+            Excluir
+          </button>
         </div>
       </div>
     `;
@@ -113,7 +127,6 @@ function renderAddressList(addresses) {
   }
 }
 
-
 document.addEventListener('DOMContentLoaded', async () => {
   // efeito de voltar na seta
   document.getElementById('backBtn').addEventListener('click', () => {
@@ -146,6 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.location.href = 'identify.html';
   }
 });
+
 async function deleteAddress(id) {
   const confirm = await Swal.fire({
     title: 'Deseja excluir este endereço?',
@@ -174,4 +188,12 @@ async function deleteAddress(id) {
       Swal.fire('Erro', 'Não foi possível excluir o endereço.', 'error');
     }
   }
+}
+
+// Função para redirecionar à edição do endereço
+function editAddress(id) {
+  // se você tiver uma página de edição, redirecione para ela:
+  window.location.href = `edit-address.html?addressId=${id}`;
+  // ou abra um modal de edição aqui, caso prefira:
+  // openEditModal(id);
 }
