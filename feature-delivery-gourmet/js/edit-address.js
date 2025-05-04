@@ -56,12 +56,14 @@ function renderAddressList(addresses) {
           ${addr.padrao ? 'checked' : ''}
         />
         <label for="addr-${addr.id}">
-          <strong>${addr.bairro}, ${addr.numero}</strong><br/>
-          ${addr.cidade} – ${addr.uf.toUpperCase()}<br/>
-          ${addr.referencia ? `<em>${addr.referencia}</em><br/>` : ''}
-          <small>
-            ${addr.distanciaKm.toFixed(1)} km • ${addr.tempoMinutos} min • R$ ${addr.frete.toFixed(2)}
-          </small>
+          <strong>${addr.bairro}, ${addr.numero}</strong>
+        </label>
+        <label for="addr-${addr.id}">
+          ${addr.cidade} – ${addr.uf.toUpperCase()}
+        </label>
+        ${addr.referencia ? `<label for="addr-${addr.id}"><em>${addr.referencia}</em></label>` : ''}
+        <label for="addr-${addr.id}">
+          <small>${addr.distanciaKm.toFixed(1)} km • ${addr.tempoMinutos} min • R$ ${addr.frete.toFixed(2)}</small>
         </label>
       </div>
       <button class="menu-btn" data-id="${addr.id}" aria-label="Opções">⋮</button>
@@ -69,16 +71,12 @@ function renderAddressList(addresses) {
     ul.appendChild(li);
   });
 
-  // toggle dropdown com Editar e Excluir
+  // dropdown com Editar e Excluir
   document.querySelectorAll('.menu-btn').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
       const id = btn.dataset.id;
-
-      // remover dropdowns antigos
       document.querySelectorAll('.dropdown').forEach(d => d.remove());
-
-      // criar novo dropdown
       const dd = document.createElement('div');
       dd.className = 'dropdown';
       dd.innerHTML = `
@@ -96,12 +94,12 @@ function renderAddressList(addresses) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // botão voltar
+  // voltar
   document.getElementById('backBtn').addEventListener('click', () => {
     history.length > 1 ? history.back() : window.location.href = 'index.html';
   });
 
-  // novo endereço
+  // novo
   document.getElementById('newAddressBtn').addEventListener('click', () => {
     window.location.href = 'register-address.html';
   });
@@ -116,24 +114,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('saveBtn').addEventListener('click', () => {
       const sel = document.querySelector('input[name="selectedAddress"]:checked');
-      if (!sel) {
-        alert('Selecione um endereço.');
-        return;
-      }
+      if (!sel) { alert('Selecione um endereço.'); return; }
       window.location.href = `checkout.html?userId=${userId}&addressId=${sel.value}`;
     });
-  } catch (err) {
-    console.error('Erro ao buscar endereços:', err);
+  } catch {
+    console.error('Erro ao buscar endereços');
     window.location.href = 'identify.html';
   }
 });
 
-// redireciona para edição
+// edição
 function editAddress(id) {
   window.location.href = `edit-address.html?addressId=${id}`;
 }
 
-// exclui o endereço
+// exclusão
 async function deleteAddress(id) {
   if (!confirm('Deseja excluir este endereço?')) return;
   try {
@@ -149,11 +144,10 @@ async function deleteAddress(id) {
 /**
  * @typedef {Object} AddressDto
  * @property {number} id
- * @property {number} usuarioId
- * @property {string} uf
- * @property {string} cidade
  * @property {string} bairro
  * @property {string} numero
+ * @property {string} cidade
+ * @property {string} uf
  * @property {string} referencia
  * @property {boolean} padrao
  * @property {number} distanciaKm
