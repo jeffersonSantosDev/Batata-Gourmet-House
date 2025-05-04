@@ -104,10 +104,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// redireciona para edição
-function editAddress(id) {
-  window.location.href = `edit-address.html?addressId=${id}`;
-}
+ 
 
 // exclui
 async function deleteAddress(id) {
