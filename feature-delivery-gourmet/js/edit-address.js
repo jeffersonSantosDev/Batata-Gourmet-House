@@ -73,7 +73,7 @@ function renderAddressList(addresses) {
 
   // Bloqueia novo cadastro se já tiver 3 endereços
   const newBtn = document.getElementById('newAddressBtn');
-  if (addresses.length >= 2) {
+  if (addresses.length >= 5) {
     newBtn.disabled = true;
     newBtn.style.opacity = '0.6';
     newBtn.style.cursor = 'not-allowed';
