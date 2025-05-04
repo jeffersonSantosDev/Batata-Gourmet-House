@@ -5,11 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Editar Endereços — Batata Gourmet House</title>
   <link rel="stylesheet" href="css/edit-address.css"/>
-  <!-- Se você usa utils.js / identify -->
   <script src="js/utils.js"></script>
   <script defer src="js/edit-address.js"></script>
 </head>
 <body>
+  <!-- Loader -->
+  <div id="loader" class="loader hidden"></div>
+
   <!-- HEADER -->
   <header class="address-header">
     <button id="backBtn" class="back-btn">←</button>
@@ -22,17 +24,17 @@
       Crie um novo endereço ou use a lista abaixo
     </p>
     <hr class="divider"/>
-    <a href="register-address.html" class="new-address">
-      Cadastrar Novo Endereço
-    </a>
+    <button id="newAddressBtn" class="new-address-btn">
+      + Cadastrar Novo Endereço
+    </button>
     <ul id="addressList" class="address-list">
-      <!-- vai ser preenchido pelo JS -->
+      <!-- preenchido pelo JS -->
     </ul>
   </main>
 
   <!-- FOOTER -->
   <footer class="address-footer">
-    <button id="saveBtn" class="btn save-btn">Salvar</button>
+    <button id="saveBtn" class="save-btn">Salvar</button>
   </footer>
 </body>
 </html>
