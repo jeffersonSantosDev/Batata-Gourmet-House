@@ -64,16 +64,36 @@ function renderAddressList(addresses) {
           </small>
         </label>
       </div>
-      <button class="menu-btn" data-id="${addr.id}" aria-label="Opções">
-        <i class="fas fa-ellipsis-v"></i>
-      </button>
+      <div style="position: relative;">
+        <button class="menu-btn" data-id="${addr.id}" aria-label="Opções">
+          <i class="fas fa-ellipsis-v"></i>
+        </button>
+        <div class="dropdown" id="dropdown-${addr.id}" style="display:none; position:absolute; right:0; top:30px; background:#fff; border:1px solid #ccc; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.15); z-index:10;">
+          <button class="dropdown-item" onclick="deleteAddress(${addr.id})" style="padding:8px 16px; border:none; background:none; cursor:pointer; color:#c0392b;">Excluir</button>
+        </div>
+      </div>
     `;
     ul.appendChild(li);
   });
 
-  // Bloqueia novo cadastro se já tiver 3 endereços
+  // dropdown toggle
+  document.querySelectorAll('.menu-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.getAttribute('data-id');
+      document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
+      const dropdown = document.getElementById(`dropdown-${id}`);
+      dropdown.style.display = 'block';
+    });
+  });
+
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
+  });
+
+  // Bloqueia novo cadastro se tiver 3
   const newBtn = document.getElementById('newAddressBtn');
-  if (addresses.length >= 2) {
+  if (addresses.length >= 3) {
     newBtn.disabled = true;
     newBtn.style.opacity = '0.6';
     newBtn.style.cursor = 'not-allowed';
@@ -89,11 +109,10 @@ function renderAddressList(addresses) {
     newBtn.disabled = false;
     newBtn.style.opacity = '1';
     newBtn.style.cursor = 'pointer';
-    newBtn.onclick = () => {
-      window.location.href = 'register-address.html';
-    };
+    newBtn.onclick = () => window.location.href = 'register-address.html';
   }
 }
+
 
 document.addEventListener('DOMContentLoaded', async () => {
   // efeito de voltar na seta
@@ -127,3 +146,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.location.href = 'identify.html';
   }
 });
+async function deleteAddress(id) {
+  const confirm = await Swal.fire({
+    title: 'Deseja excluir este endereço?',
+    text: 'Essa ação não poderá ser desfeita.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sim, excluir',
+    cancelButtonText: 'Cancelar'
+  });
+
+  if (confirm.isConfirmed) {
+    try {
+      const resp = await fetch(`/api/Usuario/DeleteEndereco/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (!resp.ok) throw new Error('Erro ao excluir');
+
+      Swal.fire('Excluído!', 'Endereço removido com sucesso.', 'success');
+
+      const whatsapp = localStorage.getItem('bgHouse_whatsapp');
+      const addresses = await fetchUserAddresses(whatsapp);
+      renderAddressList(addresses);
+
+    } catch (err) {
+      Swal.fire('Erro', 'Não foi possível excluir o endereço.', 'error');
+    }
+  }
+}
