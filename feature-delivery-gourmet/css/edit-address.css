@@ -75,6 +75,7 @@ body {
   font-size: 1.2rem;
   font-weight: 600;
   text-align: center;
+  color: var(--text-dark);
 }
 .small-btn {
   background: var(--secondary);
@@ -83,6 +84,7 @@ body {
   border-radius: 4px;
   padding: 0.3rem 0.8rem;
   font-size: 0.85rem;
+  font-weight: 500;
   cursor: pointer;
   transition: background 0.2s;
   white-space: nowrap;
@@ -91,7 +93,7 @@ body {
   background: var(--highlight);
 }
 
-/* Subtítulo */
+/* Subtitle */
 .address-subtitle {
   background: var(--primary);
   text-align: center;
@@ -108,16 +110,14 @@ body {
   overflow-y: auto;
 }
 
-/* Lista */
+/* Lista de endereços */
 .address-list {
   list-style: none;
-  margin: 0 auto;
-  padding: 0;
   width: 100%;
   max-width: 480px;
+  margin: 0 auto;
+  padding: 0;
 }
-
-/* Item de endereço */
 .address-item {
   display: flex;
   align-items: flex-start;
@@ -129,15 +129,18 @@ body {
 .address-info {
   flex: 1;
   display: grid;
+  grid-auto-rows: auto;
   row-gap: 0.25rem;
   padding-right: 2.5rem;
 }
 .address-info strong {
   font-size: 1.05rem;
+  color: var(--text-dark);
 }
 .address-info label {
   line-height: 1.4;
   font-weight: 500;
+  color: #333;
   cursor: pointer;
 }
 .address-info em {
@@ -150,7 +153,7 @@ body {
   color: #888;
 }
 
-/* Estado “sem endereço” */
+/* Estado “Nenhum endereço” */
 .no-address {
   padding: 2rem;
   text-align: center;
@@ -201,10 +204,10 @@ body {
   background: var(--btn-hover);
 }
 .dropdown button:first-child {
-  color: var(--text-dark);
+  color: var(--text-dark); /* Editar */
 }
 .dropdown button:last-child {
-  color: #c0392b;
+  color: #c0392b; /* Excluir */
 }
 
 /* Footer */
@@ -222,6 +225,7 @@ body {
   border: none;
   border-radius: 6px;
   font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -229,7 +233,6 @@ body {
   background: var(--highlight);
 }
 
-/* Mobile */
 @media (max-width: 480px) {
   .address-header {
     grid-template-columns: 40px 1fr;
