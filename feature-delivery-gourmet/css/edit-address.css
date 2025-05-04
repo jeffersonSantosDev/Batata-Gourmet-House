@@ -42,7 +42,7 @@
   to { transform: rotate(360deg); }
 }
 
-/* Global */
+/* Body */
 body {
   font-family: "Poppins", sans-serif;
   background: var(--bg-light);
@@ -75,19 +75,17 @@ body {
   font-size: 1.2rem;
   font-weight: 600;
   text-align: center;
-  color: var(--text-dark);
 }
 .small-btn {
   background: var(--secondary);
   color: #fff;
   border: none;
   border-radius: 4px;
-  padding: 0.35rem 0.8rem;
+  padding: 0.3rem 0.8rem;
   font-size: 0.85rem;
-  font-weight: 500;
   cursor: pointer;
   transition: background 0.2s;
-  min-width: 70px;
+  white-space: nowrap;
 }
 .small-btn:hover {
   background: var(--highlight);
@@ -103,7 +101,7 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
-/* Main Content */
+/* Main */
 .address-main {
   flex: 1;
   padding: 1rem;
@@ -124,9 +122,7 @@ body {
   justify-content: space-between;
   padding: 1rem 0;
   border-bottom: 1px solid var(--border);
-  font-size: 0.95rem;
   position: relative;
-  background: transparent;
 }
 .address-info {
   flex: 1;
@@ -137,12 +133,10 @@ body {
 }
 .address-info strong {
   font-size: 1.05rem;
-  color: var(--text-dark);
 }
 .address-info label {
   line-height: 1.4;
   font-weight: 500;
-  color: #333;
   cursor: pointer;
 }
 .address-info em {
@@ -155,15 +149,15 @@ body {
   color: #888;
 }
 
-/* Menu Button */
+/* Menu button */
 .menu-btn {
   background: none;
   border: none;
+  font-size: 1.2rem;
   cursor: pointer;
   position: absolute;
   top: 1rem;
   right: 1rem;
-  font-size: 1.2rem;
   color: var(--text-dark);
 }
 .menu-btn:hover {
@@ -198,10 +192,10 @@ body {
   background: var(--btn-hover);
 }
 .dropdown button:first-child {
-  color: var(--text-dark); /* Editar */
+  color: var(--text-dark);
 }
 .dropdown button:last-child {
-  color: #c0392b; /* Excluir */
+  color: #c0392b;
 }
 
 /* Footer */
@@ -219,7 +213,6 @@ body {
   border: none;
   border-radius: 6px;
   font-size: 1rem;
-  font-weight: 600;
   cursor: pointer;
   transition: background 0.2s;
 }

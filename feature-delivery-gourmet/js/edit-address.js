@@ -1,16 +1,16 @@
-// ative o loader
+// Ative o loader
 function showLoader() {
   document.getElementById('loader').classList.remove('hidden');
 }
 
-// esconda o loader
+// Esconda o loader
 function hideLoader() {
   document.getElementById('loader').classList.add('hidden');
 }
 
 /**
  * Busca os endereços do usuário via WhatsApp.
- * @param {string} whatsapp 
+ * @param {string} whatsapp
  * @returns {Promise<AddressDto[]>}
  */
 async function fetchUserAddresses(whatsapp) {
@@ -24,7 +24,7 @@ async function fetchUserAddresses(whatsapp) {
     });
     if (resp.status === 204) return [];
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    return await resp.json();
+    return resp.json();
   } finally {
     hideLoader();
   }
@@ -32,7 +32,7 @@ async function fetchUserAddresses(whatsapp) {
 
 /**
  * Renderiza a lista de endereços no UL.
- * @param {AddressDto[]} addresses 
+ * @param {AddressDto[]} addresses
  */
 function renderAddressList(addresses) {
   const ul = document.getElementById('addressList');
@@ -71,14 +71,12 @@ function renderAddressList(addresses) {
     ul.appendChild(li);
   });
 
-  // insere dropdown de Editar/Excluir
+  // Dropdown de editar/excluir
   document.querySelectorAll('.menu-btn').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
       const id = btn.dataset.id;
-      // remove dropdowns existentes
       document.querySelectorAll('.dropdown').forEach(d => d.remove());
-      // cria novo dropdown
       const dd = document.createElement('div');
       dd.className = 'dropdown';
       dd.innerHTML = `
@@ -89,73 +87,22 @@ function renderAddressList(addresses) {
     });
   });
 
-  // fecha dropdown ao clicar fora
+  // Fecha dropdown ao clicar fora
   document.addEventListener('click', () => {
     document.querySelectorAll('.dropdown').forEach(d => d.remove());
   });
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // botão “←”
+  // Botão voltar
   document.getElementById('backBtn').addEventListener('click', () => {
     history.length > 1 ? history.back() : window.location.href = 'index.html';
   });
 
-  // botão “+ Novo”
+  // Botão "+ Cadastrar"
   document.getElementById('newAddressBtn').addEventListener('click', () => {
     window.location.href = 'register-address.html';
   });
 
   const whatsapp = localStorage.getItem('bgHouse_whatsapp');
-  const userId   = localStorage.getItem('bgHouse_id');
-  if (!whatsapp) return window.location.href = 'identify.html';
-
-  try {
-    const addresses = await fetchUserAddresses(whatsapp);
-    renderAddressList(addresses);
-
-    document.getElementById('saveBtn').addEventListener('click', () => {
-      const sel = document.querySelector('input[name="selectedAddress"]:checked');
-      if (!sel) {
-        alert('Selecione um endereço.');
-        return;
-      }
-      window.location.href = `checkout.html?userId=${userId}&addressId=${sel.value}`;
-    });
-  } catch (err) {
-    console.error('Erro ao buscar endereços:', err);
-    window.location.href = 'identify.html';
-  }
-});
-
-// redireciona para edição
-function editAddress(id) {
-  window.location.href = `edit-address.html?addressId=${id}`;
-}
-
-// exclui o endereço
-async function deleteAddress(id) {
-  if (!confirm('Deseja excluir este endereço?')) return;
-  try {
-    const resp = await fetch(`/api/Usuario/DeleteEndereco/${id}`, { method: 'DELETE' });
-    if (!resp.ok) throw new Error();
-    const list = await fetchUserAddresses(localStorage.getItem('bgHouse_whatsapp'));
-    renderAddressList(list);
-  } catch {
-    alert('Não foi possível excluir.');
-  }
-}
-
-/**
- * @typedef {Object} AddressDto
- * @property {number} id
- * @property {string} bairro
- * @property {string} numero
- * @property {string} cidade
- * @property {string} uf
- * @property {string} referencia
- * @property {boolean} padrao
- * @property {number} distanciaKm
- * @property {number} tempoMinutos
- * @property {number} frete
- */
+  const userId   = localStorage.getItem('bg
