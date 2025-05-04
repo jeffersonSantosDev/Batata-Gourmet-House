@@ -115,7 +115,110 @@
      * Renderiza a lista de endereços no UL.
      * @param {AddressDto[]} addresses 
      */
-    function renderAddressList(addresses) {
+     function renderAddressList(addresses) {
+  const ul = document.getElementById('addressList');
+  ul.innerHTML = '';
+
+  if (addresses.length === 0) {
+    ul.innerHTML = '<li class="text-gray-500">Nenhum endereço cadastrado.</li>';
+    return;
+  }
+
+  addresses.forEach(addr => {
+    // cria o LI
+    const li = document.createElement('li');
+    li.className = 'address-item';
+    li.style.position = 'relative';
+    li.style.padding = '1rem';
+    li.style.borderBottom = '1px solid #e2e8f0';
+    li.style.display = 'flex';
+    li.style.alignItems = 'flex-start';
+
+    // conteúdo principal
+    const info = document.createElement('div');
+    info.style.flex = '1';
+    info.style.paddingRight = '4rem';
+    info.innerHTML = `
+      <input
+        type="radio" name="selectedAddress"
+        id="addr-${addr.id}" value="${addr.id}"
+        ${addr.padrao ? 'checked' : ''}
+      />
+      <label for="addr-${addr.id}" style="margin-left:0.5rem; line-height:1.4;">
+        <strong>${addr.bairro}, ${addr.numero}</strong><br/>
+        ${addr.cidade} – ${addr.uf.toUpperCase()}<br/>
+        ${addr.referencia ? `<em>${addr.referencia}</em><br/>` : ''}
+        <small>${addr.distanciaKm.toFixed(1)} km • ${addr.tempoMinutos} min • R$ ${addr.frete.toFixed(2)}</small>
+      </label>
+    `;
+    li.appendChild(info);
+
+    // botão editar
+    const btnEdit = document.createElement('button');
+    btnEdit.textContent = '✏️ Editar';
+    btnEdit.style.position = 'absolute';
+    btnEdit.style.top = '1rem';
+    btnEdit.style.right = '5rem';
+    btnEdit.style.background = 'none';
+    btnEdit.style.border = 'none';
+    btnEdit.style.cursor = 'pointer';
+    btnEdit.style.color = '#2980b9';
+    btnEdit.addEventListener('click', () => editAddress(addr.id));
+    li.appendChild(btnEdit);
+
+    // botão de opções (excluir dropdown)
+    const btnMenu = document.createElement('button');
+    btnMenu.textContent = '⋮';
+    btnMenu.style.position = 'absolute';
+    btnMenu.style.top = '0.75rem';
+    btnMenu.style.right = '1rem';
+    btnMenu.style.background = 'none';
+    btnMenu.style.border = 'none';
+    btnMenu.style.cursor = 'pointer';
+    btnMenu.style.fontSize = '1.2rem';
+    li.appendChild(btnMenu);
+
+    // dropdown excluir
+    const dd = document.createElement('div');
+    dd.id = `dropdown-${addr.id}`;
+    dd.style.display = 'none';
+    dd.style.position = 'absolute';
+    dd.style.top = '2.5rem';
+    dd.style.right = '1rem';
+    dd.style.background = '#fff';
+    dd.style.border = '1px solid #ccc';
+    dd.style.borderRadius = '6px';
+    dd.style.boxShadow = '0 2px 6px rgba(0,0,0,0.15)';
+    dd.style.zIndex = '10';
+    const itemExcluir = document.createElement('button');
+    itemExcluir.textContent = '🗑️ Excluir';
+    itemExcluir.style.padding = '8px 16px';
+    itemExcluir.style.width = '100%';
+    itemExcluir.style.textAlign = 'left';
+    itemExcluir.style.border = 'none';
+    itemExcluir.style.background = 'none';
+    itemExcluir.style.cursor = 'pointer';
+    itemExcluir.style.color = '#c0392b';
+    itemExcluir.addEventListener('click', () => deleteAddress(addr.id));
+    dd.appendChild(itemExcluir);
+    li.appendChild(dd);
+
+    // toggle dropdown
+    btnMenu.addEventListener('click', e => {
+      e.stopPropagation();
+      document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
+      dd.style.display = 'block';
+    });
+
+    ul.appendChild(li);
+  });
+
+  // fechar qualquer dropdown ao clicar fora
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
+  });
+}
+
       const ul = document.getElementById('addressList');
       ul.innerHTML = '';
 
