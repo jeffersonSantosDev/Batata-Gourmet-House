@@ -42,6 +42,7 @@
   to { transform: rotate(360deg); }
 }
 
+/* Global */
 body {
   font-family: "Poppins", sans-serif;
   background: var(--bg-light);
@@ -76,7 +77,6 @@ body {
   text-align: center;
   color: var(--text-dark);
 }
-/* Botão “+ Novo” no header */
 .small-btn {
   background: var(--secondary);
   color: #fff;
@@ -87,7 +87,6 @@ body {
   font-weight: 500;
   cursor: pointer;
   transition: background 0.2s;
-  width: auto;
   min-width: 70px;
 }
 .small-btn:hover {
@@ -104,7 +103,7 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
-/* Main */
+/* Main Content */
 .address-main {
   flex: 1;
   padding: 1rem;
@@ -120,34 +119,31 @@ body {
   padding: 0;
 }
 .address-item {
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.95rem;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.95rem;
   position: relative;
   background: transparent;
-  border-radius: 0;
-  box-shadow: none;
-  transition: none;
 }
 .address-info {
   flex: 1;
   display: grid;
-  grid-template-rows: auto auto auto auto;
+  grid-auto-rows: auto;
   row-gap: 0.25rem;
   padding-right: 2.5rem;
+}
+.address-info strong {
+  font-size: 1.05rem;
+  color: var(--text-dark);
 }
 .address-info label {
   line-height: 1.4;
   font-weight: 500;
   color: #333;
   cursor: pointer;
-}
-.address-info strong {
-  font-size: 1.05rem;
-  color: var(--text-dark);
 }
 .address-info em {
   font-style: italic;
@@ -205,7 +201,7 @@ body {
   color: var(--text-dark); /* Editar */
 }
 .dropdown button:last-child {
-  color: #c0392b;       /* Excluir */
+  color: #c0392b; /* Excluir */
 }
 
 /* Footer */

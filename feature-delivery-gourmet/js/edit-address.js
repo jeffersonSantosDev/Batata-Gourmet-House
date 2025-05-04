@@ -71,12 +71,14 @@ function renderAddressList(addresses) {
     ul.appendChild(li);
   });
 
-  // dropdown com Editar e Excluir
+  // insere dropdown de Editar/Excluir
   document.querySelectorAll('.menu-btn').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
       const id = btn.dataset.id;
+      // remove dropdowns existentes
       document.querySelectorAll('.dropdown').forEach(d => d.remove());
+      // cria novo dropdown
       const dd = document.createElement('div');
       dd.className = 'dropdown';
       dd.innerHTML = `
@@ -94,12 +96,12 @@ function renderAddressList(addresses) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // voltar
+  // botão “←”
   document.getElementById('backBtn').addEventListener('click', () => {
     history.length > 1 ? history.back() : window.location.href = 'index.html';
   });
 
-  // novo
+  // botão “+ Novo”
   document.getElementById('newAddressBtn').addEventListener('click', () => {
     window.location.href = 'register-address.html';
   });
@@ -114,21 +116,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('saveBtn').addEventListener('click', () => {
       const sel = document.querySelector('input[name="selectedAddress"]:checked');
-      if (!sel) { alert('Selecione um endereço.'); return; }
+      if (!sel) {
+        alert('Selecione um endereço.');
+        return;
+      }
       window.location.href = `checkout.html?userId=${userId}&addressId=${sel.value}`;
     });
-  } catch {
-    console.error('Erro ao buscar endereços');
+  } catch (err) {
+    console.error('Erro ao buscar endereços:', err);
     window.location.href = 'identify.html';
   }
 });
 
-// edição
+// redireciona para edição
 function editAddress(id) {
   window.location.href = `edit-address.html?addressId=${id}`;
 }
 
-// exclusão
+// exclui o endereço
 async function deleteAddress(id) {
   if (!confirm('Deseja excluir este endereço?')) return;
   try {
