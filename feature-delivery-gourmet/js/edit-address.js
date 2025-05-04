@@ -46,6 +46,8 @@ function renderAddressList(addresses) {
   addresses.forEach(addr => {
     const li = document.createElement('li');
     li.className = 'address-item';
+    li.style.position = 'relative'; // <- garante que o dropdown fique alinhado ao botão
+
     li.innerHTML = `
       <div class="address-info">
         <input
@@ -64,34 +66,52 @@ function renderAddressList(addresses) {
           </small>
         </label>
       </div>
-      <div style="position: relative;">
-        <button class="menu-btn" data-id="${addr.id}" aria-label="Opções">
-          <i class="fas fa-ellipsis-v"></i>
-        </button>
-        <div class="dropdown" id="dropdown-${addr.id}" style="display:none; position:absolute; right:0; top:30px; background:#fff; border:1px solid #ccc; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.15); z-index:10;">
-          <button class="dropdown-item" onclick="deleteAddress(${addr.id})" style="padding:8px 16px; border:none; background:none; cursor:pointer; color:#c0392b;">Excluir</button>
-        </div>
+      <button class="menu-btn" data-id="${addr.id}" style="background: none; border: none; cursor: pointer;">
+        <i class="fas fa-ellipsis-v"></i>
+      </button>
+      <div class="dropdown" id="dropdown-${addr.id}" style="
+        display: none;
+        position: absolute;
+        top: 45px;
+        right: 10px;
+        background: #fff;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        z-index: 1000;
+      ">
+        <button onclick="deleteAddress(${addr.id})" style="
+          padding: 10px 16px;
+          background: none;
+          border: none;
+          width: 100%;
+          text-align: left;
+          color: #c0392b;
+          font-size: 14px;
+          cursor: pointer;
+        ">Excluir</button>
       </div>
     `;
     ul.appendChild(li);
   });
 
-  // dropdown toggle
+  // Mostrar/esconder dropdown
   document.querySelectorAll('.menu-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const id = btn.getAttribute('data-id');
       document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
       const dropdown = document.getElementById(`dropdown-${id}`);
-      dropdown.style.display = 'block';
+      if (dropdown) dropdown.style.display = 'block';
     });
   });
 
+  // Fechar dropdown ao clicar fora
   document.addEventListener('click', () => {
     document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
   });
 
-  // Bloqueia novo cadastro se tiver 3
+  // Bloqueio do botão Novo Endereço
   const newBtn = document.getElementById('newAddressBtn');
   if (addresses.length >= 3) {
     newBtn.disabled = true;
@@ -112,6 +132,7 @@ function renderAddressList(addresses) {
     newBtn.onclick = () => window.location.href = 'register-address.html';
   }
 }
+
 
 
 document.addEventListener('DOMContentLoaded', async () => {
