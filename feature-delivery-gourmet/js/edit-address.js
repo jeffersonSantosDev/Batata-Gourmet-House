@@ -105,4 +105,55 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   const whatsapp = localStorage.getItem('bgHouse_whatsapp');
-  const userId   = localStorage.getItem('bg
+  const userId   = localStorage.getItem('bgHouse_id');
+  if (!whatsapp) return window.location.href = 'identify.html';
+
+  try {
+    const addresses = await fetchUserAddresses(whatsapp);
+    renderAddressList(addresses);
+
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      const sel = document.querySelector('input[name="selectedAddress"]:checked');
+      if (!sel) {
+        alert('Selecione um endereço.');
+        return;
+      }
+      window.location.href = `checkout.html?userId=${userId}&addressId=${sel.value}`;
+    });
+  } catch (err) {
+    console.error('Erro ao buscar endereços:', err);
+    window.location.href = 'identify.html';
+  }
+});
+
+// Redireciona para edição
+function editAddress(id) {
+  window.location.href = `edit-address.html?addressId=${id}`;
+}
+
+// Exclui o endereço
+async function deleteAddress(id) {
+  if (!confirm('Deseja excluir este endereço?')) return;
+  try {
+    const resp = await fetch(`/api/Usuario/DeleteEndereco/${id}`, { method: 'DELETE' });
+    if (!resp.ok) throw new Error();
+    const list = await fetchUserAddresses(localStorage.getItem('bgHouse_whatsapp'));
+    renderAddressList(list);
+  } catch {
+    alert('Não foi possível excluir.');
+  }
+}
+
+/**
+ * @typedef {Object} AddressDto
+ * @property {number} id
+ * @property {string} bairro
+ * @property {string} numero
+ * @property {string} cidade
+ * @property {string} uf
+ * @property {string} referencia
+ * @property {boolean} padrao
+ * @property {number} distanciaKm
+ * @property {number} tempoMinutos
+ * @property {number} frete
+ */
