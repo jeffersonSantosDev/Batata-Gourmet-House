@@ -46,9 +46,6 @@ function renderAddressList(addresses) {
   addresses.forEach(addr => {
     const li = document.createElement('li');
     li.className = 'address-item';
-    li.style.position = 'relative';
-
-    // conteúdo principal
     li.innerHTML = `
       <div class="address-info">
         <input
@@ -67,48 +64,26 @@ function renderAddressList(addresses) {
           </small>
         </label>
       </div>
-      <!-- botão editar -->
-      <button class="edit-btn" onclick="editAddress(${addr.id})" title="Editar endereço"
-              style="position:absolute; top:1rem; right:4rem; background:none; border:none; cursor:pointer; color:var(--secondary);">
-        ✏️
-      </button>
-      <!-- menu de opções -->
-      <button class="menu-btn" data-id="${addr.id}" aria-label="Opções"
-              style="position:absolute; top:1rem; right:1rem; background:none; border:none; cursor:pointer;">
-        ⋮
-      </button>
+      <button class="menu-btn" data-id="${addr.id}" aria-label="Opções">⋮</button>
     `;
     ul.appendChild(li);
   });
 
-  // ao clicar no ⋮ abre dropdown de excluir
+  // toggle dropdown com Editar e Excluir
   document.querySelectorAll('.menu-btn').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
       const id = btn.dataset.id;
-      // remove todos
+
+      // remover dropdowns antigos
       document.querySelectorAll('.dropdown').forEach(d => d.remove());
-      // cria dropdown
+
+      // criar novo dropdown
       const dd = document.createElement('div');
       dd.className = 'dropdown';
-      dd.id = `dropdown-${id}`;
-      dd.style = `
-        position:absolute;
-        top:2.5rem;
-        right:1rem;
-        background:var(--primary);
-        border:1px solid var(--border);
-        border-radius:6px;
-        box-shadow:0 2px 6px var(--shadow);
-        z-index:10;
-      `;
       dd.innerHTML = `
-        <button onclick="deleteAddress(${id})"
-                style="display:block; width:100%; padding:8px 16px; border:none;
-                       background:none; text-align:left; cursor:pointer;
-                       color:#c0392b;">
-          🗑️ Excluir
-        </button>
+        <button onclick="editAddress(${id})">✏️ Editar</button>
+        <button onclick="deleteAddress(${id})">🗑️ Excluir</button>
       `;
       btn.parentElement.appendChild(dd);
     });
@@ -121,7 +96,7 @@ function renderAddressList(addresses) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // voltar na seta
+  // botão voltar
   document.getElementById('backBtn').addEventListener('click', () => {
     history.length > 1 ? history.back() : window.location.href = 'index.html';
   });
@@ -153,20 +128,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// função de edição
+// redireciona para edição
 function editAddress(id) {
   window.location.href = `edit-address.html?addressId=${id}`;
 }
 
-// função de exclusão (padrão)
+// exclui o endereço
 async function deleteAddress(id) {
   if (!confirm('Deseja excluir este endereço?')) return;
   try {
     const resp = await fetch(`/api/Usuario/DeleteEndereco/${id}`, { method: 'DELETE' });
     if (!resp.ok) throw new Error();
-    // recarrega lista
-    const addresses = await fetchUserAddresses(localStorage.getItem('bgHouse_whatsapp'));
-    renderAddressList(addresses);
+    const list = await fetchUserAddresses(localStorage.getItem('bgHouse_whatsapp'));
+    renderAddressList(list);
   } catch {
     alert('Não foi possível excluir.');
   }

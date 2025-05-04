@@ -154,21 +154,13 @@ body {
   color: #666;
 }
 
-/* Edit & Menu Buttons */
-.edit-btn,
+/* Menu Button */
 .menu-btn {
   background: none;
   border: none;
   cursor: pointer;
   position: absolute;
   top: 1rem;
-}
-.edit-btn {
-  right: 4rem;
-  font-size: 1rem;
-  color: var(--secondary);
-}
-.menu-btn {
   right: 1rem;
   font-size: 1.2rem;
   color: var(--text-dark);
@@ -189,20 +181,25 @@ body {
   z-index: 10;
 }
 .dropdown button {
-  display: block;
-  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   padding: 8px 16px;
+  width: 100%;
+  text-align: left;
   border: none;
   background: none;
-  text-align: left;
   cursor: pointer;
   font-size: 0.95rem;
 }
 .dropdown button:hover {
   background: var(--btn-hover);
 }
-.dropdown button.delete {
-  color: #c0392b;
+.dropdown button:first-child {
+  color: var(--text-dark); /* Editar */
+}
+.dropdown button:last-child {
+  color: #c0392b; /* Excluir */
 }
 
 /* Footer */
@@ -239,6 +236,11 @@ body {
   .address-item {
     flex-direction: column;
   }
-  .edit-btn { top: 0.75rem; right: 3.5rem; }
-  .menu-btn { top: 0.75rem; right: 1rem; }
+  .menu-btn {
+    top: 0.75rem;
+    right: 1rem;
+  }
+  .dropdown {
+    right: 0.5rem;
+  }
 }
