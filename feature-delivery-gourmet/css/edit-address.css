@@ -232,15 +232,32 @@ body {
   }
 }
 
-/* Ajusta o posicionamento do radio para ficar na mesma linha do título */
-.address-item .address-info input[type="radio"] {
-  vertical-align: middle; /* alinha ao meio do texto */
-  margin-top: 0;           /* remove qualquer top default */
-  margin-right: 0.5rem;    /* pequeno espaçamento até o texto */
+
+
+/* Alinha o rádio ao título numa grid de 2 colunas */
+.address-info {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 
+    auto /* linha 1: título */
+    auto /* linha 2: cidade/UF */
+    auto /* linha 3: referência (se houver) */
+    auto /* linha 4: frete/distância */;
+  column-gap: 0.5rem;
+  row-gap: 0.25rem;
 }
 
-/* Garante que o label também esteja alinhado ao meio */
-.address-item .address-info label:first-of-type {
-  display: inline-block;
-  vertical-align: middle;
+/* Rádio posicionado na coluna 1, linha 1, centralizado verticalmente */
+.address-info input[type="radio"] {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  margin: 0; /* remove margens extras */
+}
+
+/* Todas as labels (inclusive o título) na coluna 2 */
+.address-info label {
+  grid-column: 2;
+  margin: 0;
+  line-height: 1.4;
 }
