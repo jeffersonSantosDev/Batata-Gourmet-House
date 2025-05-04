@@ -1,24 +1,20 @@
-// ative o loader
+// Ative o loader
 function showLoader() {
   document.getElementById('loader').classList.remove('hidden');
 }
-
-// esconda o loader
+// Esconda o loader
 function hideLoader() {
   document.getElementById('loader').classList.add('hidden');
 }
 
 /**
- * Busca os endereços do usuário via WhatsApp.
- * @param {string} whatsapp 
- * @returns {Promise<AddressDto[]>}
+ * Busca os endereços via API
  */
 async function fetchUserAddresses(whatsapp) {
   showLoader();
   try {
     const resp = await fetch('/api/Usuario/GetAddressesByWhatsApp', {
       method: 'POST',
-      mode: 'cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ numero: whatsapp })
     });
@@ -31,54 +27,41 @@ async function fetchUserAddresses(whatsapp) {
 }
 
 /**
- * Renderiza a lista de endereços no UL.
- * @param {AddressDto[]} addresses 
+ * Renderiza a lista de endereços
  */
 function renderAddressList(addresses) {
   const ul = document.getElementById('addressList');
   ul.innerHTML = '';
-
   if (addresses.length === 0) {
     ul.innerHTML = '<li class="no-address">Nenhum endereço cadastrado.</li>';
     return;
   }
-
-  addresses.forEach(addr => {
+  addresses.forEach(a => {
     const li = document.createElement('li');
     li.className = 'address-item';
     li.innerHTML = `
       <div class="address-info">
-        <input
-          type="radio"
-          name="selectedAddress"
-          id="addr-${addr.id}"
-          value="${addr.id}"
-          ${addr.padrao ? 'checked' : ''}
-        />
-        <label for="addr-${addr.id}">
-          <strong>${addr.bairro}, ${addr.numero}</strong><br/>
-          ${addr.cidade} – ${addr.uf.toUpperCase()}<br/>
-          ${addr.referencia ? `<em>${addr.referencia}</em><br/>` : ''}
-          <small>
-            ${addr.distanciaKm.toFixed(1)} km • ${addr.tempoMinutos} min • R$ ${addr.frete.toFixed(2)}
-          </small>
-        </label>
+        <input type="radio"
+               name="selectedAddress"
+               id="addr-${a.id}"
+               value="${a.id}"
+               ${a.padrao ? 'checked' : ''}/>
+        <label for="addr-${a.id}"><strong>${a.bairro}, ${a.numero}</strong></label>
+        <label for="addr-${a.id}">${a.cidade} – ${a.uf.toUpperCase()}</label>
+        ${a.referencia ? `<label for="addr-${a.id}"><em>${a.referencia}</em></label>` : ''}
+        <label for="addr-${a.id}"><small>${a.distanciaKm.toFixed(1)} km • ${a.tempoMinutos} min • R$ ${a.frete.toFixed(2)}</small></label>
       </div>
-      <button class="menu-btn" data-id="${addr.id}" aria-label="Opções">⋮</button>
+      <button class="menu-btn" data-id="${a.id}" aria-label="Opções">⋮</button>
     `;
     ul.appendChild(li);
   });
 
-  // toggle dropdown com Editar e Excluir
+  // dropdown
   document.querySelectorAll('.menu-btn').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
-      const id = btn.dataset.id;
-
-      // remover dropdowns antigos
       document.querySelectorAll('.dropdown').forEach(d => d.remove());
-
-      // criar novo dropdown
+      const id = btn.dataset.id;
       const dd = document.createElement('div');
       dd.className = 'dropdown';
       dd.innerHTML = `
@@ -88,40 +71,34 @@ function renderAddressList(addresses) {
       btn.parentElement.appendChild(dd);
     });
   });
-
-  // fecha dropdown ao clicar fora
   document.addEventListener('click', () => {
     document.querySelectorAll('.dropdown').forEach(d => d.remove());
   });
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // botão voltar
-  document.getElementById('backBtn').addEventListener('click', () => {
+  // voltar
+  document.getElementById('backBtn').onclick = () => {
     history.length > 1 ? history.back() : window.location.href = 'index.html';
-  });
-
-  // novo endereço
-  document.getElementById('newAddressBtn').addEventListener('click', () => {
+  };
+  // novo cadastro
+  document.getElementById('newAddressBtn').onclick = () => {
     window.location.href = 'register-address.html';
-  });
+  };
 
   const whatsapp = localStorage.getItem('bgHouse_whatsapp');
   const userId   = localStorage.getItem('bgHouse_id');
   if (!whatsapp) return window.location.href = 'identify.html';
 
   try {
-    const addresses = await fetchUserAddresses(whatsapp);
-    renderAddressList(addresses);
+    const list = await fetchUserAddresses(whatsapp);
+    renderAddressList(list);
 
-    document.getElementById('saveBtn').addEventListener('click', () => {
+    document.getElementById('saveBtn').onclick = () => {
       const sel = document.querySelector('input[name="selectedAddress"]:checked');
-      if (!sel) {
-        alert('Selecione um endereço.');
-        return;
-      }
+      if (!sel) return alert('Selecione um endereço.');
       window.location.href = `checkout.html?userId=${userId}&addressId=${sel.value}`;
-    });
+    };
   } catch (err) {
     console.error('Erro ao buscar endereços:', err);
     window.location.href = 'identify.html';
@@ -133,7 +110,7 @@ function editAddress(id) {
   window.location.href = `edit-address.html?addressId=${id}`;
 }
 
-// exclui o endereço
+// exclui
 async function deleteAddress(id) {
   if (!confirm('Deseja excluir este endereço?')) return;
   try {
@@ -145,18 +122,3 @@ async function deleteAddress(id) {
     alert('Não foi possível excluir.');
   }
 }
-
-/**
- * @typedef {Object} AddressDto
- * @property {number} id
- * @property {number} usuarioId
- * @property {string} uf
- * @property {string} cidade
- * @property {string} bairro
- * @property {string} numero
- * @property {string} referencia
- * @property {boolean} padrao
- * @property {number} distanciaKm
- * @property {number} tempoMinutos
- * @property {number} frete
- */
