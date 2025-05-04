@@ -66,8 +66,8 @@ function renderAddressList(addresses) {
           </small>
         </label>
       </div>
-<button class="menu-btn" data-id="${addr.id}" aria-label="Opções">
-        <i class="fas fa-pen"></i>
+      <button class="menu-btn" data-id="${addr.id}" style="background: none; border: none; cursor: pointer;">
+        <i class="fas fa-ellipsis-v"></i>
       </button>
       <div class="dropdown" id="dropdown-${addr.id}" style="
         display: none;
@@ -80,16 +80,6 @@ function renderAddressList(addresses) {
         box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         z-index: 1000;
       ">
-        <button onclick="editAddress(${addr.id})" style="
-          padding: 10px 16px;
-          background: none;
-          border: none;
-          width: 100%;
-          text-align: left;
-          color: #333;
-          font-size: 14px;
-          cursor: pointer;
-        ">Editar</button>
         <button onclick="deleteAddress(${addr.id})" style="
           padding: 10px 16px;
           background: none;
@@ -205,8 +195,4 @@ async function deleteAddress(id) {
       Swal.fire('Erro', 'Não foi possível excluir o endereço.', 'error');
     }
   }
-}
-
-function editAddress(id) {
-  window.location.href = `edit-address.html?id=${id}`;
 }
