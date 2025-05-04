@@ -1,9 +1,9 @@
-// Ative o loader
+// ative o loader
 function showLoader() {
   document.getElementById('loader').classList.remove('hidden');
 }
 
-// Esconda o loader
+// esconda o loader
 function hideLoader() {
   document.getElementById('loader').classList.add('hidden');
 }
@@ -64,73 +64,22 @@ function renderAddressList(addresses) {
           </small>
         </label>
       </div>
-      <div style="position: relative;">
-        <button class="menu-btn" data-id="${addr.id}" aria-label="Opções">
-          <i class="fas fa-ellipsis-v"></i>
-        </button>
-        <div class="dropdown" id="dropdown-${addr.id}"
-             style="display:none; position:absolute; right:0; top:30px;
-                    background:#fff; border:1px solid #ccc; border-radius:6px;
-                    box-shadow:0 2px 6px rgba(0,0,0,0.15); z-index:10;">
-          <button class="dropdown-item"
-                  onclick="editAddress(${addr.id})"
-                  style="padding:8px 16px; border:none; background:none;
-                         cursor:pointer; color:#2980b9;">
-            Editar
-          </button>
-          <button class="dropdown-item"
-                  onclick="deleteAddress(${addr.id})"
-                  style="padding:8px 16px; border:none; background:none;
-                         cursor:pointer; color:#c0392b;">
-            Excluir
-          </button>
-        </div>
-      </div>
+      <button class="menu-btn" data-id="${addr.id}" aria-label="Opções">
+        <i class="fas fa-ellipsis-v"></i>
+      </button>
     `;
     ul.appendChild(li);
   });
-
-  // dropdown toggle
-  document.querySelectorAll('.menu-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const id = btn.getAttribute('data-id');
-      document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
-      const dropdown = document.getElementById(`dropdown-${id}`);
-      dropdown.style.display = 'block';
-    });
-  });
-
-  document.addEventListener('click', () => {
-    document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
-  });
-
-  // Bloqueia novo cadastro se tiver 3
-  const newBtn = document.getElementById('newAddressBtn');
-  if (addresses.length >= 3) {
-    newBtn.disabled = true;
-    newBtn.style.opacity = '0.6';
-    newBtn.style.cursor = 'not-allowed';
-    newBtn.onclick = () => {
-      Swal.fire({
-        icon: 'info',
-        title: 'Limite atingido',
-        text: 'Você só pode cadastrar até 3 endereços. Exclua um para adicionar outro.',
-        confirmButtonText: 'Entendi'
-      });
-    };
-  } else {
-    newBtn.disabled = false;
-    newBtn.style.opacity = '1';
-    newBtn.style.cursor = 'pointer';
-    newBtn.onclick = () => window.location.href = 'register-address.html';
-  }
 }
-
 document.addEventListener('DOMContentLoaded', async () => {
   // efeito de voltar na seta
   document.getElementById('backBtn').addEventListener('click', () => {
     history.length > 1 ? history.back() : window.location.href = 'index.html';
+  });
+
+  // botão de criar novo endereço
+  document.getElementById('newAddressBtn').addEventListener('click', () => {
+    window.location.href = 'register-address.html'; // ou o arquivo de cadastro que você usa
   });
 
   const whatsapp = localStorage.getItem('bgHouse_whatsapp');
@@ -144,12 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('saveBtn').addEventListener('click', () => {
       const sel = document.querySelector('input[name="selectedAddress"]:checked');
       if (!sel) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Endereço obrigatório',
-          text: 'Selecione um endereço para prosseguir.',
-          confirmButtonText: 'Ok'
-        });
+        alert('Selecione um endereço.');
         return;
       }
       window.location.href = `checkout.html?userId=${userId}&addressId=${sel.value}`;
@@ -160,40 +104,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-async function deleteAddress(id) {
-  const confirm = await Swal.fire({
-    title: 'Deseja excluir este endereço?',
-    text: 'Essa ação não poderá ser desfeita.',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Sim, excluir',
-    cancelButtonText: 'Cancelar'
-  });
 
-  if (confirm.isConfirmed) {
-    try {
-      const resp = await fetch(`/api/Usuario/DeleteEndereco/${id}`, {
-        method: 'DELETE'
-      });
-
-      if (!resp.ok) throw new Error('Erro ao excluir');
-
-      Swal.fire('Excluído!', 'Endereço removido com sucesso.', 'success');
-
-      const whatsapp = localStorage.getItem('bgHouse_whatsapp');
-      const addresses = await fetchUserAddresses(whatsapp);
-      renderAddressList(addresses);
-
-    } catch (err) {
-      Swal.fire('Erro', 'Não foi possível excluir o endereço.', 'error');
-    }
-  }
-}
-
-// Função para redirecionar à edição do endereço
-function editAddress(id) {
-  // se você tiver uma página de edição, redirecione para ela:
-  window.location.href = `edit-address.html?addressId=${id}`;
-  // ou abra um modal de edição aqui, caso prefira:
-  // openEditModal(id);
-}
+/**ssss
+ * @typedef {Object} AddressDto
+ * @property {number} id
+ * @property {number} usuarioId
+ * @property {string} uf
+ * @property {string} cidade
+ * @property {string} bairro
+ * @property {string} numero
+ * @property {string} referencia
+ * @property {boolean} padrao
+ * @property {number} distanciaKm
+ * @property {number} tempoMinutos
+ * @property {number} frete
+ */
