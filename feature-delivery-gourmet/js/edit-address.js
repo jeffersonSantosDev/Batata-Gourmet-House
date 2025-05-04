@@ -56,7 +56,7 @@ function renderAddressList(addresses) {
     ul.appendChild(li);
   });
 
-  // dropdown
+  // dropdown  // <button onclick="editAddress(${id})">✏️ Editar</button>
   document.querySelectorAll('.menu-btn').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
@@ -64,8 +64,7 @@ function renderAddressList(addresses) {
       const id = btn.dataset.id;
       const dd = document.createElement('div');
       dd.className = 'dropdown';
-      dd.innerHTML = `
-        <button onclick="editAddress(${id})">✏️ Editar</button>
+      dd.innerHTML = ` 
         <button onclick="deleteAddress(${id})">🗑️ Excluir</button>
       `;
       btn.parentElement.appendChild(dd);
