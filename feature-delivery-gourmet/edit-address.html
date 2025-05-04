@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Editar Endereços — Batata Gourmet House</title>
   <link rel="stylesheet" href="css/edit-address.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="js/utils.js"></script>
   <script defer src="js/edit-address.js"></script>
 </head>
@@ -27,11 +28,8 @@
 
       <p class="address-note">Selecione seu endereço de entrega</p>
       <hr class="divider"/>
-      <ul id="addressList" class="address-list">
-        <!-- Será preenchido pelo JS -->
-      </ul>
+      <ul id="addressList" class="address-list"></ul>
 
-      <!-- BOTÃO SALVAR -->
       <button id="saveBtn" class="btn save-btn">Salvar</button>
     </div>
   </main>

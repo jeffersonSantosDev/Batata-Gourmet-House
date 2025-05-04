@@ -1,24 +1,8 @@
-// ative o loader
-function showLoader() {
-  document.getElementById('loader').classList.remove('hidden');
-}
-
-// esconda o loader
-function hideLoader() {
-  document.getElementById('loader').classList.add('hidden');
-}
-
-/**
- * Busca os endereços do usuário via WhatsApp.
- * @param {string} whatsapp 
- * @returns {Promise<AddressDto[]>}
- */
 async function fetchUserAddresses(whatsapp) {
   showLoader();
   try {
     const resp = await fetch('/api/Usuario/GetAddressesByWhatsApp', {
       method: 'POST',
-      mode: 'cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ numero: whatsapp })
     });
@@ -30,10 +14,6 @@ async function fetchUserAddresses(whatsapp) {
   }
 }
 
-/**
- * Renderiza a lista de endereços no UL.
- * @param {AddressDto[]} addresses 
- */
 function renderAddressList(addresses) {
   const ul = document.getElementById('addressList');
   ul.innerHTML = '';
@@ -48,20 +28,12 @@ function renderAddressList(addresses) {
     li.className = 'address-item';
     li.innerHTML = `
       <div class="address-info">
-        <input
-          type="radio"
-          name="selectedAddress"
-          id="addr-${addr.id}"
-          value="${addr.id}"
-          ${addr.padrao ? 'checked' : ''}
-        />
+        <input type="radio" name="selectedAddress" id="addr-${addr.id}" value="${addr.id}" ${addr.padrao ? 'checked' : ''} />
         <label for="addr-${addr.id}">
           <strong>${addr.bairro}, ${addr.numero}</strong><br/>
           ${addr.cidade} – ${addr.uf.toUpperCase()}<br/>
           ${addr.referencia ? `<em>${addr.referencia}</em><br/>` : ''}
-          <small>
-            ${addr.distanciaKm.toFixed(1)} km • ${addr.tempoMinutos} min • R$ ${addr.frete.toFixed(2)}
-          </small>
+          <small>${addr.distanciaKm.toFixed(1)} km • ${addr.tempoMinutos} min • R$ ${addr.frete.toFixed(2)}</small>
         </label>
       </div>
       <button class="menu-btn" data-id="${addr.id}" aria-label="Opções">
@@ -70,16 +42,32 @@ function renderAddressList(addresses) {
     `;
     ul.appendChild(li);
   });
+
+  // Bloqueia novo cadastro se já tiver 3 endereços
+  if (addresses.length >= 3) {
+    const newBtn = document.getElementById('newAddressBtn');
+    newBtn.disabled = true;
+    newBtn.style.opacity = '0.6';
+    newBtn.style.cursor = 'not-allowed';
+    newBtn.addEventListener('click', () => {
+      Swal.fire({
+        icon: 'info',
+        title: 'Limite atingido',
+        text: 'Você só pode cadastrar até 3 endereços. Exclua um para adicionar outro.',
+        confirmButtonText: 'Entendi'
+      });
+    });
+  }
 }
+
 document.addEventListener('DOMContentLoaded', async () => {
-  // efeito de voltar na seta
   document.getElementById('backBtn').addEventListener('click', () => {
     history.length > 1 ? history.back() : window.location.href = 'index.html';
   });
 
-  // botão de criar novo endereço
-  document.getElementById('newAddressBtn').addEventListener('click', () => {
-    window.location.href = 'register-address.html'; // ou o arquivo de cadastro que você usa
+  const newBtn = document.getElementById('newAddressBtn');
+  newBtn.addEventListener('click', () => {
+    window.location.href = 'register-address.html';
   });
 
   const whatsapp = localStorage.getItem('bgHouse_whatsapp');
@@ -93,7 +81,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('saveBtn').addEventListener('click', () => {
       const sel = document.querySelector('input[name="selectedAddress"]:checked');
       if (!sel) {
-        alert('Selecione um endereço.');
+        Swal.fire({
+          icon: 'warning',
+          title: 'Endereço obrigatório',
+          text: 'Selecione um endereço para prosseguir.',
+          confirmButtonText: 'Ok'
+        });
         return;
       }
       window.location.href = `checkout.html?userId=${userId}&addressId=${sel.value}`;
@@ -103,19 +96,3 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.location.href = 'identify.html';
   }
 });
-
-
-/**
- * @typedef {Object} AddressDto
- * @property {number} id
- * @property {number} usuarioId
- * @property {string} uf
- * @property {string} cidade
- * @property {string} bairro
- * @property {string} numero
- * @property {string} referencia
- * @property {boolean} padrao
- * @property {number} distanciaKm
- * @property {number} tempoMinutos
- * @property {number} frete
- */
