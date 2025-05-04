@@ -9,11 +9,14 @@
   --shadow: rgba(0,0,0,0.1);
 }
 
-/* Reset básico */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+.hidden {
+  display: none !important;
 }
 
 /* Loader */
@@ -25,9 +28,6 @@
   align-items: center;
   justify-content: center;
   z-index: 999;
-}
-.loader.hidden {
-  display: none !important;
 }
 .loader::before {
   content: "";
@@ -42,7 +42,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* Corpo */
 body {
   font-family: "Poppins", sans-serif;
   background: var(--bg-light);
@@ -58,7 +57,7 @@ body {
   grid-template-columns: 40px 1fr auto;
   align-items: center;
   background: var(--primary);
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   box-shadow: 0 1px 4px var(--shadow);
 }
 .back-btn {
@@ -72,7 +71,7 @@ body {
   color: var(--secondary);
 }
 .address-title {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 600;
   text-align: center;
   color: var(--text-dark);
@@ -82,12 +81,11 @@ body {
   color: #fff;
   border: none;
   border-radius: 4px;
-  padding: 0.3rem 0.8rem;
+  padding: 0.25rem 0.75rem;
   font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
   transition: background 0.2s;
-  white-space: nowrap;
 }
 .small-btn:hover {
   background: var(--highlight);
@@ -106,36 +104,52 @@ body {
 /* Main */
 .address-main {
   flex: 1;
-  padding: 1rem;
+  padding: 0.5rem 1rem;
   overflow-y: auto;
 }
 
-/* Lista de endereços */
+/* New address button (fallback, if used elsewhere) */
+.new-address-btn {
+  background: var(--secondary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-bottom: 1rem;
+}
+.new-address-btn:hover {
+  background: var(--highlight);
+}
+
+/* Address List */
 .address-list {
   list-style: none;
   width: 100%;
   max-width: 480px;
-  margin: 0 auto;
   padding: 0;
+  margin: 0;
 }
 .address-item {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--border);
+  background: var(--primary);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 1px 3px var(--shadow);
   position: relative;
+  transition: box-shadow 0.2s;
+}
+.address-item:hover {
+  box-shadow: 0 2px 6px var(--shadow);
 }
 .address-info {
-  flex: 1;
   display: grid;
-  grid-auto-rows: auto;
+  grid-template-rows: auto auto auto;
   row-gap: 0.25rem;
   padding-right: 2.5rem;
-}
-.address-info strong {
-  font-size: 1.05rem;
-  color: var(--text-dark);
 }
 .address-info label {
   line-height: 1.4;
@@ -143,33 +157,28 @@ body {
   color: #333;
   cursor: pointer;
 }
+.address-info strong {
+  font-size: 1rem;
+}
 .address-info em {
   font-style: italic;
-  font-size: 0.9rem;
-  color: #777;
+  font-size: 0.85rem;
+  color: #666;
 }
 .address-info small {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #888;
 }
 
-/* Estado “Nenhum endereço” */
-.no-address {
-  padding: 2rem;
-  text-align: center;
-  color: #888;
-  font-size: 0.95rem;
-}
-
-/* Botão de menu */
+/* Menu Button */
 .menu-btn {
   background: none;
   border: none;
-  font-size: 1.2rem;
   cursor: pointer;
   position: absolute;
   top: 1rem;
   right: 1rem;
+  font-size: 1.2rem;
   color: var(--text-dark);
 }
 .menu-btn:hover {
@@ -243,11 +252,8 @@ body {
   .address-subtitle {
     display: none;
   }
-  .address-main {
-    padding: 0.5rem;
-  }
   .address-item {
-    padding: 0.75rem 0;
+    padding: 0.75rem;
   }
   .menu-btn {
     top: 0.75rem;
