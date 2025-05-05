@@ -27,25 +27,50 @@ async function fetchUserAddresses(whatsapp) {
 }
 
 /**
- * Renderiza a lista de endereços
+ * Define o endereço padrão na API
+ */
+async function setDefaultAddress(whatsapp, addressId) {
+  showLoader();
+  try {
+    const resp = await fetch('/api/Usuario/SetDefaultAddress', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ numero: whatsapp, addressId })
+    });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  } finally {
+    hideLoader();
+  }
+}
+
+/**
+ * Renderiza a lista de endereços e retorna o id do padrão original.
  */
 function renderAddressList(addresses) {
   const ul = document.getElementById('addressList');
   ul.innerHTML = '';
+
+  let originalDefaultId = null;
+
   if (addresses.length === 0) {
     ul.innerHTML = '<li class="no-address">Nenhum endereço cadastrado.</li>';
-    return;
+    return originalDefaultId;
   }
+
   addresses.forEach(a => {
+    if (a.padrao) originalDefaultId = String(a.id);
+
     const li = document.createElement('li');
     li.className = 'address-item';
     li.innerHTML = `
       <div class="address-info">
-        <input type="radio"
-               name="selectedAddress"
-               id="addr-${a.id}"
-               value="${a.id}"
-               ${a.padrao ? 'checked' : ''}/>
+        <input 
+          type="radio"
+          name="selectedAddress"
+          id="addr-${a.id}"
+          value="${a.id}"
+          ${a.padrao ? 'checked' : ''} 
+        />
         <label for="addr-${a.id}"><strong>${a.bairro}, ${a.numero}</strong></label>
         <label for="addr-${a.id}">${a.cidade} – ${a.uf.toUpperCase()}</label>
         ${a.referencia ? `<label for="addr-${a.id}"><em>${a.referencia}</em></label>` : ''}
@@ -56,7 +81,7 @@ function renderAddressList(addresses) {
     ul.appendChild(li);
   });
 
-  // dropdown  // <button onclick="editAddress(${id})">✏️ Editar</button>
+  // dropdown de excluir
   document.querySelectorAll('.menu-btn').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
@@ -64,7 +89,7 @@ function renderAddressList(addresses) {
       const id = btn.dataset.id;
       const dd = document.createElement('div');
       dd.className = 'dropdown';
-      dd.innerHTML = ` 
+      dd.innerHTML = `
         <button onclick="deleteAddress(${id})">🗑️ Excluir</button>
       `;
       btn.parentElement.appendChild(dd);
@@ -73,48 +98,72 @@ function renderAddressList(addresses) {
   document.addEventListener('click', () => {
     document.querySelectorAll('.dropdown').forEach(d => d.remove());
   });
+
+  return originalDefaultId;
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // voltar
+  // Voltar
   document.getElementById('backBtn').onclick = () => {
     history.length > 1 ? history.back() : window.location.href = 'index.html';
   };
-  // novo cadastro
+  // Novo cadastro
   document.getElementById('newAddressBtn').onclick = () => {
     window.location.href = 'register-address.html';
   };
 
   const whatsapp = localStorage.getItem('bgHouse_whatsapp');
-  const userId   = localStorage.getItem('bgHouse_id');
+  const userId = localStorage.getItem('bgHouse_id');
   if (!whatsapp) return window.location.href = 'identify.html';
 
+  // Carrega e renderiza
+  let originalDefaultId = null;
   try {
     const list = await fetchUserAddresses(whatsapp);
-    renderAddressList(list);
-
-    document.getElementById('saveBtn').onclick = () => {
-      const sel = document.querySelector('input[name="selectedAddress"]:checked');
-      if (!sel) return alert('Selecione um endereço.');
-      window.location.href = `checkout.html?userId=${userId}&addressId=${sel.value}`;
-    };
+    originalDefaultId = renderAddressList(list);
   } catch (err) {
     console.error('Erro ao buscar endereços:', err);
-    window.location.href = 'identify.html';
+    return window.location.href = 'identify.html';
   }
+
+  // Salvar
+  document.getElementById('saveBtn').onclick = async () => {
+    const sel = document.querySelector('input[name="selectedAddress"]:checked');
+    if (!sel) {
+      alert('Selecione um endereço.');
+      return;
+    }
+    const newDefaultId = sel.value;
+
+    // Se mudou o padrão, avisa a API
+    if (originalDefaultId !== newDefaultId) {
+      try {
+        await setDefaultAddress(whatsapp, newDefaultId);
+      } catch (err) {
+        console.error('Erro ao atualizar padrão:', err);
+        alert('Não foi possível definir o endereço padrão.');
+        return;
+      }
+      // Recarrega lista e atualiza originalDefaultId
+      const updatedList = await fetchUserAddresses(whatsapp);
+      originalDefaultId = renderAddressList(updatedList);
+    }
+
+    // Por fim, redireciona para a index
+    window.location.href = 'index.html';
+  };
 });
 
- 
-
-// exclui
+// Excluir endereço
 async function deleteAddress(id) {
   if (!confirm('Deseja excluir este endereço?')) return;
+  const whatsapp = localStorage.getItem('bgHouse_whatsapp');
   try {
     const resp = await fetch(`/api/Usuario/DeleteEndereco/${id}`, { method: 'DELETE' });
     if (!resp.ok) throw new Error();
-    const list = await fetchUserAddresses(localStorage.getItem('bgHouse_whatsapp'));
-    renderAddressList(list);
+    const updatedList = await fetchUserAddresses(whatsapp);
+    renderAddressList(updatedList);
   } catch {
-    alert('Não foi possível excluir.');
+    alert('Não foi possível excluir este endereço.');
   }
 }
