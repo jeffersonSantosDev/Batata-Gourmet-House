@@ -117,52 +117,36 @@ body {
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
+  justify-content: space-between;
 }
-.address-item:hover {
-  background: var(--bg-light);
-}
-
-/* Address Info Grid */
 .address-info {
   flex: 1;
   display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-rows:
-    auto   /* line 1: Bairro, Número */
-    auto   /* line 2: Rua */
-    auto   /* line 3: Cidade – UF */
-    auto;  /* line 4: Meta */
-  column-gap: 0.5rem;
   row-gap: 0.25rem;
+  padding-right: 2.5rem;
 }
-.address-info input[type="radio"] {
-  grid-column: 1;
-  grid-row: 1 / span 4;
-  align-self: start;
-  margin: 0;
-}
-.address-info strong,
-.address-info .address-line1 {
-  grid-column: 2; grid-row: 1;
+.address-info strong {
   font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--text-dark);
 }
-.address-info .address-street {
-  grid-column: 2; grid-row: 2;
+.address-info label {
+  line-height: 1.4;
+  font-weight: 500;
+  cursor: pointer;
+}
+.address-info em {
+  font-style: italic;
   font-size: 0.9rem;
-  color: #555;
-}
-.address-info .address-city {
-  grid-column: 2; grid-row: 3;
-  font-size: 0.85rem;
   color: #777;
 }
-.address-info .address-meta {
-  grid-column: 2; grid-row: 4;
-  font-size: 0.85rem;
-  color: #777;
+.address-info small {
+  font-size: 0.9rem;
+  color: #888;
+}
+.no-address {
+  padding: 2rem;
+  text-align: center;
+  color: #888;
+  font-size: 0.95rem;
 }
 
 /* Menu Button */
@@ -175,7 +159,6 @@ body {
   top: 1rem;
   right: 1rem;
   color: var(--text-dark);
-  padding: 0.25rem;
 }
 .menu-btn:hover {
   color: var(--secondary);
@@ -247,4 +230,59 @@ body {
   .back-btn {
     margin-right: 0.5rem;
   }
+}
+
+
+
+/* Alinha o rádio ao título numa grid de 2 colunas */
+.address-info {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 
+    auto /* linha 1: título */
+    auto /* linha 2: cidade/UF */
+    auto /* linha 3: referência (se houver) */
+    auto /* linha 4: frete/distância */;
+  column-gap: 0.5rem;
+  row-gap: 0.25rem;
+}
+
+/* Rádio posicionado na coluna 1, linha 1, centralizado verticalmente */
+.address-info input[type="radio"] {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  margin: 0; /* remove margens extras */
+}
+
+/* Todas as labels (inclusive o título) na coluna 2 */
+.address-info label {
+  grid-column: 2;
+  margin: 0;
+  line-height: 1.4;
+}
+.address-item-content {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem;
+  align-items: start;
+}
+
+.address-street {
+  grid-column: 2;
+  margin-top: 0.25rem;
+  color: #555;
+}
+
+.address-meta {
+  grid-column: 2;
+  color: #777;
+  font-size: 0.85rem;
+}
+
+.address-footer {
+  grid-column: 2;
+  margin-top: 0.25rem;
+  color: #777;
+  font-size: 0.85rem;
 }
