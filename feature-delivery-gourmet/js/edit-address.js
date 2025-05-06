@@ -74,25 +74,26 @@ function renderAddressList(addresses) {
     const li = document.createElement('li');
     li.className = 'address-item';
     li.innerHTML = `
-      <label for="addr-${a.id}" class="address-item">
-        <input
-          type="radio"
-          name="selectedAddress"
-          id="addr-${a.id}"
-          value="${a.id}"
-          ${a.padrao ? 'checked' : ''}
-        />
-        <div class="address-content">
-          <div class="address-line1"><strong>${a.bairro}, ${a.numero}</strong></div>
-          <div class="address-line2">Rua ${a.rua}</div>
-          <div class="address-line3">${a.cidade} – ${a.uf.toUpperCase()}</div>
-          <div class="address-meta">
-            ${a.distanciaKm.toFixed(1)} km • ${a.tempoMinutos} min • R$ ${a.frete.toFixed(2)}
-          </div>
-        </div>
-        <button class="menu-btn" data-id="${a.id}" aria-label="Opções">⋮</button>
+    <input
+      type="radio"
+      name="selectedAddress"
+      id="addr-${a.id}"
+      value="${a.id}"
+      ${a.padrao ? 'checked' : ''}
+    />
+    <div class="address-content">
+      <label for="addr-${a.id}" class="address-line1">
+        <strong>${a.bairro}, ${a.numero}</strong>
       </label>
-    `;
+      <div class="address-street">Rua ${a.Rua || ''}</div>
+      <div class="address-city">${a.cidade} – ${a.uf.toUpperCase()}</div>
+      <div class="address-meta">
+        ${a.distanciaKm.toFixed(1)} km • ${a.tempoMinutos} min • R$ ${a.frete.toFixed(2)}
+      </div>
+    </div>
+    <button class="menu-btn" data-id="${a.id}" aria-label="Opções">⋮</button>
+  `;
+  
     ul.appendChild(li);
   });
 
