@@ -195,3 +195,32 @@ body {
 .autocomplete-list li:hover {
   background: var(--bg-light);
 }
+.new-address-form .form-group { position: relative; }
+
+.autocomplete-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  background: var(--primary);
+  max-height: 200px;
+  overflow-y: auto;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  box-shadow: 0 2px 8px var(--shadow);
+  border-radius: 4px;
+}
+
+.autocomplete-list li {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-dark);
+}
+
+.autocomplete-list li:hover {
+  background: var(--bg-light);
+}
