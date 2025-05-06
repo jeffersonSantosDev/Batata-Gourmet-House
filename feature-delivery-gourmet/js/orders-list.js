@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       // Recarrega lista e atualiza originalDefaultId
       const updatedList = await fetchUserAddresses(whatsapp);
-      
+
       originalDefaultId = renderAddressList(updatedList);
     }
 
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function deleteAddress(id) {
   const confirm = await swal({
     title: "Confirmação",
-    text: "Deseja excluir este endereço?",
+    text: "Deseja excluir este endereço?.",
     icon: "warning",
     buttons: ["Cancelar", "Excluir"],
     dangerMode: true
