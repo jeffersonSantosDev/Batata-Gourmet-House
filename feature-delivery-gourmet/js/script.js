@@ -177,8 +177,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Navegação
   ordersBtn.addEventListener("click", () => {
-    if (identifyUser()) window.location.href = "index.html";
-    else window.location.href = "identify.html?return=orders-list.html";
+    if (identifyUser()) window.location.href = "orders-list.html";
+    else window.location.href = "identify.html?return=index.html";
   });
   scheduleBtn.addEventListener("click", () => {
     if (identifyUser()) window.location.href = "edit-address.html";
