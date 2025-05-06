@@ -44,8 +44,7 @@ body {
 
 /* Header */
 .address-header {
-  display: flex;
-  align-items: center;
+  display: flex; align-items: center;
   background: var(--primary);
   padding: 1rem;
   box-shadow: 0 1px 4px var(--shadow);
@@ -54,10 +53,12 @@ body {
   background: none; border: none;
   font-size: 1.5rem; cursor: pointer;
   color: var(--text-dark);
+  margin-right: 1rem;
 }
 .back-btn:hover { color: var(--secondary); }
 .address-title {
-  flex: 1; text-align: center;
+  flex: 1;
+  text-align: center;
   font-size: 1.25rem; font-weight: 600;
 }
 
@@ -65,8 +66,7 @@ body {
 .address-subtitle {
   background: var(--primary);
   text-align: center;
-  font-size: 0.9rem;
-  color: #666;
+  font-size: 0.9rem; color: #666;
   padding: 0.5rem 1rem;
   border-bottom: 1px solid var(--border);
 }
@@ -80,7 +80,8 @@ body {
 }
 .new-address-btn {
   background: var(--secondary);
-  color: #fff; border: none; border-radius: 6px;
+  color: #fff;
+  border: none; border-radius: 6px;
   padding: 0.75rem 1.5rem;
   font-size: 0.95rem; font-weight: 600;
   cursor: pointer; transition: background 0.2s;
@@ -102,7 +103,6 @@ body {
 }
 .address-item {
   display: flex; align-items: flex-start;
-  justify-content: space-between;
   padding: 1rem 0;
   border-bottom: 1px solid var(--border);
   position: relative;
@@ -111,35 +111,48 @@ body {
   background: var(--bg-light);
 }
 
-/* Content grid */
+/* Grid layout for info */
 .address-info {
   display: grid;
   grid-template-columns: auto 1fr;
   grid-template-rows:
-    auto /* title */
-    auto /* street */
-    auto /* city/uf */
-    auto /* meta */;
+    auto  /* line 1: title (bairro, nº) */
+    auto  /* line 2: street */
+    auto  /* line 3: city/UF */
+    auto; /* line 4: meta */
   column-gap: 0.5rem;
   row-gap: 0.25rem;
   flex: 1;
 }
+
+/* Radio button */
 .address-info input[type="radio"] {
-  grid-column: 1; grid-row: 1 / span 4;
-  align-self: center; margin: 0;
+  grid-column: 1;
+  grid-row: 1 / span 4;
+  align-self: center;
+  margin: 0;
 }
-.address-info strong {
+
+/* Line 1: Bairro, Número */
+.address-info .address-line1 {
   grid-column: 2; grid-row: 1;
   font-size: 1.05rem; color: var(--text-dark);
+  font-weight: 600;
 }
+
+/* Line 2: Rua */
 .address-info .address-street {
   grid-column: 2; grid-row: 2;
-  font-size: 0.9rem; color: #555;
+  font-size: 0.95rem; color: #555;
 }
+
+/* Line 3: Cidade – UF */
 .address-info .address-city {
   grid-column: 2; grid-row: 3;
-  font-size: 0.85rem; color: #777;
+  font-size: 0.9rem; color: #777;
 }
+
+/* Line 4: Distância • Tempo • Frete */
 .address-info .address-meta {
   grid-column: 2; grid-row: 4;
   font-size: 0.85rem; color: #777;
@@ -190,6 +203,10 @@ body {
 
 /* Mobile */
 @media (max-width: 480px) {
-  .new-address-btn { width: 100%; }
-  .back-btn { margin-right: 0.5rem; }
+  .new-address-btn {
+    width: 100%; padding: 0.75rem;
+  }
+  .back-btn {
+    margin-right: 0.5rem;
+  }
 }
