@@ -1,12 +1,12 @@
 :root {
-  --primary:    #ffffff;
-  --text-dark:  #2c3e50;
-  --secondary:  #d28b4b;
-  --highlight:  #d28b4b;
-  --border:     #e2e2e2;
-  --bg-light:   #f8f7f3;
-  --btn-hover:  #f0f0f0;
-  --shadow:     rgba(0,0,0,0.1);
+  --primary: #ffffff;
+  --text-dark: #2c3e50;
+  --secondary: #d28b4b;
+  --highlight: #d28b4b;
+  --border: #e2e2e2;
+  --bg-light: #f8f7f3;
+  --btn-hover: #f0f0f0;
+  --shadow: rgba(0,0,0,0.1);
 }
 
 /* Reset */
@@ -18,19 +18,18 @@
 
 /* Loader */
 .loader {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  position: fixed; top:0; left:0; right:0; bottom:0;
   background: rgba(255,255,255,0.6);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 999;
+  display: flex; align-items:center; justify-content:center;
+  z-index:999;
 }
 .loader.hidden { display: none !important; }
 .loader::before {
-  content: ""; width: 48px; height: 48px; border-radius: 50%;
-  border: 5px solid var(--bg-light);
-  border-top-color: var(--secondary);
-  animation: spin 1s linear infinite;
+  content:""; width:48px; height:48px; border-radius:50%;
+  border:5px solid var(--bg-light); border-top-color:var(--secondary);
+  animation:spin 1s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin { to{ transform:rotate(360deg); } }
 
 /* Body */
 body {
@@ -44,7 +43,8 @@ body {
 
 /* Header */
 .address-header {
-  display: flex; align-items: center;
+  display: flex;
+  align-items: center;
   background: var(--primary);
   padding: 1rem;
   box-shadow: 0 1px 4px var(--shadow);
@@ -53,20 +53,23 @@ body {
   background: none; border: none;
   font-size: 1.5rem; cursor: pointer;
   color: var(--text-dark);
-  margin-right: 1rem;
 }
-.back-btn:hover { color: var(--secondary); }
+.back-btn:hover {
+  color: var(--secondary);
+}
 .address-title {
   flex: 1;
   text-align: center;
-  font-size: 1.25rem; font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
 /* Subtitle */
 .address-subtitle {
   background: var(--primary);
   text-align: center;
-  font-size: 0.9rem; color: #666;
+  font-size: 0.9rem;
+  color: #666;
   padding: 0.5rem 1rem;
   border-bottom: 1px solid var(--border);
 }
@@ -81,109 +84,136 @@ body {
 .new-address-btn {
   background: var(--secondary);
   color: #fff;
-  border: none; border-radius: 6px;
+  border: none;
+  border-radius: 6px;
   padding: 0.75rem 1.5rem;
-  font-size: 0.95rem; font-weight: 600;
-  cursor: pointer; transition: background 0.2s;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
 }
-.new-address-btn:hover { background: var(--highlight); }
+.new-address-btn:hover {
+  background: var(--highlight);
+}
 
 /* Main */
 .address-main {
-  flex: 1; overflow-y: auto; padding: 1rem;
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
 }
-.address-main::-webkit-scrollbar { display: none; }
-.address-main { scrollbar-width: none; -ms-overflow-style: none; }
 
 /* Address List */
 .address-list {
   list-style: none;
-  width: 100%; max-width: 480px;
-  margin: 0 auto; padding: 0;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0;
 }
 .address-item {
-  display: flex; align-items: flex-start;
   padding: 1rem 0;
   border-bottom: 1px solid var(--border);
   position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
 }
 .address-item:hover {
   background: var(--bg-light);
 }
 
-/* Grid layout for info */
+/* Address Info Grid */
 .address-info {
+  flex: 1;
   display: grid;
   grid-template-columns: auto 1fr;
   grid-template-rows:
-    auto  /* line 1: title (bairro, nº) */
-    auto  /* line 2: street */
-    auto  /* line 3: city/UF */
-    auto; /* line 4: meta */
+    auto   /* line 1: Bairro, Número */
+    auto   /* line 2: Rua */
+    auto   /* line 3: Cidade – UF */
+    auto;  /* line 4: Meta */
   column-gap: 0.5rem;
   row-gap: 0.25rem;
-  flex: 1;
 }
-
-/* Radio button */
 .address-info input[type="radio"] {
   grid-column: 1;
   grid-row: 1 / span 4;
-  align-self: center;
+  align-self: start;
   margin: 0;
 }
-
-/* Line 1: Bairro, Número */
+.address-info strong,
 .address-info .address-line1 {
   grid-column: 2; grid-row: 1;
-  font-size: 1.05rem; color: var(--text-dark);
+  font-size: 1.05rem;
   font-weight: 600;
+  color: var(--text-dark);
 }
-
-/* Line 2: Rua */
 .address-info .address-street {
   grid-column: 2; grid-row: 2;
-  font-size: 0.95rem; color: #555;
+  font-size: 0.9rem;
+  color: #555;
 }
-
-/* Line 3: Cidade – UF */
 .address-info .address-city {
   grid-column: 2; grid-row: 3;
-  font-size: 0.9rem; color: #777;
+  font-size: 0.85rem;
+  color: #777;
 }
-
-/* Line 4: Distância • Tempo • Frete */
 .address-info .address-meta {
   grid-column: 2; grid-row: 4;
-  font-size: 0.85rem; color: #777;
+  font-size: 0.85rem;
+  color: #777;
 }
 
 /* Menu Button */
 .menu-btn {
-  background: none; border: none;
-  font-size: 1.2rem; cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
   color: var(--text-dark);
-  position: absolute; top: 1rem; right: 1rem;
+  padding: 0.25rem;
 }
-.menu-btn:hover { color: var(--secondary); }
+.menu-btn:hover {
+  color: var(--secondary);
+}
 
 /* Dropdown */
 .dropdown {
-  position: absolute; top: 2.5rem; right: 1rem;
+  position: absolute;
+  top: 2.5rem;
+  right: 1rem;
   background: var(--primary);
   border: 1px solid var(--border);
   border-radius: 6px;
   box-shadow: 0 2px 6px var(--shadow);
-  z-index: 10; overflow: hidden;
+  z-index: 10;
+  overflow: hidden;
 }
 .dropdown button {
-  display: flex; align-items: center; gap: 0.5rem;
-  padding: 0.5rem 1rem; width: 100%;
-  background: none; border: none;
-  font-size: 0.9rem; cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 0.9rem;
 }
-.dropdown button:hover { background: var(--btn-hover); }
-.dropdown button:last-child { color: #c0392b; }
+.dropdown button:hover {
+  background: var(--btn-hover);
+}
+.dropdown button:first-child {
+  color: var(--text-dark);
+}
+.dropdown button:last-child {
+  color: #c0392b;
+}
 
 /* Footer */
 .address-footer {
@@ -193,18 +223,26 @@ body {
   text-align: center;
 }
 .save-btn {
-  width: 100%; padding: 0.75rem;
+  width: 100%;
+  padding: 0.75rem;
   background: var(--secondary);
-  color: #fff; border: none; border-radius: 6px;
-  font-size: 1rem; font-weight: 600;
-  cursor: pointer; transition: background 0.2s;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
 }
-.save-btn:hover { background: var(--highlight); }
+.save-btn:hover {
+  background: var(--highlight);
+}
 
 /* Mobile */
 @media (max-width: 480px) {
   .new-address-btn {
-    width: 100%; padding: 0.75rem;
+    width: 100%;
+    padding: 0.75rem;
   }
   .back-btn {
     margin-right: 0.5rem;
