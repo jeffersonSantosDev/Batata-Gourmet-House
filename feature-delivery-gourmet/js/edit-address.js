@@ -21,6 +21,10 @@ async function fetchUserAddresses(whatsapp) {
     if (resp.status === 204) return [];
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     return await resp.json();
+  } catch (err) {
+    console.error(err);
+    await swal("Erro", "Não foi possível carregar seus pedidos. Tente novamente mais tarde.", "error");
+    window.location.href = 'identify.html';
   } finally {
     hideLoader();
   }
@@ -38,6 +42,10 @@ async function setDefaultAddress(whatsapp, addressId) {
       body: JSON.stringify({ numero: whatsapp, addressId })
     });
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  } catch (err) {
+    console.error(err);
+    await swal("Erro", "Não foi possível definir o endereço padrão. Tente novamente mais tarde.", "error");
+    throw err;  // para não prosseguir no save
   } finally {
     hideLoader();
   }
@@ -89,9 +97,7 @@ function renderAddressList(addresses) {
       const id = btn.dataset.id;
       const dd = document.createElement('div');
       dd.className = 'dropdown';
-      dd.innerHTML = `
-        <button onclick="deleteAddress(${id})">🗑️ Excluir</button>
-      `;
+      dd.innerHTML = `<button onclick="deleteAddress(${id})">🗑️ Excluir</button>`;
       btn.parentElement.appendChild(dd);
     });
   });
@@ -113,7 +119,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   const whatsapp = localStorage.getItem('bgHouse_whatsapp');
-  const userId = localStorage.getItem('bgHouse_id');
   if (!whatsapp) return window.location.href = 'identify.html';
 
   // Carrega e renderiza
@@ -121,17 +126,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     const list = await fetchUserAddresses(whatsapp);
     originalDefaultId = renderAddressList(list);
-  } catch (err) {
-    console.error('Erro ao buscar endereços:', err);
-    return window.location.href = 'identify.html';
+  } catch {
+    // Já tratado no fetchUserAddresses
+    return;
   }
 
   // Salvar
   document.getElementById('saveBtn').onclick = async () => {
     const sel = document.querySelector('input[name="selectedAddress"]:checked');
     if (!sel) {
-      alert('Selecione um endereço.');
-      return;
+      return swal("Atenção", "Selecione um endereço antes de salvar.", "warning");
     }
     const newDefaultId = sel.value;
 
@@ -139,9 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (originalDefaultId !== newDefaultId) {
       try {
         await setDefaultAddress(whatsapp, newDefaultId);
-      } catch (err) {
-        console.error('Erro ao atualizar padrão:', err);
-        alert('Não foi possível definir o endereço padrão.');
+      } catch {
         return;
       }
       // Recarrega lista e atualiza originalDefaultId
@@ -156,14 +158,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Excluir endereço
 async function deleteAddress(id) {
-  if (!confirm('Deseja excluir este endereço?')) return;
+  const confirm = await swal({
+    title: "Confirmação",
+    text: "Deseja excluir este endereço?",
+    icon: "warning",
+    buttons: ["Cancelar", "Excluir"],
+    dangerMode: true
+  });
+  if (!confirm) return;
+
   const whatsapp = localStorage.getItem('bgHouse_whatsapp');
+  showLoader();
   try {
     const resp = await fetch(`/api/Usuario/DeleteEndereco/${id}`, { method: 'DELETE' });
     if (!resp.ok) throw new Error();
     const updatedList = await fetchUserAddresses(whatsapp);
     renderAddressList(updatedList);
   } catch {
-    alert('Não foi possível excluir este endereço.');
+    console.error('Erro ao excluir endereço');
+    await swal("Erro", "Não foi possível excluir este endereço. Tente novamente mais tarde.", "error");
+  } finally {
+    hideLoader();
   }
 }
