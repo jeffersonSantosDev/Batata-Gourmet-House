@@ -160,24 +160,40 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 });
 
-// Excluir endereço
+// Excluir endereço 
 async function deleteAddress(id) {
-  const confirm = await swal({
+  const confirmDelete = await swal({
     title: "Confirmação",
     text: "Deseja excluir este endereço?",
     icon: "warning",
     buttons: ["Cancelar", "Excluir"],
     dangerMode: true
   });
-  if (!confirm) return;
+  if (!confirmDelete) return;
 
   const whatsapp = localStorage.getItem('bgHouse_whatsapp');
   showLoader();
   try {
     const resp = await fetch(`/api/Usuario/DeleteEndereco/${id}`, { method: 'DELETE' });
     if (!resp.ok) throw new Error();
+
+    // Recarrega lista
     const updatedList = await fetchUserAddresses(whatsapp);
     renderAddressList(updatedList);
+
+    // Se só restou 1, define automaticamente como padrão
+    if (updatedList.length === 1) {
+      const onlyAddressId = updatedList[0].id;
+      try {
+        await setDefaultAddress(whatsapp, onlyAddressId);
+        // Opcional: atualizar UI pra marcar o rádio
+        document
+          .querySelector(`input[name="selectedAddress"][value="${onlyAddressId}"]`)
+          .checked = true;
+      } catch {
+        // já mostrou erro lá dentro, podemos ignorar
+      }
+    }
   } catch {
     console.error('Erro ao excluir endereço');
     await swal("Erro", "Não foi possível excluir este endereço. Tente novamente mais tarde.", "error");
