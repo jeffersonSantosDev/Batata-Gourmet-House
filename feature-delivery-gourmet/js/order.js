@@ -1,32 +1,25 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const progressContainer = document.getElementById("progressContainer");
-  const progressFill = document.getElementById("progressFill");
+  const loading = document.getElementById("loadingOverlay");
 
-  // 1) Exibe e reseta a barra
-  progressFill.style.width = "0%";
-  progressContainer.style.display = "block";
+  // 1) exibe o overlay
+  loading.classList.remove("hidden");
 
   const params = new URLSearchParams(location.search);
   const pedidoId = parseInt(params.get("id"));
 
   if (!pedidoId || isNaN(pedidoId)) {
-    // completa e redireciona
-    progressFill.style.width = "100%";
-    setTimeout(() => window.location.href = "orders-list.html", 300);
+    swal("Ops!", "ID do pedido inválido.", "error")
+      .then(() => window.location.href = "orders-list.html");
     return;
   }
 
-  const backBtn = document.getElementById("backBtn");
-  backBtn.addEventListener("click", () => {
+  document.getElementById("backBtn").addEventListener("click", () => {
     history.length > 1
       ? history.back()
       : window.location.href = "orders-list.html";
   });
 
   try {
-    // 2) Início do fetch
-    progressFill.style.width = "20%";
-
     const response = await fetch("/api/Usuario/GetDetalhesPedido", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -34,12 +27,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     if (!response.ok) throw new Error("Pedido não encontrado");
-
-    // 3) Dados recebidos
-    progressFill.style.width = "60%";
     const pedido = await response.json();
 
-    // Preenche steps
+    // timeline original
     const statusEtapas = [
       "Pedido Recebido",
       "Pedido em preparo",
@@ -49,16 +39,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const indexAtual = statusEtapas.findIndex(etapa =>
       etapa.toLowerCase().trim() === pedido.status.toLowerCase().trim()
     );
-
-    const steps = document.querySelectorAll(".progress-step");
+    const steps = document.querySelectorAll(".status-timeline .step");
     steps.forEach((step, idx) => {
-      if (idx <= indexAtual) step.classList.add("completed");
+      if (idx === indexAtual) {
+        step.classList.add("current");
+      } else if (idx < indexAtual) {
+        step.classList.add("completed");
+      }
     });
 
-    const percentage = (indexAtual / (steps.length - 1)) * 100;
-    progressFill.style.width = `${percentage}%`;
-
-    // Preenche dados do pedido
+    // preenche dados
     document.getElementById("orderNumber").textContent = pedido.pedidoId;
     const statusPill = document.getElementById("orderStatus");
     statusPill.textContent = pedido.status;
@@ -96,16 +86,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       buttons: false
     });
 
-    // 4) Finaliza e esconde a barra
-    progressFill.style.width = "100%";
-    setTimeout(() => { progressContainer.style.display = "none"; }, 500);
-
   } catch (err) {
     console.error(err);
-    // Completa mesmo em erro
-    progressFill.style.width = "100%";
-    setTimeout(() => { progressContainer.style.display = "none"; }, 500);
     swal("Erro", "Não foi possível carregar os dados do pedido.", "error")
       .then(() => window.location.href = "orders-list.html");
+  } finally {
+    // 3) oculta o overlay
+    loading.classList.add("hidden");
   }
 });

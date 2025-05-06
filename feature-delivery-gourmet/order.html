@@ -12,6 +12,11 @@
   <script defer src="./js/order.js"></script>
 </head>
 <body>
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+
   <header class="order-header">
     <button class="back-btn" id="backBtn">←</button>
     <h1 class="order-title">Status do Pedido</h1>
@@ -19,14 +24,23 @@
 
   <main class="order-container">
     <section class="order-info">
-      <!-- PROGRESS BAR -->
-      <div class="progress-container" id="progressContainer" style="display:none;">
-        <div class="progress-bar">
-          <div class="progress" id="progressFill"></div>
-          <div class="progress-step" data-label="Recebido"></div>
-          <div class="progress-step" data-label="Em preparo"></div>
-          <div class="progress-step" data-label="Saiu para entrega"></div>
-          <div class="progress-step" data-label="Entregue"></div>
+      <!-- TIMELINE ORIGINAL -->
+      <div class="status-timeline">
+        <div class="step">
+          <span class="circle"></span>
+          <span class="step-label">Pedido Recebido</span>
+        </div>
+        <div class="step">
+          <span class="circle"></span>
+          <span class="step-label">Pedido em preparo</span>
+        </div>
+        <div class="step">
+          <span class="circle"></span>
+          <span class="step-label">Saiu para entrega</span>
+        </div>
+        <div class="step">
+          <span class="circle"></span>
+          <span class="step-label">Entregue</span>
         </div>
       </div>
 
