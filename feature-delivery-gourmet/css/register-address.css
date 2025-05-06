@@ -186,3 +186,19 @@ body {
 .autocomplete-list li:hover {
   background: var(--bg-light);
 }
+
+/* remove o box-shadow da lista do Google Places */
+.pac-container {
+  box-shadow: none !important;
+  border: 1px solid var(--border) !important;
+}
+
+/* oculta o pequeno “triângulo” antes do container */
+.pac-container::before {
+  display: none !important;
+}
+
+/* remove qualquer sombra no próprio input quando ativo */
+.pac-target-input {
+  box-shadow: none !important;
+}
