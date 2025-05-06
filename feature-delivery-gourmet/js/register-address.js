@@ -24,18 +24,23 @@ function fillInAddress() {
   if (!place.address_components) return;
 
   const comps = place.address_components.reduce((acc, comp) => {
-    comp.types.forEach(t => acc[t] = comp.long_name);
+    comp.types.forEach(type => acc[type] = comp.long_name);
     return acc;
   }, {});
 
-  document.getElementById('state').value    = comps['administrative_area_level_1'] || '';
-  document.getElementById('city').value     = comps['administrative_area_level_2'] || '';
-  document.getElementById('locality').value = comps['sublocality_level_1']
-                                              || comps['sublocality']
-                                              || comps['neighborhood']
-                                              || '';
-  document.getElementById('street').value   = comps['route'] || '';
-  document.getElementById('number').value   = comps['street_number'] || '';
+  // CRAVA UF e Cidade fixos
+  document.getElementById('state').value = 'SP';
+  document.getElementById('city').value  = 'São Paulo';
+
+  // Preenche apenas os campos que variam
+  document.getElementById('locality').value = 
+    comps['sublocality_level_1'] ||
+    comps['sublocality'] ||
+    comps['neighborhood'] ||
+    '';
+
+  document.getElementById('street').value = comps['route'] || '';
+  document.getElementById('number').value = comps['street_number'] || '';
 }
 
 // 4) restante da lógica de UI / validação / submit
