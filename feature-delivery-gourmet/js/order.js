@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const loading = document.getElementById("loadingOverlay");
 
-  // 1) exibe o overlay
+  // exibe o overlay
   loading.classList.remove("hidden");
 
   const params = new URLSearchParams(location.search);
@@ -41,10 +41,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
     const steps = document.querySelectorAll(".status-timeline .step");
     steps.forEach((step, idx) => {
-      if (idx === indexAtual) {
-        step.classList.add("current");
-      } else if (idx < indexAtual) {
-        step.classList.add("completed");
+      if (idx < indexAtual + 1) {
+        step.classList.add(idx === indexAtual ? "current" : "completed");
       }
     });
 
@@ -91,7 +89,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     swal("Erro", "Não foi possível carregar os dados do pedido.", "error")
       .then(() => window.location.href = "orders-list.html");
   } finally {
-    // 3) oculta o overlay
+    // oculta o overlay
     loading.classList.add("hidden");
   }
 });
