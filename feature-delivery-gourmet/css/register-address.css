@@ -172,13 +172,16 @@ body {
   max-height: 200px;
   overflow-y: auto;
   z-index: 1000;
+  overflow-y: auto;
+  overflow-x: hidden;      /* impede scroll-X */
 }
 .autocomplete-list li {
   padding: 0.5rem 1rem;
   cursor: pointer;
   font-size: 0.9rem;
   color: var(--text-dark);
-  white-space: nowrap;
+  /* white-space: nowrap;  Removido para quebrar linha se for muito longo */
+  word-break: break-word;   /* Quebra texto longo em múltiplas linhas */
 }
 .autocomplete-list li:hover {
   background: var(--bg-light);

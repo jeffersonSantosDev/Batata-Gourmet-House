@@ -21,10 +21,10 @@
 
   <main class="address-main">
     <div class="card">
-      <form id="newAddressForm" class="new-address-form" novalidate>
+      <form id="newAddressForm" class="new-address-form" novalidate autocomplete="off">
         <div class="form-group autocomplete-container">
           <label for="autocomplete">Buscar Endereço <span class="required">*</span></label>
-          <input type="text" id="autocomplete" placeholder="Digite e selecione" autocomplete="off"/>
+          <input type="text" id="autocomplete" name="address_search" placeholder="Digite e selecione" autocomplete="off" placeholder="Digite e selecione"/>
           <ul class="autocomplete-list"></ul>
           <p id="autocompleteError" class="error-text hidden">Selecione um endereço válido.</p>
         </div>
