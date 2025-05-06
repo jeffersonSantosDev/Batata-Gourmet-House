@@ -176,7 +176,7 @@ body {
   cursor: pointer;
   position: absolute;
   top: 1rem;
-  right: 1rem;             /* mantém distância do conteúdo */
+  right: -9rem;             /* mantém distância do conteúdo */
   padding: 0.25rem;        /* afasta dos pontinhos do texto */
   color: var(--text-dark);
 }
