@@ -114,10 +114,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     history.length > 1 ? history.back() : window.location.href = 'index.html';
   };
   // Novo cadastro
-  document.getElementById('newAddressBtn').onclick = () => {
+  document.getElementById('newAddressBtn').onclick = (e) => {
+    // conta quantos <li class="address-item"> existem
+    const count = document.querySelectorAll('.address-item').length;
+    if (count >= 2) {
+      e.preventDefault();
+      return swal("Atenção", "Você só pode ter 2 endereços cadastrados. Caso queira cadastrar outro, exclua um antes.", "warning");
+    }
+    // senão, segue para a tela de cadastro
     window.location.href = 'register-address.html';
   };
-
   const whatsapp = localStorage.getItem('bgHouse_whatsapp');
   if (!whatsapp) return window.location.href = 'identify.html';
 
