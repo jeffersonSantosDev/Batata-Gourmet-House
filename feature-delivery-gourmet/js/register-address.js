@@ -1,44 +1,37 @@
 let autocomplete;
-
 function initAutocomplete() {
-  const streetInput = document.getElementById('street');
-  autocomplete = new google.maps.places.Autocomplete(streetInput, {
-    types: ['address'],
-    componentRestrictions: { country: 'br' }
-  });
+  autocomplete = new google.maps.places.Autocomplete(
+    document.getElementById('autocomplete'),
+    { types: ['address'], componentRestrictions: { country: 'br' } }
+  );
   autocomplete.addListener('place_changed', fillInAddress);
 }
 
 function fillInAddress() {
   const place = autocomplete.getPlace();
-  const comps = place.address_components.reduce((acc, c) => {
-    c.types.forEach(type => acc[type] = c.long_name);
-    return acc;
+  if (!place.address_components) return;
+
+  const comps = place.address_components.reduce((a, c) => {
+    c.types.forEach(t => a[t] = c.long_name);
+    return a;
   }, {});
 
-  // Preenche automaticamente alguns campos
-  document.getElementById('locality').value =
-    comps['sublocality_level_1'] ||
-    comps['sublocality'] ||
-    comps['neighborhood'] ||
-    '';
-  document.getElementById('city').value =
-    comps['administrative_area_level_2'] || 'São Paulo';
-  document.getElementById('state').value =
-    comps['administrative_area_level_1'] || 'SP';
+  // Mapeia componentes para seus campos
+  document.getElementById('state').value    = comps['administrative_area_level_1'] || '';
+  document.getElementById('city').value     = comps['administrative_area_level_2'] || '';
+  document.getElementById('locality').value = comps['sublocality_level_1'] 
+                                              || comps['sublocality'] 
+                                              || comps['neighborhood'] 
+                                              || '';
+  document.getElementById('street').value   = comps['route'] || '';
+  document.getElementById('number').value   = comps['street_number'] || '';
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const backBtn     = document.getElementById("backBtn");
-  const form        = document.getElementById("newAddressForm");
-  const localityEl  = document.getElementById("locality");
-  const streetEl    = document.getElementById("street");
-  const numberEl    = document.getElementById("number");
-  const referenceEl = document.getElementById("reference");
-
-  const errLocality = document.getElementById("localityError");
-  const errStreet   = document.getElementById("streetError");
-  const errNumber   = document.getElementById("numberError");
+  const backBtn = document.getElementById("backBtn");
+  const form    = document.getElementById("newAddressForm");
+  const autoEl  = document.getElementById("autocomplete");
+  const errAuto = document.getElementById("autocompleteError");
 
   backBtn.addEventListener("click", () => {
     history.length > 1
@@ -48,29 +41,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
   form.addEventListener("submit", async e => {
     e.preventDefault();
-    [errLocality, errStreet, errNumber].forEach(el => el.classList.add("hidden"));
+    errAuto.classList.add("hidden");
 
-    let hasError = false;
-    if (!localityEl.value.trim()) { errLocality.classList.remove("hidden"); hasError = true; }
-    if (!streetEl.value.trim())   { errStreet.classList.remove("hidden");   hasError = true; }
-    if (!numberEl.value.trim())   { errNumber.classList.remove("hidden");   hasError = true; }
-    if (hasError) return;
+    // Garante que o usuário selecionou algo do Autocomplete
+    if (!document.getElementById('street').value) {
+      errAuto.classList.remove("hidden");
+      return;
+    }
 
-    // Monta payload
+    // Monta payload apenas com os campos necessários
     const payload = {
-      uf: document.getElementById('state').value,
-      cidade: document.getElementById('city').value,
-      bairro: localityEl.value.trim(),
-      endereco: streetEl.value.trim(),
-      numero: numberEl.value.trim(),
-      referencia: referenceEl.value.trim()
+      uf:       document.getElementById('state').value,
+      cidade:   document.getElementById('city').value,
+      bairro:   document.getElementById('locality').value,
+      endereco: document.getElementById('street').value,
+      numero:   document.getElementById('number').value,
+      referencia: document.getElementById('reference').value.trim()
     };
 
-    // Chama sua API (exemplo)
     try {
       const resp = await fetch('/api/Usuario/AddAddress', {
         method: 'POST',
-        headers: {'Content-Type':'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
       if (!resp.ok) throw new Error();

@@ -6,65 +6,59 @@
   <title>Cadastrar Endereço — Batata Gourmet House</title>
   <link rel="stylesheet" href="css/register-address.css"/>
 
-  <!-- 1) Carrega o Google Places API (substitua YOUR_API_KEY) -->
+  <!-- Google Maps + Places (substitua YOUR_API_KEY) -->
   <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1fNIX_jYvev0ASAjGvyOfK2wAtx_hCKM&libraries=places&callback=initAutocomplete"
-    async defer></script>
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1fNIX_jYvev0ASAjGvyOfK2wAtx_hCKM&libraries=places&callback=initAutocomplete"
+  async defer>
+</script>
 
   <script src="js/utils.js"></script>
   <script defer src="js/register-address.js"></script>
 </head>
 <body>
-  <!-- HEADER -->
   <header class="address-header">
     <button id="backBtn" class="back-btn">←</button>
     <h1 class="address-title">Novo Endereço</h1>
   </header>
 
-  <!-- FORMULÁRIO -->
   <main class="address-main">
     <div class="card">
       <form id="newAddressForm" class="new-address-form" novalidate>
-        <!-- UF fixo -->
+        <!-- Campo de busca único -->
+        <div class="form-group">
+          <label for="autocomplete">Buscar Endereço <span class="required">*</span></label>
+          <input type="text" id="autocomplete" placeholder="Digite e selecione!" autocomplete="off"/>
+          <p id="autocompleteError" class="error-text hidden">Selecione um endereço válido.</p>
+        </div>
+
+        <!-- Campos preenchidos automaticamente -->
         <div class="form-group">
           <label for="state">UF</label>
-          <input type="text" id="state" value="SP" readonly />
+          <input type="text" id="state" readonly />
         </div>
-
-        <!-- Cidade fixa -->
         <div class="form-group">
           <label for="city">Cidade</label>
-          <input type="text" id="city" value="São Paulo" readonly />
+          <input type="text" id="city" readonly />
         </div>
-
-        <!-- Localidade -->
         <div class="form-group">
-          <label for="locality">Localidade <span class="required">*</span></label>
-          <input type="text" id="locality" placeholder="Bairro, zona, etc."/>
-          <p id="localityError" class="error-text hidden">Preencha a localidade.</p>
+          <label for="locality">Bairro</label>
+          <input type="text" id="locality" readonly />
         </div>
-
-        <!-- Endereço com Autocomplete -->
         <div class="form-group">
-          <label for="street">Endereço <span class="required">*</span></label>
-          <input type="text" id="street" placeholder="Rua, avenida, etc." autocomplete="off"/>
-          <p id="streetError" class="error-text hidden">Preencha o endereço.</p>
+          <label for="street">Rua</label>
+          <input type="text" id="street" readonly />
         </div>
-
-        <!-- Número -->
         <div class="form-group">
-          <label for="number">Número <span class="required">*</span></label>
-          <input type="text" id="number" placeholder="Ex: 123"/>
-          <p id="numberError" class="error-text hidden">Preencha o número.</p>
+          <label for="number">Número</label>
+          <input type="text" id="number" readonly />
         </div>
 
-        <!-- Ponto de referência -->
+        <!-- Ponto de Referência manual -->
         <div class="form-group">
           <label for="reference">Ponto de Referência</label>
           <input type="text" id="reference" placeholder="Opcional"/>
         </div>
 
-        <!-- BOTÃO ENTREGAR -->
         <button type="submit" class="btn save-btn">Entregar neste endereço</button>
       </form>
     </div>
