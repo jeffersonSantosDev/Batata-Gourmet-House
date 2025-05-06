@@ -97,8 +97,23 @@ function renderAddressList(addresses) {
     ul.appendChild(li);
   });
 
-  // … resto igual …
-  // dropdown, evento de click, etc.
+  document.querySelectorAll('.menu-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      // limpa outros dropdowns
+      document.querySelectorAll('.dropdown').forEach(d => d.remove());
+      // cria o dropdown de excluir
+      const dd = document.createElement('div');
+      dd.className = 'dropdown';
+      dd.innerHTML = `<button onclick="deleteAddress(${btn.dataset.id})">🗑️ Excluir</button>`;
+      btn.parentElement.appendChild(dd);
+    });
+  });
+  
+  // clique fora fecha
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.dropdown').forEach(d => d.remove());
+  });
 
   return originalDefaultId;
 }
