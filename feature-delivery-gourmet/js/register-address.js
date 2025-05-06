@@ -23,38 +23,44 @@ function fillInAddress() {
   const place = autocomplete.getPlace();
   if (!place.address_components) return;
 
-  // Converte address_components em um objeto fácil de ler
   const comps = place.address_components.reduce((acc, comp) => {
     comp.types.forEach(type => acc[type] = comp.long_name);
     return acc;
   }, {});
 
-  // Pega o nome do estado e do país
-  const estado = comps['administrative_area_level_1'];   // ex: "São Paulo"
-  const pais   = comps['country'];                       // ex: "Brasil"
+  // Crava SP/City
+  document.getElementById('state').value = 'SP';
+  document.getElementById('city').value  = 'São Paulo';
 
-  // Se não for Brasil ou não for SP, cancela
-  if (pais !== 'Brasil' || estado !== 'São Paulo') {
-    swal("Desculpe", "Não atendemos neste local. Só entregamos em São Paulo/SP.", "error")
-      .then(() => {
-        // limpa todos os campos preenchidos
-        document.getElementById('autocomplete').value = '';
-        ['state','city','locality','street','number'].forEach(id => {
-          document.getElementById(id).value = '';
-        });
-      });
-    return;
+  // Bairro sempre readonly
+  document.getElementById('locality').value = 
+    comps['sublocality_level_1'] ||
+    comps['sublocality'] ||
+    comps['neighborhood'] ||
+    '';
+
+  // **Rua**  
+  const streetEl = document.getElementById('street');
+  if (comps['route']) {
+    streetEl.value = comps['route'];
+    streetEl.readOnly = true;
+  } else {
+    streetEl.value = '';
+    streetEl.readOnly = false;   // libera edição
+    streetEl.placeholder = 'Informe a rua manualmente';
+    streetEl.focus();
   }
 
-  // Caso seja SP/BR, preenche normalmente
-  document.getElementById('state').value    = 'SP';  // cravado
-  document.getElementById('city').value     = 'São Paulo'; // cravado
-  document.getElementById('locality').value = comps['sublocality_level_1']
-                                              || comps['sublocality']
-                                              || comps['neighborhood']
-                                              || '';
-  document.getElementById('street').value   = comps['route'] || '';
-  document.getElementById('number').value   = comps['street_number'] || '';
+  // **Número**
+  const numberEl = document.getElementById('number');
+  if (comps['street_number']) {
+    numberEl.value = comps['street_number'];
+    numberEl.readOnly = true;
+  } else {
+    numberEl.value = '';
+    numberEl.readOnly = false;   // libera edição
+    numberEl.placeholder = 'Informe o número';
+  }
 }
 
 
