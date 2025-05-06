@@ -8,24 +8,56 @@ async function fetchPlaces(input) {
   return predictions;
 }
 
-// 2) Busca detalhes via /api/placeDetails
+// 2) Busca detalhes via /api/places (place_id)
+// agora unificado em /api/places?place_id=
 async function fetchPlaceDetails(placeId) {
-  const res = await fetch(`/api/placeDetails?place_id=${encodeURIComponent(placeId)}`);
+  const res = await fetch(`/api/places?place_id=${encodeURIComponent(placeId)}`);
   if (!res.ok) throw new Error("Place details failed");
-  return await res.json();  // contém address_components
+  const { details } = await res.json();
+  return details;  // { address_components: [...] }
 }
 
-// 3) Preenche os campos a partir do objeto placeDetails
+// 3) Preenche e controla readonly de cada campo
 function fillFieldsFromPlace(place) {
   const comps = place.address_components.reduce((acc, c) => {
     c.types.forEach(t => acc[t] = c.long_name);
     return acc;
   }, {});
 
-  document.getElementById("locality").value = 
-    comps.sublocality_level_1 || comps.sublocality || comps.neighborhood || "";
-  document.getElementById("street").value   = comps.route || "";
-  document.getElementById("number").value   = comps.street_number || "";
+  const localityEl = document.getElementById("locality");
+  const streetEl   = document.getElementById("street");
+  const numEl      = document.getElementById("number");
+
+  // Bairro
+  if (comps.sublocality_level_1 || comps.sublocality || comps.neighborhood) {
+    localityEl.value = comps.sublocality_level_1 || comps.sublocality || comps.neighborhood;
+    localityEl.readOnly = true;
+  } else {
+    localityEl.value = "";
+    localityEl.readOnly = false;
+    localityEl.placeholder = "Informe o bairro";
+    localityEl.focus();
+  }
+
+  // Rua
+  if (comps.route) {
+    streetEl.value = comps.route;
+    streetEl.readOnly = true;
+  } else {
+    streetEl.value = "";
+    streetEl.readOnly = false;
+    streetEl.placeholder = "Informe a rua";
+  }
+
+  // Número
+  if (comps.street_number) {
+    numEl.value = comps.street_number;
+    numEl.readOnly = true;
+  } else {
+    numEl.value = "";
+    numEl.readOnly = false;
+    numEl.placeholder = "Informe o número";
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -45,16 +77,25 @@ document.addEventListener("DOMContentLoaded", () => {
   stateEl.value = "SP";
   cityEl.value  = "São Paulo";
 
-  // verifica usuário identificado
+  // inicia readonly
+  [locEl, streetEl, numEl].forEach(el => el.readOnly = true);
+
+  // filtro de dígitos no número
+  numEl.addEventListener("input", e => {
+    const filtered = e.target.value.replace(/\D+/g, "");
+    if (e.target.value !== filtered) e.target.value = filtered;
+  });
+
+  // verifica usuário
   const whatsapp = localStorage.getItem("bgHouse_whatsapp");
   if (!whatsapp) return window.location.replace("identify.html");
 
-  // botão voltar
+  // voltar
   backBtn.addEventListener("click", () => {
     history.length > 1 ? history.back() : window.location.href = "identify.html";
   });
 
-  // enquanto digita, carrega sugestões
+  // sugestões
   autoIn.addEventListener("input", async () => {
     const q = autoIn.value.trim();
     listEl.innerHTML = "";
@@ -69,39 +110,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ao clicar numa sugestão
+  // seleção
   listEl.addEventListener("click", async e => {
     const li = e.target.closest("li[data-idx]");
     if (!li) return;
     autoIn.value = li.textContent;
     listEl.innerHTML = "";
 
-    // busca detalhes
-    const placeId = li.dataset.placeid;
     try {
-      const place = await fetchPlaceDetails(placeId);
+      const place = await fetchPlaceDetails(li.dataset.placeid);
 
-      // extrai estado e país
-      const comps = place.address_components.reduce((acc, c) => {
-        c.types.forEach(t => acc[t] = c.long_name);
-        return acc;
+      // valida SP/BR
+      const comps = place.address_components.reduce((a,c) => {
+        c.types.forEach(t=>a[t]=c.long_name);
+        return a;
       }, {});
-      const estado = comps.administrative_area_level_1;
-      const pais   = comps.country;
-
-      // Se não for Brasil/SP, bloqueia
-      if (pais !== "Brasil" || estado !== "São Paulo") {
-        swal("Desculpe", "Só entregamos em São Paulo/SP.", "error")
-          .then(() => {
+      if (comps.country !== "Brasil" || comps.administrative_area_level_1 !== "São Paulo") {
+        return swal("Desculpe", "Só entregamos em São Paulo/SP.", "error")
+          .then(()=>{
             autoIn.value = "";
-            locEl.value = "";
-            streetEl.value = "";
-            numEl.value = "";
+            [locEl,streetEl,numEl].forEach(el=>el.value="", el.readOnly=true);
           });
-        return;
       }
 
-      // preenche os campos
       fillFieldsFromPlace(place);
     } catch (err) {
       console.error(err);
@@ -134,16 +165,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const resp = await fetch("/api/Usuario/SaveAddresByWhatsApp", {
-        method: "POST",
+        method:  "POST",
         headers: {"Content-Type":"application/json"},
-        body: JSON.stringify(payload)
+        body:    JSON.stringify(payload)
       });
       if (resp.status === 204)
         return swal("Erro","Usuário não encontrado.","error");
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
 
       swal("Sucesso","Endereço cadastrado com sucesso!","success")
-        .then(() => window.location.href = "index.html");
+        .then(()=>window.location.href="index.html");
     } catch (err) {
       console.error(err);
       swal("Erro", err.message || "Falha ao cadastrar endereço.","error");
