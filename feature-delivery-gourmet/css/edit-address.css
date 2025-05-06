@@ -72,7 +72,7 @@ body {
   color: #666;
   padding: 0.5rem 1rem;
   border-bottom: 1px solid var(--border);
-  margin: 0;
+  margin: 0; /* certifique-se de zerar margens */
 }
 
 /* New Address Button */
@@ -113,13 +113,12 @@ body {
   padding: 0;
 }
 .address-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  padding: 1rem 0 1rem 0;
+  padding: 1rem 0;
   border-bottom: 1px solid var(--border);
   position: relative;
-  padding-right: 3rem; /* espaço para o botão */
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;           /* adiciona espaço entre rádio e conteúdo */
 }
 .address-item:hover {
   background: var(--bg-light);
@@ -131,24 +130,27 @@ body {
   display: grid;
   grid-template-columns: auto 1fr;
   grid-template-rows:
-    auto  /* título */
-    auto  /* rua */
-    auto  /* cidade/UF */
-    auto; /* meta */
+    auto   /* linha 1: título (bairro, nº) */
+    auto   /* linha 2: rua */
+    auto   /* linha 3: cidade/UF */
+    auto;  /* linha 4: meta */
   column-gap: 0.5rem;
   row-gap: 0.25rem;
-  padding-right: 0; /* já temos padding no item */
+  padding-right: 2.5rem;
 }
 .address-info input[type="radio"] {
   grid-column: 1;
   grid-row: 1 / span 4;
   align-self: start;
-  margin: 0 0.75rem 0 0;
+  margin: 0;               /* remove margens extras */
 }
-.address-info strong,
-.address-info .address-line1 {
+.address-info strong {
   grid-column: 2; grid-row: 1;
   font-size: 1.05rem;
+}
+.address-info .address-line1 {
+  /* pode usar <strong> ou .address-line1 */
+  grid-column: 2; grid-row: 1;
   font-weight: 600;
 }
 .address-info .address-street {
@@ -169,16 +171,15 @@ body {
 
 /* Menu Button */
 .menu-btn {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
   background: none;
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
+  position: absolute;
+  top: 1rem;
+  right: -9rem;             /* mantém distância do conteúdo */
+  padding: 0.25rem;        /* afasta dos pontinhos do texto */
   color: var(--text-dark);
-  padding: 0.25rem;
-  line-height: 1;
 }
 .menu-btn:hover {
   color: var(--secondary);
@@ -243,12 +244,46 @@ body {
 
 /* Mobile */
 @media (max-width: 480px) {
-  .new-address-btn,
-  .save-btn {
+  .new-address-btn {
     width: 100%;
     padding: 0.75rem;
   }
   .back-btn {
     margin-right: 0.5rem;
   }
+}
+/* Garante que o botão de menu fique fora do grid do conteúdo */
+.menu-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: var(--text-dark);
+  padding: 0.25rem;
+  line-height: 1;
+}
+.menu-btn:hover {
+  color: var(--secondary);
+}
+
+/* Ajuste de padding no container do item para dar espaço ao botão */
+.address-item {
+  padding-right: 3rem; /* espaço extra à direita para o botão */
+  position: relative;   /* para o absolute do .menu-btn */
+}
+
+/* Esconde qualquer overlay que o browser coloque */
+.address-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Garante que o rádio e o conteúdo alinhem bem */
+.address-item input[type="radio"] {
+  margin-top: 0.2rem;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
 }
