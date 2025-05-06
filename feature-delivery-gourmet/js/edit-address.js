@@ -113,6 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('backBtn').onclick = () => {
     history.length > 1 ? history.back() : window.location.href = 'index.html';
   };
+ 
   // Novo cadastro
   document.getElementById('newAddressBtn').onclick = (e) => {
     // conta quantos <li class="address-item"> existem
@@ -124,8 +125,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // senão, segue para a tela de cadastro
     window.location.href = 'register-address.html';
   };
-  const whatsapp = localStorage.getItem('bgHouse_whatsapp');
-  if (!whatsapp) return window.location.href = 'identify.html';
+  const whatsapp = localStorage.getItem('bgHouse_whatsapp'); 
+
+  if (!whatsapp) {
+    return window.location.replace("identify.html");
+  }
 
   // Carrega e renderiza
   let originalDefaultId = null;
