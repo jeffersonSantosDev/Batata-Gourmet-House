@@ -1,6 +1,6 @@
 // register-address.js
 
-// 1) Busca sugestões via /api/places
+// 1) Autocomplete: busca sugestões via /api/places?input=
 async function fetchPlaces(input) {
   const res = await fetch(`/api/places?input=${encodeURIComponent(input)}`);
   if (!res.ok) throw new Error("Autocomplete failed");
@@ -8,34 +8,35 @@ async function fetchPlaces(input) {
   return predictions;
 }
 
-// 2) Busca detalhes via a mesma rota unificada (/api/places?place_id=...)
+// 2) Place Details: busca detalhes via /api/placeDetails?place_id=
 async function fetchPlaceDetails(placeId) {
-  const res = await fetch(`/api/places?place_id=${encodeURIComponent(placeId)}`);
+  const res = await fetch(
+    `/api/placeDetails?place_id=${encodeURIComponent(placeId)}`
+  );
   if (!res.ok) throw new Error("Place details failed");
-  const { details } = await res.json();
-  return details;  // { address_components: [...] }
+  return await res.json(); // retorna o objeto result da API
 }
 
-// 3) Preenche e controla readonly de cada campo individualmente
+// 3) Preenche e controla readonly de cada campo
 function fillFieldsFromPlace(place) {
   const comps = place.address_components.reduce((acc, c) => {
-    c.types.forEach(t => (acc[t] = c.long_name));
+    c.types.forEach(t => acc[t] = c.long_name);
     return acc;
   }, {});
 
-  const localityEl = document.getElementById("locality");
-  const streetEl   = document.getElementById("street");
-  const numEl      = document.getElementById("number");
+  const locEl    = document.getElementById("locality");
+  const streetEl = document.getElementById("street");
+  const numEl    = document.getElementById("number");
 
   // Bairro
   if (comps.sublocality_level_1 || comps.sublocality || comps.neighborhood) {
-    localityEl.value = comps.sublocality_level_1 || comps.sublocality || comps.neighborhood;
-    localityEl.readOnly = true;
+    locEl.value = comps.sublocality_level_1 || comps.sublocality || comps.neighborhood;
+    locEl.readOnly = true;
   } else {
-    localityEl.value = "";
-    localityEl.readOnly = false;
-    localityEl.placeholder = "Informe o bairro";
-    localityEl.focus();
+    locEl.value = "";
+    locEl.readOnly = false;
+    locEl.placeholder = "Informe o bairro";
+    locEl.focus();
   }
 
   // Rua
@@ -76,10 +77,8 @@ document.addEventListener("DOMContentLoaded", () => {
   stateEl.value = "SP";
   cityEl.value  = "São Paulo";
 
-  // inicia readonly nos campos que podem ser liberados depois
-  [locEl, streetEl, numEl].forEach(el => {
-    el.readOnly = true;
-  });
+  // inicia readonly nos campos liberáveis
+  [locEl, streetEl, numEl].forEach(el => el.readOnly = true);
 
   // filtra apenas dígitos no número
   numEl.addEventListener("input", e => {
@@ -93,22 +92,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // botão voltar
   backBtn.addEventListener("click", () => {
-    history.length > 1 ? history.back() : window.location.href = "identify.html";
+    if (history.length > 1) history.back();
+    else window.location.href = "identify.html";
   });
 
-  // enquanto digita, carrega sugestões
+  // enquanto digita → busca sugestões
   autoIn.addEventListener("input", async () => {
     const q = autoIn.value.trim();
     listEl.innerHTML = "";
     if (q.length < 3) return;
     try {
       const preds = await fetchPlaces(q);
-      listEl.innerHTML = preds
-        .map(
-          (p, i) =>
-            `<li data-idx="${i}" data-placeid="${p.place_id || ""}">${p.description}</li>`
-        )
-        .join("");
+      listEl.innerHTML = preds.map((p, i) =>
+        `<li data-idx="${i}" data-placeid="${p.place_id || ""}">${p.description}</li>`
+      ).join("");
     } catch (e) {
       console.error(e);
     }
@@ -119,60 +116,57 @@ document.addEventListener("DOMContentLoaded", () => {
     const li = e.target.closest("li[data-idx]");
     if (!li) return;
 
-    const desc    = li.textContent;
-    const placeId = li.dataset.placeid;
-
-    // preenche apenas o campo de busca e esconde dropdown
-    autoIn.value = desc;
+    autoIn.value = li.textContent;
     listEl.innerHTML = "";
 
-    // se não veio placeId (ex: fora de alcance), libera tudo para manual
+    const placeId = li.dataset.placeid;
+
+    // se não veio placeId → libera todos para digitação manual
     if (!placeId) {
       [locEl, streetEl, numEl].forEach(el => {
         el.readOnly = false;
         el.value = "";
-        el.placeholder =
-          el === numEl
-            ? "Informe o número"
-            : el === streetEl
+        el.placeholder = el === numEl
+          ? "Informe o número"
+          : el === streetEl
             ? "Informe a rua"
             : "Informe o bairro";
       });
       return;
     }
 
-    // caso tenha placeId, busca detalhes
+    // se tiver placeId → busca detalhes
     try {
       const place = await fetchPlaceDetails(placeId);
 
-      // extrai estado e país para validação
+      // valida Brasil/SP
       const comps = place.address_components.reduce((a, c) => {
-        c.types.forEach((t) => (a[t] = c.long_name));
+        c.types.forEach(t => (a[t] = c.long_name));
         return a;
       }, {});
-      if (
-        comps.country !== "Brasil" ||
-        comps.administrative_area_level_1 !== "São Paulo"
-      ) {
-        return swal("Desculpe", "Só entregamos em São Paulo/SP.", "error").then(() => {
-          autoIn.value = "";
-          [locEl, streetEl, numEl].forEach((el) => {
-            el.readOnly = true;
-            el.value = "";
+      if (comps.country !== "Brasil" ||
+          comps.administrative_area_level_1 !== "São Paulo") {
+        return swal("Desculpe", "Só entregamos em São Paulo/SP.", "error")
+          .then(() => {
+            autoIn.value = "";
+            [locEl, streetEl, numEl].forEach(el => {
+              el.readOnly = true;
+              el.value = "";
+            });
           });
-        });
       }
 
-      // preenche e ajusta readonly campo-a-campo
+      // preenche e ajusta readonly
       fillFieldsFromPlace(place);
+
     } catch (err) {
       console.error(err);
       swal("Erro", "Não foi possível obter detalhes do endereço.", "error");
     }
   });
 
-  // submit: valida e envia
-  form.addEventListener("submit", async (e) => {
+  // submit → valida e envia
+  form.addEventListener("submit", async e => {
     e.preventDefault();
     errAuto.classList.add("hidden");
 
@@ -205,9 +199,8 @@ document.addEventListener("DOMContentLoaded", () => {
         return swal("Erro", "Usuário não encontrado.", "error");
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
 
-      swal("Sucesso", "Endereço cadastrado com sucesso!", "success").then(() =>
-        window.location.href = "index.html"
-      );
+      swal("Sucesso", "Endereço cadastrado com sucesso!", "success")
+        .then(() => window.location.href = "index.html");
     } catch (err) {
       console.error(err);
       swal("Erro", err.message || "Falha ao cadastrar endereço.", "error");
