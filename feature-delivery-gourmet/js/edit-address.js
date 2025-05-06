@@ -150,9 +150,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const updatedList = await fetchUserAddresses(whatsapp);
       originalDefaultId = renderAddressList(updatedList);
     }
-
-    // Por fim, redireciona para a index
-    window.location.href = 'index.html';
+ 
   };
 });
 
