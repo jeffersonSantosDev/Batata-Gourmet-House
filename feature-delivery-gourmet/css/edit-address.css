@@ -9,29 +9,39 @@
   --shadow: rgba(0,0,0,0.1);
 }
 
-/* Reset */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+.hidden {
+  display: none !important;
+}
+
 /* Loader */
 .loader {
-  position: fixed; top:0; left:0; right:0; bottom:0;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(255,255,255,0.6);
-  display: flex; align-items:center; justify-content:center;
-  z-index:999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
 }
-.loader.hidden { display: none !important; }
 .loader::before {
-  content:""; width:48px; height:48px; border-radius:50%;
-  border:5px solid var(--bg-light); border-top-color:var(--secondary);
-  animation:spin 1s linear infinite;
+  content: "";
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 5px solid var(--bg-light);
+  border-top-color: var(--secondary);
+  animation: spin 1s linear infinite;
 }
-@keyframes spin { to{ transform:rotate(360deg); } }
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 
-/* Body */
 body {
   font-family: "Poppins", sans-serif;
   background: var(--bg-light);
@@ -43,25 +53,42 @@ body {
 
 /* Header */
 .address-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
   align-items: center;
   background: var(--primary);
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   box-shadow: 0 1px 4px var(--shadow);
 }
 .back-btn {
-  background: none; border: none;
-  font-size: 1.5rem; cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
   color: var(--text-dark);
 }
 .back-btn:hover {
   color: var(--secondary);
 }
 .address-title {
-  flex: 1;
-  text-align: center;
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 600;
+  text-align: center;
+  color: var(--text-dark);
+}
+.small-btn {
+  background: var(--secondary);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.small-btn:hover {
+  background: var(--highlight);
 }
 
 /* Subtitle */
@@ -74,33 +101,28 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
-/* New Address Button */
-.new-address-container {
-  background: var(--primary);
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--border);
-  text-align: center;
+/* Main */
+.address-main {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  overflow-y: auto;
 }
+
+/* New address button (fallback, if used elsewhere) */
 .new-address-btn {
   background: var(--secondary);
   color: #fff;
   border: none;
   border-radius: 6px;
-  padding: 0.75rem 1.5rem;
-  font-size: 0.95rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s;
+  margin-bottom: 1rem;
 }
 .new-address-btn:hover {
   background: var(--highlight);
-}
-
-/* Main */
-.address-main {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
 }
 
 /* Address List */
@@ -108,56 +130,55 @@ body {
   list-style: none;
   width: 100%;
   max-width: 480px;
-  margin: 0 auto;
   padding: 0;
+  margin: 0;
 }
 .address-item {
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--border);
+  background: var(--primary);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 1px 3px var(--shadow);
   position: relative;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  transition: box-shadow 0.2s;
+}
+.address-item:hover {
+  box-shadow: 0 2px 6px var(--shadow);
 }
 .address-info {
-  flex: 1;
   display: grid;
+  grid-template-rows: auto auto auto;
   row-gap: 0.25rem;
   padding-right: 2.5rem;
-}
-.address-info strong {
-  font-size: 1.05rem;
 }
 .address-info label {
   line-height: 1.4;
   font-weight: 500;
+  color: #333;
   cursor: pointer;
+}
+.address-info strong {
+  font-size: 1rem;
 }
 .address-info em {
   font-style: italic;
-  font-size: 0.9rem;
-  color: #777;
+  font-size: 0.85rem;
+  color: #666;
 }
 .address-info small {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #888;
-}
-.no-address {
-  padding: 2rem;
-  text-align: center;
-  color: #888;
-  font-size: 0.95rem;
 }
 
 /* Menu Button */
 .menu-btn {
   background: none;
   border: none;
-  font-size: 1.2rem;
   cursor: pointer;
   position: absolute;
   top: 1rem;
   right: 1rem;
+  font-size: 1.2rem;
   color: var(--text-dark);
 }
 .menu-btn:hover {
@@ -192,16 +213,16 @@ body {
   background: var(--btn-hover);
 }
 .dropdown button:first-child {
-  color: var(--text-dark);
+  color: var(--text-dark); /* Editar */
 }
 .dropdown button:last-child {
-  color: #c0392b;
+  color: #c0392b; /* Excluir */
 }
 
 /* Footer */
 .address-footer {
-  background: var(--primary);
   padding: 1rem;
+  background: var(--primary);
   box-shadow: 0 -1px 4px var(--shadow);
   text-align: center;
 }
@@ -221,68 +242,25 @@ body {
   background: var(--highlight);
 }
 
-/* Mobile */
+
 @media (max-width: 480px) {
-  .new-address-btn {
-    width: 100%;
+  .address-header {
+    grid-template-columns: 40px 1fr;
+  }
+  .small-btn {
+    display: none;
+  }
+  .address-subtitle {
+    display: none;
+  }
+  .address-item {
     padding: 0.75rem;
   }
-  .back-btn {
-    margin-right: 0.5rem;
+  .menu-btn {
+    top: 0.75rem;
+    right: 0.75rem;
   }
-}
-
-
-
-/* Alinha o rádio ao título numa grid de 2 colunas */
-.address-info {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-rows: 
-    auto /* linha 1: título */
-    auto /* linha 2: cidade/UF */
-    auto /* linha 3: referência (se houver) */
-    auto /* linha 4: frete/distância */;
-  column-gap: 0.5rem;
-  row-gap: 0.25rem;
-}
-
-/* Rádio posicionado na coluna 1, linha 1, centralizado verticalmente */
-.address-info input[type="radio"] {
-  grid-column: 1;
-  grid-row: 1;
-  align-self: center;
-  margin: 0; /* remove margens extras */
-}
-
-/* Todas as labels (inclusive o título) na coluna 2 */
-.address-info label {
-  grid-column: 2;
-  margin: 0;
-  line-height: 1.4;
-}
-.address-item-content {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.5rem;
-  align-items: start;
-}
-
-.address-street {
-  grid-column: 2;
-  margin-top: 0.25rem;
-  color: #555;
-}
-
-.address-meta {
-  grid-column: 2;
-  color: #777;
-  font-size: 0.85rem;
-}
-
-.address-footer {
-  grid-column: 2;
-  margin-top: 0.25rem;
-  color: #777;
-  font-size: 0.85rem;
+  .dropdown {
+    right: 0.75rem;
+  }
 }
