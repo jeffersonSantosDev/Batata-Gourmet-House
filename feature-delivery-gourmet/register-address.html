@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Cadastrar Endereço — Batata Gourmet House</title>
   <link rel="stylesheet" href="css/register-address.css"/>
+
+  <!-- 1) Carrega o Google Places API (substitua YOUR_API_KEY) -->
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1fNIX_jYvev0ASAjGvyOfK2wAtx_hCKM&libraries=places&callback=initAutocomplete"
+    async defer></script>
+
   <script src="js/utils.js"></script>
   <script defer src="js/register-address.js"></script>
 </head>
@@ -12,7 +18,7 @@
   <!-- HEADER -->
   <header class="address-header">
     <button id="backBtn" class="back-btn">←</button>
-    <h1 class="address-title">Novo Endereço</h1> 
+    <h1 class="address-title">Novo Endereço</h1>
   </header>
 
   <!-- FORMULÁRIO -->
@@ -31,17 +37,17 @@
           <input type="text" id="city" value="São Paulo" readonly />
         </div>
 
-        <!-- Localidade (agora obrigatória) -->
+        <!-- Localidade -->
         <div class="form-group">
           <label for="locality">Localidade <span class="required">*</span></label>
           <input type="text" id="locality" placeholder="Bairro, zona, etc."/>
           <p id="localityError" class="error-text hidden">Preencha a localidade.</p>
         </div>
 
-        <!-- Endereço -->
+        <!-- Endereço com Autocomplete -->
         <div class="form-group">
           <label for="street">Endereço <span class="required">*</span></label>
-          <input type="text" id="street" placeholder="Rua, avenida, etc."/>
+          <input type="text" id="street" placeholder="Rua, avenida, etc." autocomplete="off"/>
           <p id="streetError" class="error-text hidden">Preencha o endereço.</p>
         </div>
 
@@ -58,7 +64,7 @@
           <input type="text" id="reference" placeholder="Opcional"/>
         </div>
 
-        <!-- BOTÃO ENTREGAR dentro do card -->
+        <!-- BOTÃO ENTREGAR -->
         <button type="submit" class="btn save-btn">Entregar neste endereço</button>
       </form>
     </div>
