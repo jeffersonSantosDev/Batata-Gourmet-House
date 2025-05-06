@@ -152,3 +152,46 @@ body {
     border-radius: 6px;
   }
 }
+
+
+/* Faz o container do form controlar o posicionamento */
+.new-address-form .form-group {
+  position: relative;
+}
+
+/* Remove marcadores e espaçamento default */
+.autocomplete-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  
+  /* Ajuste de borda e fundo */
+  border: 1px solid var(--border);
+  background: var(--primary);
+  
+  /* Tamanho e rolagem */
+  max-height: 200px;
+  overflow-y: auto;
+  
+  /* Posiciona sob o input */
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  
+  /* Garante ficar acima de outros elementos */
+  z-index: 1000;
+}
+
+/* Cada item */
+.autocomplete-list li {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-dark);
+}
+
+/* Hover para destaque */
+.autocomplete-list li:hover {
+  background: var(--bg-light);
+}
