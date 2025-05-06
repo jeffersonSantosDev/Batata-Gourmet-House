@@ -71,21 +71,28 @@ function renderAddressList(addresses) {
     const li = document.createElement('li');
     li.className = 'address-item';
     li.innerHTML = `
-      <div class="address-info">
-        <input 
-          type="radio"
-          name="selectedAddress"
-          id="addr-${a.id}"
-          value="${a.id}"
-          ${a.padrao ? 'checked' : ''} 
-        />
-        <label for="addr-${a.id}"><strong>${a.bairro}, ${a.numero}</strong></label>
-        <label for="addr-${a.id}">${a.cidade} – ${a.uf.toUpperCase()}</label>
-        ${a.referencia ? `<label for="addr-${a.id}"><em>${a.referencia}</em></label>` : ''}
-        <label for="addr-${a.id}"><small>${a.distanciaKm.toFixed(1)} km • ${a.tempoMinutos} min • R$ ${a.frete.toFixed(2)}</small></label>
+    <div class="address-item-content">
+      <input
+        type="radio"
+        name="selectedAddress"
+        id="addr-${a.id}"
+        value="${a.id}"
+        ${a.padrao ? 'checked' : ''} 
+      />
+      <label for="addr-${a.id}">
+        <strong>${a.bairro}, ${a.numero}</strong>
+      </label>
+      <div class="address-street">
+        <small>Rua ${a.rua}</small>
       </div>
-      <button class="menu-btn" data-id="${a.id}" aria-label="Opções">⋮</button>
-    `;
+      <div class="address-meta">
+        <small>${a.cidade} – ${a.uf.toUpperCase()}</small>
+      </div>
+      <div class="address-footer">
+        <small>${a.distanciaKm.toFixed(1)} km • ${a.tempoMinutos} min • R$ ${a.frete.toFixed(2)}</small>
+      </div>
+    </div>
+  `;
     ul.appendChild(li);
   });
 
