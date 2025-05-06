@@ -28,37 +28,48 @@ function fillInAddress() {
     return acc;
   }, {});
 
-  // Crava SP/City
+  // Crava SP e São Paulo
   document.getElementById('state').value = 'SP';
   document.getElementById('city').value  = 'São Paulo';
 
-  // Bairro sempre readonly
-  document.getElementById('locality').value = 
-    comps['sublocality_level_1'] ||
-    comps['sublocality'] ||
-    comps['neighborhood'] ||
-    '';
+  // **Bairro (locality)**
+  const localityEl = document.getElementById('locality');
+  if (comps['sublocality_level_1'] ||
+      comps['sublocality'] ||
+      comps['neighborhood']) {
 
-  // **Rua**  
+    localityEl.value    = comps['sublocality_level_1']
+                        || comps['sublocality']
+                        || comps['neighborhood'];
+    localityEl.readOnly = true;
+
+  } else {
+    // libera edição manual de bairro
+    localityEl.value       = '';
+    localityEl.readOnly    = false;
+    localityEl.placeholder = 'Informe o bairro';
+    localityEl.focus();
+  }
+
+  // **Rua**
   const streetEl = document.getElementById('street');
   if (comps['route']) {
-    streetEl.value = comps['route'];
+    streetEl.value    = comps['route'];
     streetEl.readOnly = true;
   } else {
-    streetEl.value = '';
-    streetEl.readOnly = false;   // libera edição
+    streetEl.value       = '';
+    streetEl.readOnly    = false;
     streetEl.placeholder = 'Informe a rua manualmente';
-    streetEl.focus();
   }
 
   // **Número**
   const numberEl = document.getElementById('number');
   if (comps['street_number']) {
-    numberEl.value = comps['street_number'];
+    numberEl.value    = comps['street_number'];
     numberEl.readOnly = true;
   } else {
-    numberEl.value = '';
-    numberEl.readOnly = false;   // libera edição
+    numberEl.value       = '';
+    numberEl.readOnly    = false;
     numberEl.placeholder = 'Informe o número';
   }
 }
@@ -74,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!whatsapp) {
     return window.location.replace("identify.html");
   }
-  
+
   // Voltar
   backBtn.addEventListener("click", () => {
     if (history.length > 1) {
