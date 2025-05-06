@@ -71,28 +71,32 @@ function renderAddressList(addresses) {
     const li = document.createElement('li');
     li.className = 'address-item';
     li.innerHTML = `
-    <div class="address-item-content">
+    <label for="addr-${a.id}" class="address-item">
       <input
         type="radio"
         name="selectedAddress"
         id="addr-${a.id}"
         value="${a.id}"
-        ${a.padrao ? 'checked' : ''} 
+        ${a.padrao ? 'checked' : ''}
       />
-      <label for="addr-${a.id}">
-        <strong>${a.bairro}, ${a.numero}</strong>
-      </label>
-      <div class="address-street">
-        <small>Rua ${a.rua}</small>
+      <div class="address-content">
+        <div class="address-line1">
+          <strong>${a.bairro}, ${a.numero}</strong>
+        </div>
+        <div class="address-line2">
+          Rua ${a.rua}
+        </div>
+        <div class="address-line3">
+          ${a.cidade} – ${a.uf.toUpperCase()}
+        </div>
+        <div class="address-meta">
+          ${a.distanciaKm.toFixed(1)} km • ${a.tempoMinutos} min • R$ ${a.frete.toFixed(2)}
+        </div>
       </div>
-      <div class="address-meta">
-        <small>${a.cidade} – ${a.uf.toUpperCase()}</small>
-      </div>
-      <div class="address-footer">
-        <small>${a.distanciaKm.toFixed(1)} km • ${a.tempoMinutos} min • R$ ${a.frete.toFixed(2)}</small>
-      </div>
-    </div>
+      <button class="menu-btn" data-id="${a.id}" aria-label="Opções">⋮</button>
+    </label>
   `;
+  
     ul.appendChild(li);
   });
 
