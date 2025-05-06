@@ -4,43 +4,35 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Editar Endereços — Batata Gourmet House</title>
-  
-  <link rel="stylesheet" href="css/edit-address.css"/>
-    <!-- 1. Carrega o SweetAlert primeiro -->
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-  <script src="js/utils.js"></script>
-  <script defer src="js/edit-address.js"></script>
+  <link rel="stylesheet" href="css/edit-addresses.css"/>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <script defer src="js/edit-addresses.js"></script>
 </head>
 <body>
-  <!-- Loader -->
-  <div id="loader" class="loader hidden"></div>
-
-  <!-- HEADER -->
+  <!-- HEADER APENAS LOGO E VOLTAR -->
   <header class="address-header">
     <button id="backBtn" class="back-btn">←</button>
     <h1 class="address-title">Editar Endereços</h1>
   </header>
 
-  <!-- SUBTITLE -->
-  <p class="address-subtitle">
+  <!-- SUBTÍTULO FORA DO HEADER -->
+  <div class="address-subtitle">
     Crie um novo endereço ou use a lista abaixo
-  </p>
+  </div>
 
-  <!-- BUTTON “+ Cadastrar Novo Endereço” -->
+  <!-- BOTÃO DE NOVO ENDEREÇO -->
   <div class="new-address-container">
     <button id="newAddressBtn" class="new-address-btn">
       + Cadastrar Novo Endereço
     </button>
   </div>
 
-  <!-- MAIN CONTENT -->
+  <!-- LISTA DE ENDEREÇOS -->
   <main class="address-main">
-    <ul id="addressList" class="address-list">
-      <!-- Será preenchido pelo JS -->
-    </ul>
+    <ul id="addressList" class="address-list"></ul>
   </main>
 
-  <!-- FOOTER -->
+  <!-- FOOTER COM SALVAR -->
   <footer class="address-footer">
     <button id="saveBtn" class="save-btn">Salvar</button>
   </footer>
