@@ -148,6 +148,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       // Recarrega lista e atualiza originalDefaultId
       const updatedList = await fetchUserAddresses(whatsapp);
+      
       originalDefaultId = renderAddressList(updatedList);
     }
 
