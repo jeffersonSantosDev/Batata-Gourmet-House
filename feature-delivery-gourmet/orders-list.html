@@ -1,41 +1,43 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Editar Endereços — Batata Gourmet House</title>
-  <link rel="stylesheet" href="css/edit-address.css"/>
-  <!-- utilitários (por ex. leitura de localStorage) -->
-  <script src="js/utils.js"></script>
-  <!-- nosso script principal -->
-  <script defer src="js/edit-address.js"></script>
-</head>
-<body>
-  <!-- Loader -->
-  <div id="loader" class="loader hidden"></div>
-
-  <!-- HEADER -->
-  <header class="address-header">
-    <button id="backBtn" class="back-btn">←</button>
-    <h1 class="address-title">Editar Endereços</h1>
-    <button id="newAddressBtn" class="small-btn">+ Cadastrar Novo</button>
-  </header>
-
-  <!-- SUBTITLE -->
-  <div class="address-subtitle">
-    Crie um novo endereço ou use a lista abaixo
-  </div>
-
-  <!-- MAIN CONTENT -->
-  <main class="address-main">
-    <ul id="addressList" class="address-list">
-      <!-- preenchido pelo JS -->
-    </ul>
-  </main>
-
-  <!-- FOOTER -->
-  <footer class="address-footer">
-    <button id="saveBtn" class="save-btn">Salvar</button>
-  </footer>
-</body>
-</html>
+ <html lang="pt-BR">
+ <head>
+   <meta charset="UTF-8"/>
+   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+   <title>Meus Pedidos | Batata Gourmet House</title>
+   <!-- Seu CSS de pedidos -->
+   <link rel="stylesheet" href="css/orders-list.css"/>
+   <!-- SweetAlert (se precisar) -->
+   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+   <script src="js/utils.js"></script>
+   <!-- Identify global -->
+   <script src="js/identify.js"></script>
+   <!-- Lógica de listagem -->
+   <script defer src="js/orders-list.js"></script>
+ </head>
+ <body>
+     <header class="pedidos-header">
+       <button id="backBtn" class="back-btn">←</button> 
+         <h1 class="pedidos-title">Meus Pedidos</h1>
+       </header> 
+   <main class="pedidos-container">
+     <table class="orders-table">
+       <thead>
+         <tr>
+           <th>Data</th>
+           <th>Total</th>
+           <th></th>
+         </tr>
+       </thead>
+       <tbody id="ordersTableBody">
+         <!-- preenchido via JS -->
+       </tbody>
+     </table>
+     <p id="noPedidos" class="no-pedidos hidden">
+       Você ainda não fez nenhum pedido.
+     </p>
+   </main>
+   <div id="loadingOverlay" class="loading-overlay hidden">
+     <div class="spinner"></div>
+   </div>
+ </body>
+ </html>
