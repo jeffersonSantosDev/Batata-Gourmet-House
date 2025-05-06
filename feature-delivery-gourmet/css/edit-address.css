@@ -261,3 +261,28 @@ body {
   margin: 0;
   line-height: 1.4;
 }
+.address-item-content {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem;
+  align-items: start;
+}
+
+.address-street {
+  grid-column: 2;
+  margin-top: 0.25rem;
+  color: #555;
+}
+
+.address-meta {
+  grid-column: 2;
+  color: #777;
+  font-size: 0.85rem;
+}
+
+.address-footer {
+  grid-column: 2;
+  margin-top: 0.25rem;
+  color: #777;
+  font-size: 0.85rem;
+}
