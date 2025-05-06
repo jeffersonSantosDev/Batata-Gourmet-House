@@ -48,6 +48,7 @@ body {
   background: var(--primary);
   padding: 1rem;
   box-shadow: 0 1px 4px var(--shadow);
+  border-bottom: 1px solid var(--border);
 }
 .back-btn {
   background: none; border: none;
@@ -70,8 +71,7 @@ body {
   text-align: center;
   font-size: 0.9rem;
   color: #666;
-  padding: 0.5rem 1rem;
-  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1rem; 
   margin: 0;
 }
 
