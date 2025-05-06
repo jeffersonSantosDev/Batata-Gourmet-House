@@ -1,9 +1,31 @@
-// 1) Função para buscar sugestões via /api/places
+// register-address.js
+
+// 1) Busca sugestões via /api/places
 async function fetchPlaces(input) {
   const res = await fetch(`/api/places?input=${encodeURIComponent(input)}`);
   if (!res.ok) throw new Error("Autocomplete failed");
   const { predictions } = await res.json();
   return predictions;
+}
+
+// 2) Busca detalhes via /api/placeDetails
+async function fetchPlaceDetails(placeId) {
+  const res = await fetch(`/api/placeDetails?place_id=${encodeURIComponent(placeId)}`);
+  if (!res.ok) throw new Error("Place details failed");
+  return await res.json();  // contém address_components
+}
+
+// 3) Preenche os campos a partir do objeto placeDetails
+function fillFieldsFromPlace(place) {
+  const comps = place.address_components.reduce((acc, c) => {
+    c.types.forEach(t => acc[t] = c.long_name);
+    return acc;
+  }, {});
+
+  document.getElementById("locality").value = 
+    comps.sublocality_level_1 || comps.sublocality || comps.neighborhood || "";
+  document.getElementById("street").value   = comps.route || "";
+  document.getElementById("number").value   = comps.street_number || "";
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -23,37 +45,68 @@ document.addEventListener("DOMContentLoaded", () => {
   stateEl.value = "SP";
   cityEl.value  = "São Paulo";
 
-  // verifica identificação
+  // verifica usuário identificado
   const whatsapp = localStorage.getItem("bgHouse_whatsapp");
   if (!whatsapp) return window.location.replace("identify.html");
 
-  // voltar
+  // botão voltar
   backBtn.addEventListener("click", () => {
-    if (history.length > 1) history.back();
-    else window.location.href = "identify.html";
+    history.length > 1 ? history.back() : window.location.href = "identify.html";
   });
 
-  // enquanto digita → sugestões
+  // enquanto digita, carrega sugestões
   autoIn.addEventListener("input", async () => {
     const q = autoIn.value.trim();
     listEl.innerHTML = "";
     if (q.length < 3) return;
     try {
       const preds = await fetchPlaces(q);
-      listEl.innerHTML = preds.map((p, i) =>
-        `<li data-idx="${i}">${p.description}</li>`
+      listEl.innerHTML = preds.map((p,i) =>
+        `<li data-idx="${i}" data-placeid="${p.place_id}">${p.description}</li>`
       ).join("");
     } catch (e) {
       console.error(e);
     }
   });
 
-  // ao clicar na sugestão
-  listEl.addEventListener("click", e => {
+  // ao clicar numa sugestão
+  listEl.addEventListener("click", async e => {
     const li = e.target.closest("li[data-idx]");
     if (!li) return;
     autoIn.value = li.textContent;
     listEl.innerHTML = "";
+
+    // busca detalhes
+    const placeId = li.dataset.placeid;
+    try {
+      const place = await fetchPlaceDetails(placeId);
+
+      // extrai estado e país
+      const comps = place.address_components.reduce((acc, c) => {
+        c.types.forEach(t => acc[t] = c.long_name);
+        return acc;
+      }, {});
+      const estado = comps.administrative_area_level_1;
+      const pais   = comps.country;
+
+      // Se não for Brasil/SP, bloqueia
+      if (pais !== "Brasil" || estado !== "São Paulo") {
+        swal("Desculpe", "Só entregamos em São Paulo/SP.", "error")
+          .then(() => {
+            autoIn.value = "";
+            locEl.value = "";
+            streetEl.value = "";
+            numEl.value = "";
+          });
+        return;
+      }
+
+      // preenche os campos
+      fillFieldsFromPlace(place);
+    } catch (err) {
+      console.error(err);
+      swal("Erro", "Não foi possível obter detalhes do endereço.", "error");
+    }
   });
 
   // submit
@@ -81,16 +134,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const resp = await fetch("/api/Usuario/SaveAddresByWhatsApp", {
-        method:  "POST",
+        method: "POST",
         headers: {"Content-Type":"application/json"},
-        body:    JSON.stringify(payload)
+        body: JSON.stringify(payload)
       });
       if (resp.status === 204)
         return swal("Erro","Usuário não encontrado.","error");
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
 
       swal("Sucesso","Endereço cadastrado com sucesso!","success")
-        .then(()=>window.location.href="index.html");
+        .then(() => window.location.href = "index.html");
     } catch (err) {
       console.error(err);
       swal("Erro", err.message || "Falha ao cadastrar endereço.","error");
