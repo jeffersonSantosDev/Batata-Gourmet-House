@@ -4,8 +4,8 @@ import { Loader } from 'https://unpkg.com/@googlemaps/js-api-loader?module';
 let autocomplete;
 
 // 2) inicializa a API assim que carregar o módulo
-const loader = new Loader({
-  apiKey: 'AIzaSyB1fNIX_jYvev0ASAjGvyOfK2wAtx_hCKM',  // só para teste
+const loader = new Loader({ 
+  apiKey: process.env.google_maps_key,
   libraries: ['places']
 });
 
