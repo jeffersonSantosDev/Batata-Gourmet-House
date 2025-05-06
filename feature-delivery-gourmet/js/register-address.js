@@ -1,57 +1,50 @@
-// 1) importe o Loader diretamente de um CDN como módulo ES
-import { Loader } from 'https://unpkg.com/@googlemaps/js-api-loader?module';
+// register-address.js
 
-let autocomplete;
+// 1) Busca sugestões de endereço via sua função serverless
+let suggestions = [];
+async function fetchPlaces(input) {
+  const resp = await fetch(`/api/places?input=${encodeURIComponent(input)}`);
+  if (!resp.ok) throw new Error('Autocomplete failed');
+  const json = await resp.json();
+  return json.predictions; // [{ description, place_id, ... }, …]
+}
 
-// 2) inicializa a API assim que carregar o módulo
-const loader = new Loader({ 
-  apiKey: process.env.google_maps_key,
-  libraries: ['places']
-});
+// 2) Busca detalhes de um place_id via outra função serverless
+async function fetchPlaceDetails(placeId) {
+  const resp = await fetch(`/api/placeDetails?place_id=${encodeURIComponent(placeId)}`);
+  if (!resp.ok) throw new Error('Place details failed');
+  const json = await resp.json();
+  return json.result; // conforme Place Details JSON
+}
 
-loader.load().then(() => {
-  const input = document.getElementById('autocomplete');
-  autocomplete = new google.maps.places.Autocomplete(input, {
-    types: ['address'],
-    componentRestrictions: { country: 'br' }
-  });
-  autocomplete.addListener('place_changed', fillInAddress);
-});
-
-// 3) quando o usuário selecionar, preenche os campos
-function fillInAddress() {
-  const place = autocomplete.getPlace();
-  if (!place.address_components) return;
-
+// 3) Preenche os campos com base no Place Details
+function fillAllFields(place) {
   const comps = place.address_components.reduce((acc, comp) => {
     comp.types.forEach(type => acc[type] = comp.long_name);
     return acc;
   }, {});
 
-  // Crava SP e São Paulo
-  document.getElementById('state').value = 'SP';
-  document.getElementById('city').value  = 'São Paulo';
+  // Sempre crava SP / São Paulo
+  document.getElementById('state').value   = 'SP';
+  document.getElementById('city').value    = 'São Paulo';
 
-  // **Bairro (locality)**
+  // Bairro
   const localityEl = document.getElementById('locality');
   if (comps['sublocality_level_1'] ||
       comps['sublocality'] ||
       comps['neighborhood']) {
-
     localityEl.value    = comps['sublocality_level_1']
                         || comps['sublocality']
                         || comps['neighborhood'];
     localityEl.readOnly = true;
-
   } else {
-    // libera edição manual de bairro
     localityEl.value       = '';
     localityEl.readOnly    = false;
     localityEl.placeholder = 'Informe o bairro';
     localityEl.focus();
   }
 
-  // **Rua**
+  // Rua
   const streetEl = document.getElementById('street');
   if (comps['route']) {
     streetEl.value    = comps['route'];
@@ -62,7 +55,7 @@ function fillInAddress() {
     streetEl.placeholder = 'Informe a rua manualmente';
   }
 
-  // **Número**
+  // Número
   const numberEl = document.getElementById('number');
   if (comps['street_number']) {
     numberEl.value    = comps['street_number'];
@@ -74,73 +67,95 @@ function fillInAddress() {
   }
 }
 
-
-// 4) restante da lógica de UI / validação / submit
 document.addEventListener("DOMContentLoaded", () => {
   const backBtn = document.getElementById("backBtn");
   const form    = document.getElementById("newAddressForm");
+  const autoIn  = document.getElementById("autocomplete");
+  const listEl  = document.createElement("ul");
   const errAuto = document.getElementById("autocompleteError");
 
-  const whatsapp = localStorage.getItem("bgHouse_whatsapp");
-  if (!whatsapp) {
-    return window.location.replace("identify.html");
-  }
+  listEl.className = "autocomplete-list";
+  autoIn.parentNode.appendChild(listEl);
 
-  // Voltar
+  // 4) Voltar / identificar
   backBtn.addEventListener("click", () => {
-    if (history.length > 1) {
-      history.back();
-    } else {
-      window.location.href = "./identify.html";
+    if (history.length > 1) history.back();
+    else window.location.href = "./identify.html";
+  });
+
+  // 5) Enquanto digita, busca sugestões
+  autoIn.addEventListener("input", async () => {
+    const v = autoIn.value.trim();
+    if (v.length < 3) {
+      listEl.innerHTML = "";
+      return;
+    }
+    try {
+      suggestions = await fetchPlaces(v);
+      listEl.innerHTML = suggestions
+        .map((p, i) => `<li data-idx="${i}">${p.description}</li>`)
+        .join("");
+    } catch (e) {
+      console.error(e);
     }
   });
 
+  // 6) Ao clicar numa sugestão, pega detalhes e preenche
+  listEl.addEventListener("click", async e => {
+    const li = e.target.closest("li[data-idx]");
+    if (!li) return;
+    const idx = +li.dataset.idx;
+    const placeId = suggestions[idx].place_id;
+    listEl.innerHTML = "";
+    autoIn.value = suggestions[idx].description;
+
+    try {
+      const details = await fetchPlaceDetails(placeId);
+      fillAllFields(details);
+    } catch (err) {
+      console.error(err);
+      swal("Erro", "Não foi possível obter detalhes do endereço.", "error");
+    }
+  });
+
+  // 7) Submit do formulário
   form.addEventListener("submit", async e => {
     e.preventDefault();
     errAuto.classList.add("hidden");
 
-    // 1) Recupera WhatsApp do usuário
+    // Recupera WhatsApp
     const whatsapp = localStorage.getItem("bgHouse_whatsapp");
     if (!whatsapp) {
       return swal("Erro", "Usuário não identificado. Volte e identifique-se.", "error");
     }
 
-    // 2) Lê campos obrigatórios
-    const uf     = document.getElementById("state").value.trim();
-    const cidade = document.getElementById("city").value.trim();
+    // Lê campos obrigatórios
     const bairro = document.getElementById("locality").value.trim();
     const rua    = document.getElementById("street").value.trim();
     const numero = document.getElementById("number").value.trim();
 
-    // 3) Validações
-    if (!bairro) {
-      return swal("Atenção", "Bairro não foi preenchido.", "warning");
-    }
-    if (!rua) {
-      errAuto.classList.remove("hidden");
-      return;
-    }
-    if (!numero) {
-      return swal("Atenção", "Número do endereço não foi preenchido.", "warning");
-    }
+    // Valida
+    if (!bairro) return swal("Atenção", "Bairro não foi preenchido.", "warning");
+    if (!rua)    { errAuto.classList.remove("hidden"); return; }
+    if (!numero) return swal("Atenção", "Número do endereço não foi preenchido.", "warning");
 
-    // 4) Monta o payload
+    // Monta payload
     const payload = {
       NumeroWhatsApp: whatsapp,
-      Uf: uf,
-      Cidade: cidade,
-      Bairro: bairro,
-      Rua: rua,
-      Numero: numero,
-      Referencia: document.getElementById("reference").value.trim()
+      Uf:             "SP",
+      Cidade:         "São Paulo",
+      Bairro:         bairro,
+      Rua:            rua,
+      Numero:         numero,
+      Referencia:     document.getElementById("reference").value.trim()
     };
 
-    // 5) Chama o endpoint
+    // Chama seu endpoint de salvar
     try {
       const resp = await fetch("/api/Usuario/SaveAddresByWhatsApp", {
-        method: "POST",
+        method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body:    JSON.stringify(payload)
       });
 
       if (resp.status === 204) {
@@ -148,7 +163,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       if (!resp.ok) throw new Error();
 
-      // 6) Sucesso: retorna ao início
       swal("Sucesso", "Endereço cadastrado com sucesso!", "success")
         .then(() => window.location.href = "index.html");
     } catch (err) {
@@ -157,4 +171,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-
