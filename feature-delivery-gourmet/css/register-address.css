@@ -165,8 +165,7 @@ body {
   top: calc(100% + 4px);
   left: 0;
   width: 100%;
-  background: var(--primary);
-  border: 1px solid var(--border);
+  background: var(--primary); 
   box-shadow: 0 2px 8px var(--shadow);
   border-radius: 4px;
   max-height: 200px;
