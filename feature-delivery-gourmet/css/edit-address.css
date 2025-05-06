@@ -9,11 +9,14 @@
   --shadow: rgba(0,0,0,0.1);
 }
 
-/* Reset básico */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+.hidden {
+  display: none !important;
 }
 
 /* Loader */
@@ -25,9 +28,6 @@
   align-items: center;
   justify-content: center;
   z-index: 999;
-}
-.loader.hidden {
-  display: none !important;
 }
 .loader::before {
   content: "";
@@ -42,7 +42,7 @@
   to { transform: rotate(360deg); }
 }
 
-/* Corpo */
+/* Body */
 body {
   font-family: "Poppins", sans-serif;
   background: var(--bg-light);
@@ -91,7 +91,7 @@ body {
   background: var(--highlight);
 }
 
-/* Subtítulo */
+/* Subtitle */
 .address-subtitle {
   background: var(--primary);
   text-align: center;
@@ -108,16 +108,14 @@ body {
   overflow-y: auto;
 }
 
-/* Lista */
+/* Address List */
 .address-list {
   list-style: none;
-  margin: 0 auto;
-  padding: 0;
   width: 100%;
   max-width: 480px;
+  margin: 0 auto;
+  padding: 0;
 }
-
-/* Item de endereço */
 .address-item {
   display: flex;
   align-items: flex-start;
@@ -129,6 +127,7 @@ body {
 .address-info {
   flex: 1;
   display: grid;
+  grid-auto-rows: auto;
   row-gap: 0.25rem;
   padding-right: 2.5rem;
 }
@@ -150,15 +149,7 @@ body {
   color: #888;
 }
 
-/* Estado “sem endereço” */
-.no-address {
-  padding: 2rem;
-  text-align: center;
-  color: #888;
-  font-size: 0.95rem;
-}
-
-/* Botão de menu */
+/* Menu button */
 .menu-btn {
   background: none;
   border: none;
@@ -229,7 +220,6 @@ body {
   background: var(--highlight);
 }
 
-/* Mobile */
 @media (max-width: 480px) {
   .address-header {
     grid-template-columns: 40px 1fr;
