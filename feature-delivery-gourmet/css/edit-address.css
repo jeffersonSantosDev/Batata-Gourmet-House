@@ -72,6 +72,7 @@ body {
   color: #666;
   padding: 0.5rem 1rem;
   border-bottom: 1px solid var(--border);
+  margin: 0; /* certifique-se de zerar margens */
 }
 
 /* New Address Button */
