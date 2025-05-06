@@ -19,16 +19,16 @@
 
   <main class="order-container">
     <section class="order-info">
-      <div class="progress-container">
+      <!-- PROGRESS BAR -->
+      <div class="progress-container" id="progressContainer" style="display:none;">
         <div class="progress-bar">
           <div class="progress" id="progressFill"></div>
           <div class="progress-step" data-label="Recebido"></div>
-          <div class="progress-step" data-label="em preparo"></div>
+          <div class="progress-step" data-label="Em preparo"></div>
           <div class="progress-step" data-label="Saiu para entrega"></div>
           <div class="progress-step" data-label="Entregue"></div>
         </div>
       </div>
-      
 
       <div class="order-header-block">
         <h2 class="order-number">
@@ -76,10 +76,5 @@
       <p id="paymentMethod">—</p>
     </section>
   </main>
-  <!-- HTML: certifique-se de ter algo assim na sua página -->
-<div id="progressContainer" class="progress-bar" style="display:none;">
-  <div id="progressFill" class="progress-bar-fill" style="width:0%;"></div>
-</div>
-
 </body>
 </html>
