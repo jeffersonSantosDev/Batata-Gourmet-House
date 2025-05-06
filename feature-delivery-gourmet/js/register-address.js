@@ -70,41 +70,80 @@ document.addEventListener("DOMContentLoaded", () => {
   const form    = document.getElementById("newAddressForm");
   const errAuto = document.getElementById("autocompleteError");
 
+  const whatsapp = localStorage.getItem("bgHouse_whatsapp");
+  if (!whatsapp) {
+    return window.location.replace("identify.html");
+  }
+  
+  // Voltar
   backBtn.addEventListener("click", () => {
-    history.length > 1 ? history.back() : window.location.href = "./identify.html";
+    if (history.length > 1) {
+      history.back();
+    } else {
+      window.location.href = "./identify.html";
+    }
   });
 
   form.addEventListener("submit", async e => {
     e.preventDefault();
     errAuto.classList.add("hidden");
 
-    // se street estiver vazio, não selecionou
-    if (!document.getElementById('street').value) {
+    // 1) Recupera WhatsApp do usuário
+    const whatsapp = localStorage.getItem("bgHouse_whatsapp");
+    if (!whatsapp) {
+      return swal("Erro", "Usuário não identificado. Volte e identifique-se.", "error");
+    }
+
+    // 2) Lê campos obrigatórios
+    const uf     = document.getElementById("state").value.trim();
+    const cidade = document.getElementById("city").value.trim();
+    const bairro = document.getElementById("locality").value.trim();
+    const rua    = document.getElementById("street").value.trim();
+    const numero = document.getElementById("number").value.trim();
+
+    // 3) Validações
+    if (!bairro) {
+      return swal("Atenção", "Bairro não foi preenchido.", "warning");
+    }
+    if (!rua) {
       errAuto.classList.remove("hidden");
       return;
     }
+    if (!numero) {
+      return swal("Atenção", "Número do endereço não foi preenchido.", "warning");
+    }
 
-    // monta payload
+    // 4) Monta o payload
     const payload = {
-      uf:        document.getElementById('state').value,
-      cidade:    document.getElementById('city').value,
-      bairro:    document.getElementById('locality').value,
-      endereco:  document.getElementById('street').value,
-      numero:    document.getElementById('number').value,
-      referencia:document.getElementById('reference').value.trim()
+      NumeroWhatsApp: whatsapp,
+      Uf: uf,
+      Cidade: cidade,
+      Bairro: bairro,
+      Rua: rua,
+      Numero: numero,
+      Referencia: document.getElementById("reference").value.trim()
     };
 
+    // 5) Chama o endpoint
     try {
-      const resp = await fetch('/api/Usuario/AddAddress', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const resp = await fetch("/api/Usuario/SaveAddresByWhatsApp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
+
+      if (resp.status === 204) {
+        return swal("Erro", "Usuário não encontrado. Identifique-se novamente.", "error");
+      }
       if (!resp.ok) throw new Error();
+
+      // 6) Sucesso: retorna ao início
       swal("Sucesso", "Endereço cadastrado com sucesso!", "success")
-         .then(() => window.location.href = 'index.html');
-    } catch {
-      swal("Erro", "Não foi possível cadastrar o endereço. Tente novamente mais tarde.", "error");
+        .then(() => window.location.href = "index.html");
+    } catch (err) {
+      console.error(err);
+      swal("Erro", err.message || "Não foi possível cadastrar o endereço. Tente novamente mais tarde.", "error");
     }
   });
 });
+
