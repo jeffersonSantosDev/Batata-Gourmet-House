@@ -83,6 +83,12 @@ document.addEventListener("DOMContentLoaded", () => {
     else window.location.href = "./identify.html";
   });
 
+  const whatsapp = localStorage.getItem('bgHouse_whatsapp'); 
+
+  if (!whatsapp) {
+    return window.location.replace("identify.html");
+  }
+  
   // 5) Enquanto digita, busca sugestões
   autoIn.addEventListener("input", async () => {
     const v = autoIn.value.trim();
