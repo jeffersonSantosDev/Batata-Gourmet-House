@@ -78,13 +78,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("deliveryAddress").textContent = pedido.enderecoEntrega;
     document.getElementById("paymentMethod").textContent = pedido.formaPagamento;
 
-    swal({
-      title: `Pedido #${pedido.pedidoId}`,
-      text: `Status: ${pedido.status}`,
-      icon: "info",
-      timer: 1500,
-      buttons: false
-    });
+    // swal({
+    //   title: `Pedido #${pedido.pedidoId}`,
+    //   text: `Status: ${pedido.status}`,
+    //   icon: "info",
+    //   timer: 1500,
+    //   buttons: false
+    // });
 
   } catch (err) {
     console.error(err);
