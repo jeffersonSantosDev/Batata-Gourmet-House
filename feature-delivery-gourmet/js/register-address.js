@@ -1,62 +1,54 @@
-// register-address.js
-
-/**
- * 1) Busca sugestões de endereço via sua função serverless
- */
+// 1) Função para buscar sugestões via /api/places
 async function fetchPlaces(input) {
-  const resp = await fetch(`/api/places?input=${encodeURIComponent(input)}`);
-  if (!resp.ok) throw new Error('Autocomplete failed');
-  const { predictions } = await resp.json();
-  return predictions;  // array de { description, place_id, ... }
+  const res = await fetch(`/api/places?input=${encodeURIComponent(input)}`);
+  if (!res.ok) throw new Error("Autocomplete failed");
+  const { predictions } = await res.json();
+  return predictions;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Elementos-chave
-  const backBtn     = document.getElementById("backBtn");
-  const form        = document.getElementById("newAddressForm");
-  const autoIn      = document.getElementById("autocomplete");
-  const listEl      = document.querySelector(".autocomplete-list");
-  const errAuto     = document.getElementById("autocompleteError");
-  const stateEl     = document.getElementById("state");
-  const cityEl      = document.getElementById("city");
-  const locEl       = document.getElementById("locality");
-  const streetEl    = document.getElementById("street");
-  const numberEl    = document.getElementById("number");
-  const referenceEl = document.getElementById("reference");
+  const backBtn  = document.getElementById("backBtn");
+  const form     = document.getElementById("newAddressForm");
+  const autoIn   = document.getElementById("autocomplete");
+  const listEl   = document.querySelector(".autocomplete-list");
+  const errAuto  = document.getElementById("autocompleteError");
+  const stateEl  = document.getElementById("state");
+  const cityEl   = document.getElementById("city");
+  const locEl    = document.getElementById("locality");
+  const streetEl = document.getElementById("street");
+  const numEl    = document.getElementById("number");
+  const refEl    = document.getElementById("reference");
 
-  // 0) Fixar SP/São Paulo
+  // fixa SP/São Paulo
   stateEl.value = "SP";
   cityEl.value  = "São Paulo";
 
-  // 1) Verifica identificação
+  // verifica identificação
   const whatsapp = localStorage.getItem("bgHouse_whatsapp");
-  if (!whatsapp) {
-    return window.location.replace("identify.html");
-  }
+  if (!whatsapp) return window.location.replace("identify.html");
 
-  // 2) Voltar
+  // voltar
   backBtn.addEventListener("click", () => {
     if (history.length > 1) history.back();
     else window.location.href = "identify.html";
   });
 
-  // 3) Autocomplete: enquanto digita, busca e mostra sugestões
+  // enquanto digita → sugestões
   autoIn.addEventListener("input", async () => {
     const q = autoIn.value.trim();
     listEl.innerHTML = "";
     if (q.length < 3) return;
-
     try {
-      const suggestions = await fetchPlaces(q);
-      listEl.innerHTML = suggestions
-        .map((p, i) => `<li data-idx="${i}">${p.description}</li>`)
-        .join("");
-    } catch (err) {
-      console.error(err);
+      const preds = await fetchPlaces(q);
+      listEl.innerHTML = preds.map((p, i) =>
+        `<li data-idx="${i}">${p.description}</li>`
+      ).join("");
+    } catch (e) {
+      console.error(e);
     }
   });
 
-  // 4) Clique numa sugestão: preenche apenas o input e esconde a lista
+  // ao clicar na sugestão
   listEl.addEventListener("click", e => {
     const li = e.target.closest("li[data-idx]");
     if (!li) return;
@@ -64,23 +56,19 @@ document.addEventListener("DOMContentLoaded", () => {
     listEl.innerHTML = "";
   });
 
-  // 5) Submit: valida e envia para SaveAddresByWhatsApp
+  // submit
   form.addEventListener("submit", async e => {
     e.preventDefault();
     errAuto.classList.add("hidden");
 
-    // Leitura
     const bairro = locEl.value.trim();
     const rua    = streetEl.value.trim();
-    const num    = numberEl.value.trim();
-    const referencia = referenceEl.value.trim();
+    const num    = numEl.value.trim();
 
-    // Validações
-    if (!bairro) return swal("Atenção", "Bairro não foi preenchido.", "warning");
-    if (!rua)    return swal("Atenção", "Rua não foi preenchida.", "warning");
-    if (!num)    return swal("Atenção", "Número não foi preenchido.", "warning");
+    if (!bairro) return swal("Atenção","Bairro não preenchido.","warning");
+    if (!rua)    return swal("Atenção","Rua não preenchida.","warning");
+    if (!num)    return swal("Atenção","Número não preenchido.","warning");
 
-    // Prepara payload
     const payload = {
       NumeroWhatsApp: whatsapp,
       Uf:             "SP",
@@ -88,27 +76,24 @@ document.addEventListener("DOMContentLoaded", () => {
       Bairro:         bairro,
       Rua:            rua,
       Numero:         num,
-      Referencia:     referencia
+      Referencia:     refEl.value.trim()
     };
 
     try {
       const resp = await fetch("/api/Usuario/SaveAddresByWhatsApp", {
         method:  "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {"Content-Type":"application/json"},
         body:    JSON.stringify(payload)
       });
-
-      if (resp.status === 204) {
-        return swal("Erro", "Usuário não encontrado. Identifique-se novamente.", "error");
-      }
+      if (resp.status === 204)
+        return swal("Erro","Usuário não encontrado.","error");
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
 
-      // Sucesso
-      swal("Sucesso", "Endereço cadastrado com sucesso!", "success")
-        .then(() => window.location.href = "index.html");
+      swal("Sucesso","Endereço cadastrado com sucesso!","success")
+        .then(()=>window.location.href="index.html");
     } catch (err) {
       console.error(err);
-      swal("Erro", err.message || "Não foi possível cadastrar o endereço.", "error");
+      swal("Erro", err.message || "Falha ao cadastrar endereço.","error");
     }
   });
 });

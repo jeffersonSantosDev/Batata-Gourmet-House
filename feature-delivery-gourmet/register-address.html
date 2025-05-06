@@ -6,14 +6,12 @@
   <title>Cadastrar Endereço — Batata Gourmet House</title>
   <link rel="stylesheet" href="css/register-address.css"/>
 
-      <!-- 1. Carrega o SweetAlert primeiro -->
-      <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-
-  <!-- 1) utils (se precisar) -->
+  <!-- SweetAlert -->
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <!-- Utils se precisar -->
   <script src="js/utils.js"></script>
-
-  <!-- 2) agora seu JS principal como module -->
-  <script type="module" src="js/register-address.js"></script>
+  <!-- Seu JS principal -->
+  <script defer src="js/register-address.js"></script>
 </head>
 <body>
   <header class="address-header">
@@ -24,45 +22,42 @@
   <main class="address-main">
     <div class="card">
       <form id="newAddressForm" class="new-address-form" novalidate>
-        <div class="form-group">
+        <div class="form-group autocomplete-container">
           <label for="autocomplete">Buscar Endereço <span class="required">*</span></label>
           <input type="text" id="autocomplete" placeholder="Digite e selecione" autocomplete="off"/>
           <ul class="autocomplete-list"></ul>
           <p id="autocompleteError" class="error-text hidden">Selecione um endereço válido.</p>
         </div>
+
         <div class="form-group">
           <label for="state">UF</label>
-          <input type="text" id="state" readonly />
+          <input type="text" id="state" readonly value="SP"/>
         </div>
         <div class="form-group">
           <label for="city">Cidade</label>
-          <input type="text" id="city" readonly />
+          <input type="text" id="city" readonly value="São Paulo"/>
         </div>
+
         <div class="form-group">
           <label for="locality">Bairro</label>
-          <input
-            type="text"
-            id="locality"
-            readonly
-            placeholder="Bairro, zona, etc."
-          />
+          <input type="text" id="locality" placeholder="Bairro, zona, etc."/>
         </div>
         <div class="form-group">
           <label for="street">Rua</label>
-          <input type="text" id="street" readonly placeholder="Rua" />
+          <input type="text" id="street" placeholder="Rua" />
         </div>
         <div class="form-group">
           <label for="number">Número</label>
-          <input type="text" id="number" readonly placeholder="Número" />
+          <input type="text" id="number" placeholder="Número" />
         </div>
         <div class="form-group">
           <label for="reference">Ponto de Referência</label>
           <input type="text" id="reference" placeholder="Opcional"/>
         </div>
+
         <button type="submit" class="btn save-btn">Entregar neste endereço</button>
       </form>
     </div>
   </main>
-  
 </body>
 </html>

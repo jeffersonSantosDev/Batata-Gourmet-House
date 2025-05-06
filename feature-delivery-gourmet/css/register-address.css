@@ -153,74 +153,33 @@ body {
   }
 }
 
-
-/* Faz o container do form controlar o posicionamento */
-.new-address-form .form-group {
+/* === AUTOCOMPLETE DROPDOWN === */
+.autocomplete-container {
   position: relative;
 }
-
-/* Remove marcadores e espaçamento default */
 .autocomplete-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  
-  /* Ajuste de borda e fundo */
-  border: 1px solid var(--border);
-  background: var(--primary);
-  
-  /* Tamanho e rolagem */
-  max-height: 200px;
-  overflow-y: auto;
-  
-  /* Posiciona sob o input */
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  
-  /* Garante ficar acima de outros elementos */
-  z-index: 1000;
-}
-
-/* Cada item */
-.autocomplete-list li {
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: var(--text-dark);
-}
-
-/* Hover para destaque */
-.autocomplete-list li:hover {
-  background: var(--bg-light);
-}
-.new-address-form .form-group { position: relative; }
-
-.autocomplete-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  border: 1px solid var(--border);
-  background: var(--primary);
-  max-height: 200px;
-  overflow-y: auto;
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
   width: 100%;
-  z-index: 1000;
+  background: var(--primary);
+  border: 1px solid var(--border);
   box-shadow: 0 2px 8px var(--shadow);
   border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
 }
-
 .autocomplete-list li {
   padding: 0.5rem 1rem;
   cursor: pointer;
   font-size: 0.9rem;
   color: var(--text-dark);
+  white-space: nowrap;
 }
-
 .autocomplete-list li:hover {
   background: var(--bg-light);
 }
