@@ -23,25 +23,40 @@ function fillInAddress() {
   const place = autocomplete.getPlace();
   if (!place.address_components) return;
 
+  // Converte address_components em um objeto fácil de ler
   const comps = place.address_components.reduce((acc, comp) => {
     comp.types.forEach(type => acc[type] = comp.long_name);
     return acc;
   }, {});
 
-  // CRAVA UF e Cidade fixos
-  document.getElementById('state').value = 'SP';
-  document.getElementById('city').value  = 'São Paulo';
+  // Pega o nome do estado e do país
+  const estado = comps['administrative_area_level_1'];   // ex: "São Paulo"
+  const pais   = comps['country'];                       // ex: "Brasil"
 
-  // Preenche apenas os campos que variam
-  document.getElementById('locality').value = 
-    comps['sublocality_level_1'] ||
-    comps['sublocality'] ||
-    comps['neighborhood'] ||
-    '';
+  // Se não for Brasil ou não for SP, cancela
+  if (pais !== 'Brasil' || estado !== 'São Paulo') {
+    swal("Desculpe", "Não atendemos neste local. Só entregamos em São Paulo/SP.", "error")
+      .then(() => {
+        // limpa todos os campos preenchidos
+        document.getElementById('autocomplete').value = '';
+        ['state','city','locality','street','number'].forEach(id => {
+          document.getElementById(id).value = '';
+        });
+      });
+    return;
+  }
 
-  document.getElementById('street').value = comps['route'] || '';
-  document.getElementById('number').value = comps['street_number'] || '';
+  // Caso seja SP/BR, preenche normalmente
+  document.getElementById('state').value    = 'SP';  // cravado
+  document.getElementById('city').value     = 'São Paulo'; // cravado
+  document.getElementById('locality').value = comps['sublocality_level_1']
+                                              || comps['sublocality']
+                                              || comps['neighborhood']
+                                              || '';
+  document.getElementById('street').value   = comps['route'] || '';
+  document.getElementById('number').value   = comps['street_number'] || '';
 }
+
 
 // 4) restante da lógica de UI / validação / submit
 document.addEventListener("DOMContentLoaded", () => {
