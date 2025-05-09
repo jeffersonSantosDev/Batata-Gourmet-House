@@ -36,13 +36,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         tr.className = "item-row";
         tr.innerHTML = `
           <td>
-            <div class="item-info">
-              <span>${item.quantidade}× ${item.produtoNome}</span>
-              <button class="remove-btn" data-id="${item.itemId}" title="Remover">×</button>
-            </div>
+            <span>${item.quantidade}× ${item.produtoNome}</span>
             ${item.observacoes ? `<small>“${item.observacoes}”</small>` : ""}
           </td>
-          <td>R$ ${item.precoUnitario.toFixed(2).replace(".",",")}</td>
+          <td>
+            R$ ${item.precoUnitario.toFixed(2).replace(".",",")}
+            <button class="remove-btn" data-id="${item.itemId}" title="Remover">×</button>
+          </td>
         `;
         cartList.appendChild(tr);
       });
