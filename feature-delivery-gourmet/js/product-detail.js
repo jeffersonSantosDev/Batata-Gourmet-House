@@ -135,21 +135,45 @@ document.addEventListener("DOMContentLoaded", async () => {
   // … lá no final do seu DOMContentLoaded …
 
   // Adicionar ao carrinho
-  addCartBtn.onclick = () => {
+  addCartBtn.onclick = async () => {
+    // 1) se não identificado, manda pra identify e sai
     if (!identifyUser()) {
-      // usuário não logado: manda pra identificar, retornando a esta página
-      const returnUrl = encodeURIComponent(`product-detail.html?id=${id}`);
-      window.location.href = `identify.html?return=${returnUrl}`;
+      const returnTo = `product-detail.html?id=${id}`;
+      window.location.href = `identify.html?return=${returnTo}`;
       return;
     }
 
-    // se chegou aqui, está logado — faz o add ao carrinho
-    swal(
-      "Adicionado!",
-      `${mainQty}× ${prod.nome} adicionado ao carrinho.`,
-      "success"
-    );
-    // aqui você prossegue com sua lógica de armazenamento no carrinho…
+    try {
+      // 2) monta o payload
+      const payload = {
+        whatsapp: localStorage.getItem("bgHouse_whatsapp"),
+        produtoId: prod.id,
+        quantidade: mainQty,
+        adicionais: Object.entries(selectedAddons).map(([idx, qty]) => {
+          const addon = addonsData[idx];
+          return {
+            adicionalId: idx,
+            quantidade: qty,
+            preco: addon.price
+          };
+        })
+      };
+
+      // 3) chama o backend
+      const resp = await fetch("/api/Cart/AddItem", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+      // 4) sucesso
+      swal("Adicionado!", `Você adicionou ${mainQty}× ${prod.name}`, "success");
+    } catch (err) {
+      console.error("Erro ao adicionar carrinho:", err);
+      swal("Erro", "Não foi possível adicionar ao carrinho. Tente novamente.", "error");
+    }
   };
 
 });
