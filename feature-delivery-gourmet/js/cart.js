@@ -41,7 +41,10 @@ document.addEventListener("DOMContentLoaded", async () => {
           </td>
           <td>
             R$ ${item.precoUnitario.toFixed(2).replace(".",",")}
-            <button class="remove-btn" data-id="${item.itemId}" title="Remover">×</button>
+            <button class="edit-btn" data-id="${item.itemId}" title="Opções">
+  <i class="fas fa-pencil-alt"></i>
+</button>
+
           </td>
         `;
         cartList.appendChild(tr);
