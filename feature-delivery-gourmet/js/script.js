@@ -111,7 +111,7 @@ function renderProducts() {
 }
 
 // ——— MODAIS E BINDINGS ———
-document.addEventListener("DOMContentLoaded", async  () => {
+document.addEventListener("DOMContentLoaded", async () => {
   // Atualiza status da loja e carrega produtos
   atualizarStatusLoja(1);
   loadProducts();
