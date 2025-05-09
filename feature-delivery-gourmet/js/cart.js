@@ -57,41 +57,59 @@ document.addEventListener("DOMContentLoaded", async () => {
   
       // ao clicar em × pergunta e remove
       cartList.addEventListener("click", e => {
-        const btn = e.target.closest(".remove-btn");
+        // procura o botão de edit (lápis)
+        const btn = e.target.closest(".edit-btn");
         if (!btn) return;
         const itemId = btn.dataset.id;
+      
         swal({
-          title: "Remover item?",
-          text: "Deseja mesmo apagar este item do carrinho?",
-          icon: "warning",
-          buttons: ["Cancelar","Sim"],
-          dangerMode: true
-        }).then(async willDelete => {
-          if (!willDelete) return;
-  
-          try {
-            loading.classList.remove("hidden");
-            const del = await fetch(
-              `/api/Cart/RemoveItem/${itemId}?whatsapp=${encodeURIComponent(whatsapp)}`,
-              { method: "DELETE" }
-            );
-            if (!del.ok) throw new Error();
-  
-            // recarrega ou, se ficou vazio, volta pra home
-            const remaining = cart.items.filter(i => i.itemId != itemId).length;
-            if (remaining === 0) {
-              window.location.href = "index.html";
-            } else {
-              window.location.reload();
+          title: "O que deseja fazer?",
+          buttons: {
+            cancel: "Cancelar",
+            remove: {
+              text: "Remover item",
+              value: "remove",
+              visible: true
             }
-          } catch (err) {
-            console.error("Erro ao remover item:", err);
-            swal("Erro", "Não foi possível remover o item.", "error");
-          } finally {
-            loading.classList.add("hidden");
           }
+        })
+        .then(choice => {
+          if (choice !== "remove") return;
+      
+          // confirma remoção
+          swal({
+            title: "Remover item?",
+            text: "Deseja mesmo apagar este item do carrinho?",
+            icon: "warning",
+            buttons: ["Não","Sim"],
+            dangerMode: true
+          }).then(async willDelete => {
+            if (!willDelete) return;
+      
+            loading.classList.remove("hidden");
+            try {
+              const del = await fetch(
+                `/api/Cart/RemoveItem/${itemId}?whatsapp=${encodeURIComponent(whatsapp)}`,
+                { method: "DELETE" }
+              );
+              if (!del.ok) throw new Error();
+      
+              // Se era o último, volta para home
+              const remaining = cart.items.filter(i => i.itemId != itemId).length;
+              if (remaining === 0) {
+                window.location.href = "index.html";
+              } else {
+                window.location.reload();
+              }
+            } catch {
+              swal("Erro", "Não foi possível remover o item.", "error");
+            } finally {
+              loading.classList.add("hidden");
+            }
+          });
         });
       });
+      
   
       // próximo passo
       nextBtn.onclick = () => window.location.href = "checkout.html";
