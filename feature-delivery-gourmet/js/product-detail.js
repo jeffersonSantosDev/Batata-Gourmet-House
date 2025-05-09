@@ -137,47 +137,44 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Adicionar ao carrinho
   addCartBtn.onclick = async () => {
-    // 1) se não identificado, manda pra identify e sai
     if (!identifyUser()) {
-      const returnTo = `product-detail.html?id=${id}`;
-      window.location.href = `identify.html?return=${returnTo}`;
+      window.location.href = `identify.html?return=product-detail.html?id=${prod.id}`;
       return;
     }
-
+  
+    const payload = {
+      whatsapp: localStorage.getItem("bgHouse_whatsapp"),
+      produtoId: prod.id,
+      quantidade: mainQty,
+      observacoes: notesInput.value.trim(),
+      adicionais: prod.adicionais
+        .filter(a => selectedAddons[a.id] > 0)
+        .map(a => ({
+          adicionalId: a.id,
+          quantidade: selectedAddons[a.id],
+          preco: a.preco
+        }))
+    };
+  
     try {
-      // 2) monta o payload
-      const notes = document.getElementById("notes").value.trim();
-      const payload = {
-        whatsapp: localStorage.getItem("bgHouse_whatsapp"),
-        produtoId: prod.id,
-        quantidade: mainQty,
-        observacoes: notesInput.value.trim(),
-        adicionais: Object.entries(selectedAddons).map(([aid, q]) => {
-          const addon = prod.adicionais.find(x => x.id === +aid);
-          return {
-            adicionalId: +aid,
-            quantidade: q,
-            preco: addon ? addon.preco : 0
-          };
-        })
-      };
-      
-
-      // 3) chama o backend
-      const resp = await fetch("/api/Cart/AddItem", {
+      const r = await fetch("/api/Cart/AddItem", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-
-      // 4) sucesso
-      swal("Adicionado!", `Você adicionou ${mainQty}× ${prod.nome}`, "success");
-    } catch (err) {
-      console.error("Erro ao adicionar carrinho:", err);
-      swal("Erro", "Não foi possível adicionar ao carrinho. Tente novamente.", "error");
+      if (!r.ok) throw new Error();
+  
+      // Sucesso: exibe alerta e redireciona para a home
+      swal("Adicionado!", `Você adicionou ${mainQty}× ${prod.nome}`, "success")
+        .then(() => {
+          // Aqui redireciona para a página inicial
+          window.location.href = "index.html";
+        });
+  
+    } catch {
+      swal("Erro", "Não foi possível adicionar ao carrinho.", "error");
     }
   };
+  
 
 });

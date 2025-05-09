@@ -126,23 +126,28 @@ document.addEventListener("DOMContentLoaded", async  () => {
   const cartCountEl = document.getElementById("cart-count");
   const whatsapp    = localStorage.getItem("bgHouse_whatsapp");
 
-  if (whatsapp) {
-    try {
-      const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
-      if (resp.ok) {
-        const cart = await resp.json();
-        const totalItems = cart.items.reduce((sum, i) => sum + i.quantidade, 0);
-        if (totalItems > 0) {
-          cartCountEl.textContent = `(${totalItems}) Veja meu carrinho`;
-          cartBar.classList.remove("hidden");
-          // ao clicar, leva à página do carrinho
-          cartBar.onclick = () => window.location.href = "cart.html";
-        }
-      }
-    } catch (err) {
-      console.error("Não foi possível carregar o carrinho:", err);
-    }
+  if (!whatsapp) {
+    cartBar.classList.add("hidden");
+    return;
   }
+
+  try {
+    const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
+    if (!resp.ok) throw new Error();
+    const cart = await resp.json();
+
+    const totalItems = cart.items.reduce((sum, i) => sum + i.quantidade, 0);
+    if (totalItems > 0) {
+      cartCountEl.textContent = `(${totalItems}) Veja meu carrinho`;
+      cartBar.classList.remove("hidden");
+      cartBar.onclick = () => window.location.href = "cart.html";
+    } else {
+      cartBar.classList.add("hidden");
+    }
+  } catch {
+    cartBar.classList.add("hidden");
+  }
+});
 
   function openModal() {
     overlay.classList.remove('hidden');
