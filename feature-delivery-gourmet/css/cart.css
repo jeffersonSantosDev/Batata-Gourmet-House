@@ -135,7 +135,7 @@
     background: none;
     border: none;
     color: var(--accent);
-    font-size: 1.2rem;     /* aumenta o ícone */
+    font-size: 0.9rem;     /* aumenta o ícone */
     margin-left: 0.75rem;
     vertical-align: middle;
     cursor: pointer;
