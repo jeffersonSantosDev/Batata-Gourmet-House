@@ -130,16 +130,18 @@
   
 
 
-  .remove-btn {
+/* botão lápis */
+.edit-btn {
     background: none;
     border: none;
-    color: #e53e3e;
-    font-size: 1.5rem;       /* ou 2rem, se quiser gigante */
-    margin-left: 0.75rem;    /* aumenta o espaçamento */
+    color: var(--accent);
+    font-size: 1.2rem;     /* aumenta o ícone */
+    margin-left: 0.75rem;
     vertical-align: middle;
     cursor: pointer;
     line-height: 1;
   }
-  .remove-btn:hover {
-    color: #c53030;
+  .edit-btn:hover {
+    color: #bb4a2e;
   }
+  
