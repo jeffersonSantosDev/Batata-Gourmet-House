@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Adicionar ao carrinho
   addCartBtn.onclick = async () => {
     if (!identifyUser()) {
-      window.location.href = `identify.html?return=product-detail.html?id=${prod.id}`;
+      location.replace(`identify.html?return=product-detail.html?id=${prod.id}`);
       return;
     }
   

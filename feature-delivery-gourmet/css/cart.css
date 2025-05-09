@@ -146,24 +146,46 @@
   }
   
 
-
+ 
+/* botão lápis */
+.edit-btn {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 1.2rem;       /* aumenta o ícone */
+    margin-left: 0.75rem;
+    vertical-align: middle;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .edit-btn:hover {
+    color: #bb4a2e;
+  }
+  
+  /* permite que o popover não seja cortado */
+  .item-row {
+    overflow: visible;
+  }
+  
   /* cada linha deve ser relative, para posicionar o popover */
-.item-row .item-info {
+  .item-row .item-info {
     position: relative;
   }
   
   /* o popover flutuante */
   .popover {
     position: absolute;
-    top: 100%;         /* logo abaixo do botão */
+    top: calc(100% + 4px);   /* desça 4px além do final do botão */
     right: 0;
+  
     background: #fff;
     border: 1px solid var(--border);
     border-radius: 6px;
     box-shadow: 0 2px 8px var(--shadow);
+  
     padding: 0.5rem 0;
     white-space: nowrap;
-    z-index: 200;      /* acima de tudo na linha */
+    z-index: 1000;           /* garante estar acima de tudo */
   }
   .popover.hidden {
     display: none;
