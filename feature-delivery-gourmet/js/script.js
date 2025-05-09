@@ -84,7 +84,8 @@ function renderProducts() {
     grid.className = "category-grid";
 
     items.forEach(prod => {
-      const src = prod.imagemUrl.startsWith("/") ? prod.imagemUrl : "/" + prod.imagemUrl;
+      const path = prod.imagemUrl.replace(/^\/+/, "");        // remove barras extras
+      const src  = `${window.location.origin}/${path}`;
       const card = document.createElement("div");
       card.className = "product-card";
       card.innerHTML = `
