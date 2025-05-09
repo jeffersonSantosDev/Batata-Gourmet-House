@@ -210,3 +210,26 @@
     font-size: 1rem;
   }
   
+  /* 1) Garanta que a tabela não corte "vazamentos" */
+.orders-table,
+.orders-table tbody,
+.orders-table tr,
+.orders-table td {
+  overflow: visible;    /* permite que filhos saiam dos limites */
+}
+
+/* 2) Se o container geral do carrinho tiver overflow, também libere */
+.cart-container, .cart-container main, .cart-container section {
+  overflow: visible;
+}
+
+/* 3) Popover com z-index ainda maior */
+.popover {
+  z-index: 2000 !important;   /* por cima de tudo */
+}
+
+/* 4) Se precisar, force também o botão de lápis ficar no topo */
+.edit-btn {
+  position: relative;
+  z-index: 2001;
+}
