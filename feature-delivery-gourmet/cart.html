@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Carrinho | Batata Gourmet House</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  <link rel="stylesheet" href="css/cart.css"/>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <script defer src="js/utils.js"></script>
+  <script defer src="js/cart.js"></script>
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="detail-header">
+    <button id="backBtn" class="back-btn">←</button>
+    <h1 class="detail-title">Carrinho</h1>
+  </header>
+
+  <!-- ITENS -->
+  <main class="detail-main">
+    <section class="cart-items">
+      <table>
+        <thead>
+          <tr>
+            <th>ITENS</th>
+            <th>PREÇO</th>
+          </tr>
+        </thead>
+        <tbody id="cartList">
+          <!-- preenchido via JS -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- CUPOM -->
+    <section class="coupon-section">
+      <label for="couponCode">Ativar Seu Cupom</label>
+      <div class="coupon-controls">
+        <input id="couponCode" type="text" placeholder="Código do Cupom"/>
+        <button id="applyCoupon" class="btn apply-btn">Verificar</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- RESUMO E PRÓXIMO -->
+  <footer class="detail-footer">
+    <div class="summary-lines">
+      <div class="summary-line">
+        <span>Subtotal</span>
+        <span id="subtotal">+ R$ 0,00</span>
+      </div>
+      <div class="summary-line total">
+        <span>TOTAL</span>
+        <span id="total">R$ 0,00</span>
+      </div>
+    </div>
+    <button id="nextBtn" class="btn next-btn">Próximo</button>
+  </footer>
+</body>
+</html>

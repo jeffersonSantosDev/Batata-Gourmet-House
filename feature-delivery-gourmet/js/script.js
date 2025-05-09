@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const cartBar     = document.getElementById("cart-bar");
   const cartCountEl = document.getElementById("cart-count");
   const whatsapp    = localStorage.getItem("bgHouse_whatsapp");
-
+ 
   if (whatsapp) {
     try {
       const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
