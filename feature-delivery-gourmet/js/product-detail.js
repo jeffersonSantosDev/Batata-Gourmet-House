@@ -24,8 +24,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const minusMain  = document.getElementById("mainMinus");
   const plusMain   = document.getElementById("mainPlus");
   const finalPrice = document.getElementById("finalPrice");
-  const addCartBtn = document.getElementById("addCartBtn");
-  const backBtn    = document.getElementById("backBtn");
+  const addCartBtn = document.getElementById("addCartBtn"); 
   const notesInput   = document.getElementById("notes");
 
   // Inserção dinâmica da seção de imagem/descrição
@@ -130,12 +129,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   // Botão voltar
-  backBtn.onclick = () => history.back();
+  document.getElementById("backBtn").onclick = () => {
+    window.location.href = "index.html";
+  };
  
   // Adicionar ao carrinho
   addCartBtn.onclick = async () => {
     if (!identifyUser()) {
-      location.replace(`identify.html?return=product-detail.html?id=${prod.id}`);
+      location.replace(`identify.html?return=${encodeURIComponent(location.pathname + location.search)}`);
       return;
     }
   
