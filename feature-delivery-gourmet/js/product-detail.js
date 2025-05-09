@@ -8,8 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Se não estiver logado, apenas oculta o loading e continua
   if (!identifyUser()) {
-    hideLoading();
-    console.warn("Usuário não identificado – continuando sem login.");
+    hideLoading(); 
   }
 
   // Parâmetros
@@ -133,7 +132,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   backBtn.onclick = () => history.back();
 
   // Adicionar ao carrinho
+  // … lá no final do seu DOMContentLoaded …
+
+  // Adicionar ao carrinho
   addCartBtn.onclick = () => {
-    swal("Adicionado!", `${mainQty}× ${prod.nome} adicionado ao carrinho.`, "success");
+    if (!identifyUser()) {
+      // usuário não logado: manda pra identificar, retornando a esta página
+      const returnUrl = encodeURIComponent(`product-detail.html?id=${id}`);
+      window.location.href = `identify.html?return=${returnUrl}`;
+      return;
+    }
+
+    // se chegou aqui, está logado — faz o add ao carrinho
+    swal(
+      "Adicionado!",
+      `${mainQty}× ${prod.nome} adicionado ao carrinho.`,
+      "success"
+    );
+    // aqui você prossegue com sua lógica de armazenamento no carrinho…
   };
+
 });
