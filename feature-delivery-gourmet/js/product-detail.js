@@ -6,6 +6,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   showLoading();
 
+
+  document.querySelectorAll(".loyalty-progress .dot")
+  .forEach((dot, idx) => {
+    if (idx < completed) dot.classList.add("filled");
+  });
+
   // Se não estiver logado, apenas oculta o loading e continua
   if (!identifyUser()) {
     hideLoading(); 
