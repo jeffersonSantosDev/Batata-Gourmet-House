@@ -147,7 +147,7 @@ document.addEventListener("DOMContentLoaded", async  () => {
   } catch {
     cartBar.classList.add("hidden");
   }
-});
+ 
 
   function openModal() {
     overlay.classList.remove('hidden');
