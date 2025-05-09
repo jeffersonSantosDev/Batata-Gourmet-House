@@ -150,16 +150,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         whatsapp: localStorage.getItem("bgHouse_whatsapp"),
         produtoId: prod.id,
         quantidade: mainQty,
-        observacoes: notes,           // novo
-        adicionais: Object.entries(selectedAddons).map(([idx, qty]) => {
-          const addon = addonsData[idx];
+        observacoes: notesInput.value.trim(),
+        adicionais: Object.entries(selectedAddons).map(([aid, q]) => {
+          const addon = prod.adicionais.find(x => x.id === +aid);
           return {
-            adicionalId: idx,
-            quantidade: qty,
-            preco: addon.price
+            adicionalId: +aid,
+            quantidade: q,
+            preco: addon ? addon.preco : 0
           };
         })
       };
+      
 
       // 3) chama o backend
       const resp = await fetch("/api/Cart/AddItem", {
