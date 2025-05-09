@@ -1,15 +1,21 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  if (!identifyUser()) return;
+  const loading = document.getElementById("loadingOverlay");
+  function showLoading() { loading.classList.remove("hidden"); }
+  function hideLoading() { loading.classList.add("hidden"); }
 
-  // Params
+  showLoading();
+  if (!identifyUser()) {
+    // caso identifyUser redirecione, não seguimos adiante
+    return;
+  }
+
   const params = new URLSearchParams(location.search);
   const id     = Number(params.get("id"));
-  const loja   = 1; // ou obter dinamicamente se precisar
+  const loja   = 1;
 
-  // Refs
+  // refs
   const titleEl      = document.getElementById("detailTitle");
-  const imgEl        = document.getElementById("detailImage");
-  const descEl       = document.getElementById("detailDesc");
+  const descEl       = document.getElementById("detailDesc"); // será criado dinamicamente
   const addonsList   = document.getElementById("addonsList");
   const mainQtyEl    = document.getElementById("mainQty");
   const minusMain    = document.getElementById("mainMinus");
@@ -18,28 +24,42 @@ document.addEventListener("DOMContentLoaded", async () => {
   const addCartBtn   = document.getElementById("addCartBtn");
   const backBtn      = document.getElementById("backBtn");
 
-  // 1) Busca do back-end
+  // cria o container de imagem & descrição dinamicamente
+  const infoSection = document.createElement("section");
+  infoSection.className = "product-info";
+  infoSection.innerHTML = `
+    <img id="detailImage" class="product-img" src="" alt="Imagem do produto"/>
+    <p id="detailDesc" class="product-desc"></p>`;
+  document.querySelector(".detail-main").insertBefore(
+    infoSection,
+    document.querySelector(".notes-section")
+  );
+
+  // fetch do back-end
   let prod;
   try {
     const resp = await fetch(`/api/Produto/Detail/${id}?loja=${loja}`);
     if (!resp.ok) throw new Error("Produto não encontrado");
     prod = await resp.json();
-  } catch {
+  } catch (err) {
     swal("Erro", "Não foi possível carregar o produto.", "error")
-       .then(() => history.back());
+      .then(() => history.back());
     return;
+  } finally {
+    hideLoading();
   }
 
-  // 2) Renderiza dados básicos
+  // popula título, imagem e descrição
   titleEl.textContent = prod.nome;
-  imgEl.src           = `${window.location.origin}/${prod.imagemUrl.replace(/^\/+/, "")}`;
-  imgEl.alt           = prod.nome;
-  descEl.textContent  = prod.descricao;
+  const imgEl = document.getElementById("detailImage");
+  imgEl.src = `${window.location.origin}/${prod.imagemUrl.replace(/^\/+/, "")}`;
+  imgEl.alt = prod.nome;
+  document.getElementById("detailDesc").textContent = prod.descricao;
 
   let mainQty = 1;
-  let selectedAddons = {};   // { adicionalId: qty, ... }
+  let selectedAddons = {};
 
-  // 3) Monta lista de adicionais
+  // lista de adicionais
   prod.adicionais.forEach(a => {
     const li = document.createElement("li");
     li.className = "addon-item";
@@ -57,22 +77,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     addonsList.appendChild(li);
   });
 
-  // 4) Calcula e atualiza preço total
+  // atualiza preço
   function updateFinal() {
-    const base   = prod.preco * mainQty;
+    const base = prod.preco * mainQty;
     const extras = Object.entries(selectedAddons)
       .reduce((sum,[aid,q]) => {
-        const a = prod.adicionais.find(x=>x.id==aid);
-        return sum + (a.preco * q);
+        const ad = prod.adicionais.find(x=>x.id==aid);
+        return sum + (ad.preco * q);
       }, 0);
     finalPriceEl.textContent = (base + extras)
       .toFixed(2).replace(".",",");
   }
   updateFinal();
 
-  // 5) Eventos de quantidade principal
+  // controles quantidade principal
   minusMain.onclick = () => {
-    if (mainQty > 1) {
+    if (mainQty>1) {
       mainQty--;
       mainQtyEl.textContent = mainQty;
       updateFinal();
@@ -84,35 +104,34 @@ document.addEventListener("DOMContentLoaded", async () => {
     updateFinal();
   };
 
-  // 6) Eventos de adicionais
+  // controles de adicionais
   addonsList.addEventListener("click", e => {
     const btn = e.target.closest("button");
     if (!btn) return;
-    const id   = btn.dataset.id;
-    let qty    = selectedAddons[id] || 0;
-    const used = Object.values(selectedAddons).reduce((c,v)=> c + (v>0?1:0),0);
+    const aid = btn.dataset.id;
+    let qty = selectedAddons[aid]||0;
+    const usedTypes = Object.values(selectedAddons)
+      .filter(v=>v>0).length;
 
     if (btn.classList.contains("plus")) {
-      // até 3 tipos
-      if (used >= 3 && qty === 0) return;
+      if (usedTypes>=3 && qty===0) return;
       qty++;
     } else {
-      if (qty > 0) qty--;
+      if (qty>0) qty--;
     }
 
-    if (qty > 0) selectedAddons[id] = qty;
-    else delete selectedAddons[id];
+    if (qty>0) selectedAddons[aid]=qty;
+    else delete selectedAddons[aid];
 
     btn.parentNode.querySelector(".qty").textContent = qty;
     updateFinal();
   });
 
-  // 7) Voltar
-  backBtn.onclick = () => history.back();
+  // botão voltar
+  backBtn.onclick = ()=> history.back();
 
-  // 8) Adicionar ao carrinho (implemente conforme seu storage)
-  addCartBtn.onclick = () => {
-    // Exemplo: reúna objeto final e salve no localStorage ou chame API de carrinho
+  // adicionar ao carrinho
+  addCartBtn.onclick = ()=> {
     swal("Adicionado!", `${mainQty}× ${prod.nome} adicionado ao carrinho.`, "success");
   };
 });

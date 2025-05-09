@@ -15,16 +15,20 @@
   />
   <!-- Seu CSS específico -->
   <link rel="stylesheet" href="css/product-detail.css"/>
-  <!-- SweetAlert (opcional, para confirmações) -->
+  <!-- SweetAlert -->
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-  <!-- Sua função global de identificação -->
+  <!-- Identify global -->
   <script defer src="js/utils.js"></script>
   <script defer src="js/identify.js"></script>
   <!-- Lógica desta página -->
   <script defer src="js/product-detail.js"></script>
-
 </head>
 <body>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
 
   <!-- HEADER -->
   <header class="detail-header">
@@ -45,11 +49,7 @@
       <ul id="addonsList" class="addons-list"></ul>
     </section>
 
-    <!-- DESCRIÇÃO E IMAGEM -->
-    <section class="product-info">
-      <img id="detailImage" class="product-img" src="imagens/itemCardapio.jpg" alt="Imagem do produto"/>
-      <p id="detailDesc" class="product-desc"></p>
-    </section>
+    <!-- DESCRIÇÃO E IMAGEM serão renderizadas dinamicamente via JS -->
 
     <!-- OBSERVAÇÕES -->
     <section class="notes-section">
