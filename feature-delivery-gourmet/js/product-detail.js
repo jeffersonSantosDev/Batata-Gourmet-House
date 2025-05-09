@@ -131,10 +131,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Botão voltar
   backBtn.onclick = () => history.back();
-
-  // Adicionar ao carrinho
-  // … lá no final do seu DOMContentLoaded …
-
+ 
   // Adicionar ao carrinho
   addCartBtn.onclick = async () => {
     if (!identifyUser()) {
@@ -157,6 +154,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
   
     try {
+      showLoading();
       const r = await fetch("/api/Cart/AddItem", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -173,6 +171,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   
     } catch {
       swal("Erro", "Não foi possível adicionar ao carrinho.", "error");
+    } finally {
+      hideLoading();
     }
   };
   
