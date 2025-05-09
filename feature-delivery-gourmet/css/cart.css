@@ -145,3 +145,46 @@
     color: #bb4a2e;
   }
   
+
+
+  /* cada linha deve ser relative, para posicionar o popover */
+.item-row .item-info {
+    position: relative;
+  }
+  
+  /* o popover flutuante */
+  .popover {
+    position: absolute;
+    top: 100%;         /* logo abaixo do botão */
+    right: 0;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-shadow: 0 2px 8px var(--shadow);
+    padding: 0.5rem 0;
+    white-space: nowrap;
+    z-index: 200;      /* acima de tudo na linha */
+  }
+  .popover.hidden {
+    display: none;
+  }
+  .popover button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: none;
+    border: none;
+    color: #e53e3e;
+    padding: 0.5rem 1rem;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  .popover button:hover {
+    background: rgba(229, 83, 62, 0.1);
+  }
+  .popover i {
+    font-size: 1rem;
+  }
+  

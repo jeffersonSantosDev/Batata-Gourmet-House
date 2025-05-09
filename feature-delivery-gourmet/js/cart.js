@@ -36,19 +36,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         tr.className = "item-row";
         tr.innerHTML = `
           <td>
-            <span>${item.quantidade}× ${item.produtoNome}</span>
-            ${item.observacoes ? `<small>“${item.observacoes}”</small>` : ""}
+            <div class="item-info">
+              <span>${item.quantidade}× ${item.produtoNome}</span>
+              <button class="edit-btn" data-id="${item.itemId}" title="Opções">
+                <i class="fas fa-pencil-alt"></i>
+              </button>
+              <div class="popover hidden" data-id="${item.itemId}">
+                <button class="confirm-remove">
+                  <i class="fas fa-trash-alt"></i> Excluir
+                </button>
+              </div>
+            </div>
           </td>
           <td>
             R$ ${item.precoUnitario.toFixed(2).replace(".",",")}
-            <button class="edit-btn" data-id="${item.itemId}" title="Opções">
-  <i class="fas fa-pencil-alt"></i>
-</button>
-
           </td>
         `;
         cartList.appendChild(tr);
       });
+      
   
       // calcula valores
       const subtotal = cart.items.reduce((s,i)=> s + (i.precoUnitario * i.quantidade), 0);
