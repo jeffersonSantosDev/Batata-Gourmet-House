@@ -128,3 +128,18 @@
     .detail-header, .detail-footer { padding:0.5rem; }
   }
   
+
+
+  .remove-btn {
+    background: none;
+    border: none;
+    color: #e53e3e;
+    font-size: 1.5rem;       /* ou 2rem, se quiser gigante */
+    margin-left: 0.75rem;    /* aumenta o espaçamento */
+    vertical-align: middle;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .remove-btn:hover {
+    color: #c53030;
+  }
