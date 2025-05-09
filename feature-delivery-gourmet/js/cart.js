@@ -1,11 +1,11 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const loading = document.getElementById("loadingOverlay");
-    const backBtn  = document.getElementById("backBtn");
-    const cartList = document.getElementById("cartList");
-    const subtotalEl  = document.getElementById("subtotal");
-    const totalEl     = document.getElementById("total");
-    const nextBtn     = document.getElementById("nextBtn");
-    const whatsapp    = localStorage.getItem("bgHouse_whatsapp");
+    const loading   = document.getElementById("loadingOverlay");
+    const backBtn   = document.getElementById("backBtn");
+    const cartList  = document.getElementById("cartList");
+    const subtotalEl= document.getElementById("subtotal");
+    const totalEl   = document.getElementById("total");
+    const nextBtn   = document.getElementById("nextBtn");
+    const whatsapp  = localStorage.getItem("bgHouse_whatsapp");
   
     backBtn.onclick = () => history.back();
   
@@ -16,21 +16,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   
     try {
-      // mostra loading enquanto carrega
       loading.classList.remove("hidden");
-  
       const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
       if (!resp.ok) throw new Error();
       const cart = await resp.json();
   
       cartList.innerHTML = "";
       if (!cart.items.length) {
-        cartList.innerHTML = `<tr><td colspan="2" style="text-align:center; padding:1rem">Seu carrinho está vazio.</td></tr>`;
+        cartList.innerHTML = `
+          <tr><td colspan="2" style="text-align:center; padding:1rem">
+            Seu carrinho está vazio.
+          </td></tr>`;
         nextBtn.disabled = true;
         return;
       }
   
-      // popula linhas com X de remover
+      // Renderiza cada linha com popover já oculto
       cart.items.forEach(item => {
         const tr = document.createElement("tr");
         tr.className = "item-row";
@@ -50,39 +51,45 @@ document.addEventListener("DOMContentLoaded", async () => {
           </td>
           <td>
             R$ ${item.precoUnitario.toFixed(2).replace(".",",")}
-          </td>
-        `;
+          </td>`;
         cartList.appendChild(tr);
       });
-      
   
-      // calcula valores
-      const subtotal = cart.items.reduce((s,i)=> s + (i.precoUnitario * i.quantidade), 0);
+      // Calcula subtotal e total
+      const subtotal = cart.items.reduce((sum,i) => sum + i.precoUnitario * i.quantidade, 0);
       subtotalEl.textContent = `+ R$ ${subtotal.toFixed(2).replace(".",",")}`;
       totalEl.textContent    = `R$ ${subtotal.toFixed(2).replace(".",",")}`;
   
-      // ao clicar em × pergunta e remove
+      // Fecha popovers ao clicar fora
+      document.addEventListener("click", e => {
+        if (!e.target.closest(".item-info")) {
+          document.querySelectorAll(".popover")
+            .forEach(p => p.classList.add("hidden"));
+        }
+      });
+  
+      // Lógica de popover e remoção
       cartList.addEventListener("click", e => {
-        // procura o botão de edit (lápis)
-        const btn = e.target.closest(".edit-btn");
-        if (!btn) return;
-        const itemId = btn.dataset.id;
-      
-        swal({
-          title: "O que deseja fazer?",
-          buttons: {
-            cancel: "Cancelar",
-            remove: {
-              text: "Remover item",
-              value: "remove",
-              visible: true
-            }
-          }
-        })
-        .then(choice => {
-          if (choice !== "remove") return;
-      
-          // confirma remoção
+        // 1) Clique no lápis: só toggle popover
+        const editBtn = e.target.closest(".edit-btn");
+        if (editBtn) {
+          e.stopPropagation();
+          const id = editBtn.dataset.id;
+          // fecha outros e abre o correto
+          document.querySelectorAll(".popover").forEach(p => p.classList.add("hidden"));
+          const pop = editBtn.parentNode.querySelector(`.popover[data-id="${id}"]`);
+          pop.classList.toggle("hidden");
+          return;
+        }
+  
+        // 2) Clique em "Excluir" no popover
+        const remBtn = e.target.closest(".confirm-remove");
+        if (remBtn) {
+          const pop = remBtn.closest(".popover");
+          const itemId = pop.dataset.id;
+          pop.classList.add("hidden");
+  
+          // confirmação final
           swal({
             title: "Remover item?",
             text: "Deseja mesmo apagar este item do carrinho?",
@@ -91,7 +98,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             dangerMode: true
           }).then(async willDelete => {
             if (!willDelete) return;
-      
+  
             loading.classList.remove("hidden");
             try {
               const del = await fetch(
@@ -99,8 +106,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 { method: "DELETE" }
               );
               if (!del.ok) throw new Error();
-      
-              // Se era o último, volta para home
+  
+              // se ficar vazio, volta pra index
               const remaining = cart.items.filter(i => i.itemId != itemId).length;
               if (remaining === 0) {
                 window.location.href = "index.html";
@@ -113,11 +120,9 @@ document.addEventListener("DOMContentLoaded", async () => {
               loading.classList.add("hidden");
             }
           });
-        });
+        }
       });
-      
   
-      // próximo passo
       nextBtn.onclick = () => window.location.href = "checkout.html";
   
     } catch (err) {
