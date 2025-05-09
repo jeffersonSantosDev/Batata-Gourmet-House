@@ -1,14 +1,19 @@
 :root {
-    --primary: #ffffff;
+    --primary:   #ffffff;
     --text-dark: #2c3e50;
-    --accent: #d28b4b;
+    --accent:    #d28b4b;
     --highlight: #2ecc71;
-    --border: #e2e2e2;
-    --bg-light: #f8f7f3;
-    --shadow: rgba(0,0,0,0.1);
+    --border:    #e2e2e2;
+    --bg-light:  #f8f7f3;
+    --shadow:    rgba(0,0,0,0.1);
   }
   
-  * { box-sizing: border-box; margin:0; padding:0; }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
   body {
     font-family: "Poppins", sans-serif;
     background: var(--bg-light);
@@ -17,9 +22,12 @@
     flex-direction: column;
     height: 100vh;
   }
-  .hidden { display:none; }
   
-  /* Header */
+  .hidden {
+    display: none;
+  }
+  
+  /* HEADER */
   .detail-header {
     display: flex;
     align-items: center;
@@ -28,164 +36,100 @@
     box-shadow: 0 1px 4px var(--shadow);
     z-index: 10;
   }
+  
   .back-btn {
-    background: none; border: none; font-size:1.5rem;
-    margin-right:1rem; cursor:pointer;
-  }
-  .detail-title {
-    font-size:1.25rem; font-weight:600;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    cursor: pointer;
   }
   
-  /* Main */
+  .detail-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  
+  /* MAIN */
   .detail-main {
-    flex:1;
+    flex: 1;
     overflow-y: auto;
     padding: 1rem;
   }
   
-  /* Items table */
+  /* ITENS – libera overflow para popover */
+  .cart-items,
+  .cart-items table,
+  .cart-items thead,
+  .cart-items tbody,
+  .cart-items tr,
+  .cart-items th,
+  .cart-items td {
+    overflow: visible;
+  }
+  
+  /* tabela de itens */
   .cart-items table {
-    width: 100%; border-collapse: collapse;
-    background: var(--primary); border-radius:8px;
-    overflow:hidden; box-shadow:0 2px 8px var(--shadow);
-  }
-  .cart-items th, .cart-items td {
-    padding: 0.75rem 1rem; text-align:left;
-    border-bottom:1px solid var(--border);
-  }
-  .cart-items th { background: var(--bg-light); font-weight:600; }
-  .cart-items td:nth-child(2) { color: var(--accent); font-weight:700; }
-  .item-row .item-info {
-    display:flex; align-items:center; gap:0.5rem;
-  }
-  .item-row button.remove-btn {
-    background:none; border:none; color:#e53e3e;
-    font-size:1.1rem; cursor:pointer;
-  }
-  
-  /* Coupon */
-  .coupon-section {
-    margin-top:1.5rem;
+    width: 100%;
+    border-collapse: collapse;
     background: var(--primary);
-    padding:1rem;
-    border-radius:8px;
-    box-shadow:0 2px 8px var(--shadow);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px var(--shadow);
   }
-  .coupon-section label {
-    font-size:0.9rem; margin-bottom:0.5rem; display:block;
+  .cart-items th,
+  .cart-items td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
   }
-  .coupon-controls {
-    display:flex; gap:0.5rem;
+  .cart-items th {
+    background: var(--bg-light);
+    font-weight: 600;
   }
-  .coupon-controls input {
-    flex:1; padding:0.5rem; border:1px solid var(--border);
-    border-radius:6px;
-  }
-  .apply-btn {
-    background: #888; color:#fff; border:none;
-    padding:0.5rem 1rem; border-radius:6px; cursor:pointer;
-  }
-  .apply-btn:hover {
-    background:#666;
-  }
-  
-  /* Footer */
-  .detail-footer {
-    position: sticky;
-    bottom: 0; left:0; width:100%;
-    background: var(--primary);
-    box-shadow: 0 -1px 4px var(--shadow);
-    padding:0.75rem 1rem;
-    display:flex; align-items:center; gap:1rem;
-    z-index:10;
-  }
-  .summary-lines {
-    flex:1;
-  }
-  .summary-line {
-    display:flex; justify-content:space-between;
-    margin-bottom:0.5rem;
-  }
-  .summary-line.total span:first-child {
-    font-weight:600; color: var(--accent);
-  }
-  .summary-line.total span:last-child {
-    font-size:1.1rem; font-weight:700;
-  }
-  .next-btn {
-    background: var(--highlight);
-    color:#fff; border:none;
-    padding:0.65rem 1rem; border-radius:6px;
-    font-size:0.95rem; cursor:pointer;
-  }
-  .next-btn:hover {
-    background:#28a745;
-  }
-  
-  /* Responsivo */
-  @media(max-width:480px) {
-    .detail-main { padding:0.75rem; }
-    .detail-header, .detail-footer { padding:0.5rem; }
-  }
-  
-
-
-/* botão lápis */
-.edit-btn {
-    background: none;
-    border: none;
+  .cart-items td:nth-child(2) {
     color: var(--accent);
-    font-size: 0.9rem;     /* aumenta o ícone */
-    margin-left: 0.75rem;
-    vertical-align: middle;
-    cursor: pointer;
-    line-height: 1;
-  }
-  .edit-btn:hover {
-    color: #bb4a2e;
+    font-weight: 700;
   }
   
-
- 
-/* botão lápis */
-.edit-btn {
-    background: none;
-    border: none;
-    color: var(--accent);
-    font-size: 1.2rem;       /* aumenta o ícone */
-    margin-left: 0.75rem;
-    vertical-align: middle;
-    cursor: pointer;
-    line-height: 1;
-  }
-  .edit-btn:hover {
-    color: #bb4a2e;
-  }
-  
-  /* permite que o popover não seja cortado */
+  /* linha do item */
   .item-row {
     overflow: visible;
   }
   
-  /* cada linha deve ser relative, para posicionar o popover */
+  /* container do texto + botões */
   .item-row .item-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     position: relative;
   }
   
-  /* o popover flutuante */
+  /* botão lápis/edit */
+  .edit-btn {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 1.2rem;
+    cursor: pointer;
+    position: relative;
+    z-index: 2001;
+  }
+  .edit-btn:hover {
+    color: #bb4a2e;
+  }
+  
+  /* popover flutuante */
   .popover {
     position: absolute;
-    top: calc(100% + 4px);   /* desça 4px além do final do botão */
+    top: calc(100% + 4px);
     right: 0;
-  
     background: #fff;
     border: 1px solid var(--border);
     border-radius: 6px;
     box-shadow: 0 2px 8px var(--shadow);
-  
     padding: 0.5rem 0;
     white-space: nowrap;
-    z-index: 1000;           /* garante estar acima de tudo */
+    z-index: 2000 !important;
   }
   .popover.hidden {
     display: none;
@@ -210,26 +154,95 @@
     font-size: 1rem;
   }
   
-  /* 1) Garanta que a tabela não corte "vazamentos" */
-.orders-table,
-.orders-table tbody,
-.orders-table tr,
-.orders-table td {
-  overflow: visible;    /* permite que filhos saiam dos limites */
-}
-
-/* 2) Se o container geral do carrinho tiver overflow, também libere */
-.cart-container, .cart-container main, .cart-container section {
-  overflow: visible;
-}
-
-/* 3) Popover com z-index ainda maior */
-.popover {
-  z-index: 2000 !important;   /* por cima de tudo */
-}
-
-/* 4) Se precisar, force também o botão de lápis ficar no topo */
-.edit-btn {
-  position: relative;
-  z-index: 2001;
-}
+  /* seção de cupom */
+  .coupon-section {
+    margin-top: 1.5rem;
+    background: var(--primary);
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+  .coupon-section label {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  .coupon-controls {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .coupon-controls input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .apply-btn {
+    background: #888;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .apply-btn:hover {
+    background: #666;
+  }
+  
+  /* FOOTER */
+  .detail-footer {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--primary);
+    box-shadow: 0 -1px 4px var(--shadow);
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    z-index: 10;
+  }
+  
+  .summary-lines {
+    flex: 1;
+  }
+  
+  .summary-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+  
+  .summary-line.total span:first-child {
+    font-weight: 600;
+    color: var(--accent);
+  }
+  
+  .summary-line.total span:last-child {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+  
+  .next-btn {
+    background: var(--highlight);
+    color: #fff;
+    border: none;
+    padding: 0.65rem 1rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+  .next-btn:hover {
+    background: #28a745;
+  }
+  
+  /* responsivo */
+  @media (max-width: 480px) {
+    .detail-main,
+    .detail-header,
+    .detail-footer {
+      padding: 0.5rem;
+    }
+  }
+  
