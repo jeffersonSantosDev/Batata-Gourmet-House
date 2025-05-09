@@ -1,148 +1,137 @@
-/* css/orders-list.css */
-
 :root {
-    --primary:    #ffffff;
-    --text-dark:  #2c3e50;
-    --secondary:  #d28b4b;
-    --border:     #e2e2e2;
-    --bg-light:   #f8f7f3;
-    --btn-bg:     #ffffff;
-    --btn-hover:  #f0f0f0;
-    --shadow:     rgba(0,0,0,0.05);
-  }
-  
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .hidden {
-    display: none;
-  }
-  
-  body {
-    font-family: "Poppins", sans-serif;
-    background: var(--bg-light);
-    color: var(--text-dark);
-  }
-  
-  /* ===== HEADER (idéntico ao order.css) ===== */
-  .pedidos-header {
-    display: flex;
-    align-items: center;
-    background: var(--primary);
-    padding: 1rem;
-    box-shadow: 0 1px 4px var(--shadow);
-    /* mantive sem borda inferior, igual ao order.css */
-  }
-  
-  .pedidos-header .back-btn {
-    background: none;
-    border: none;
-    font-size: 1.5rem;        /* igual ao order.css */
-    cursor: pointer;
-    margin-right: 1rem;       /* igual ao order.css */
-    color: var(--text-dark);  
-  }
-  
-  .pedidos-header .back-btn:hover {
-    /* opcional: leve mudança de cor no hover */
-    color: var(--secondary);
-  }
-  
-  .pedidos-header .pedidos-title {
-    font-size: 1.25rem;       /* igual ao .order-title */
-    font-weight: 600;
-    color: var(--text-dark);
-  }
-  
-  /* ===== CONTAINER ===== */
+  --primary:    #ffffff;
+  --text-dark:  #2c3e50;
+  --secondary:  #d28b4b;
+  --border:     #e2e2e2;
+  --bg-light:   #f8f7f3;
+  --btn-bg:     #ffffff;
+  --btn-hover:  #f0f0f0;
+  --shadow:     rgba(0,0,0,0.05);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.hidden {
+  display: none;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background: var(--bg-light);
+  color: var(--text-dark);
+}
+
+/* HEADER */
+.pedidos-header {
+  display: flex;
+  align-items: center;
+  background: var(--primary);
+  padding: 1rem;
+  box-shadow: 0 1px 4px var(--shadow);
+}
+.pedidos-header .back-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin-right: 1rem;
+  color: var(--text-dark);
+}
+.pedidos-header .back-btn:hover {
+  color: var(--secondary);
+}
+.pedidos-header .pedidos-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+/* FILTER ROW */
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0 0.5rem;
+}
+.filter-row label {
+  font-size: 0.95rem;
+  color: var(--text-dark);
+}
+.filter-row input[type="date"] {
+  padding: 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
+.clear-btn {
+  padding: 0.4rem 0.75rem;
+  background: var(--primary);
+  color: var(--secondary);
+  border: 1px solid var(--secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.clear-btn:hover {
+  background: var(--secondary);
+  color: #fff;
+}
+
+/* CONTAINER */
+.pedidos-container {
+  max-width: 600px;
+  margin: 1.5rem auto;
+  padding: 0 1rem;
+}
+
+/* TABLE */
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--primary);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+.orders-table thead {
+  background: var(--bg-light);
+}
+.orders-table th,
+.orders-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.orders-table th {
+  font-weight: 600;
+  color: var(--text-dark);
+}
+.orders-table td:nth-child(2) {
+  /* total column */
+  color: var(--secondary);
+  font-weight: 700;
+}
+
+/* “SEM PEDIDOS” */
+.no-pedidos {
+  text-align: center;
+  color: #666;
+  margin-top: 1.5rem;
+  font-size: 1rem;
+}
+
+/* RESPONSIVO */
+@media (max-width: 480px) {
   .pedidos-container {
-    max-width: 600px;
-    margin: 1.5rem auto;
-    padding: 0 1rem;
-  }
-  
-  /* ===== TABELA ===== */
-  .orders-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--primary);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px var(--shadow);
-    margin-top: 1rem;
-  }
-  .orders-table thead {
-    background: var(--bg-light);
+    padding: 0 0.5rem;
   }
   .orders-table th,
   .orders-table td {
-    padding: 0.75rem 1rem;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
+    padding: 0.5rem;
   }
-  .orders-table th {
-    font-weight: 600;
-    color: var(--text-dark);
-  }
-  .orders-table td:nth-child(2) {
-    color: var(--secondary);
-    font-weight: 700;
-  }
-  
-  /* ===== BUTTON “Ver Pedido” ===== */
-  .pedido-link {
-    display: inline-block;
-    padding: 0.4rem 0.75rem;
-    background: var(--primary);
-    color: var(--secondary);
-    border: 1px solid var(--secondary);
-    border-radius: 6px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background 0.2s, color 0.2s;
-  }
-  .pedido-link:hover {
-    background: var(--secondary);
-    color: #fff;
-  }
-  
-  /* ===== “SEM PEDIDOS” ===== */
-  .no-pedidos {
-    text-align: center;
-    color: #666;
-    margin-top: 1.5rem;
-    font-size: 1rem;
-  }
-  
-  /* ===== RESPONSIVO ===== */
-  @media (max-width: 480px) {
-    .pedidos-container {
-      padding: 0 0.5rem;
-    }
-    .orders-table th,
-    .orders-table td {
-      padding: 0.5rem;
-    }
-  }
-  /* dentro de css/orders-list.css */
-
-.order-breakdown {
-  font-size: 0.85rem;
-  color: #555;
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-bottom: 0.25rem;
-}
-.order-breakdown .val {
-  font-weight: 600;
-}
-.order-total {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--secondary);
 }
