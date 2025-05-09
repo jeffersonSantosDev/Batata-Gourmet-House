@@ -171,7 +171,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
 
       // 4) sucesso
-      swal("Adicionado!", `Você adicionou ${mainQty}× ${prod.name}`, "success");
+      swal("Adicionado!", `Você adicionou ${mainQty}× ${prod.nome}`, "success");
     } catch (err) {
       console.error("Erro ao adicionar carrinho:", err);
       swal("Erro", "Não foi possível adicionar ao carrinho. Tente novamente.", "error");
