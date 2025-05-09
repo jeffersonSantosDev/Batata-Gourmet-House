@@ -128,4 +128,21 @@
       padding: 0.5rem;
     }
   }
-  
+  /* dentro de css/orders-list.css */
+
+.order-breakdown {
+  font-size: 0.85rem;
+  color: #555;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.25rem;
+}
+.order-breakdown .val {
+  font-weight: 600;
+}
+.order-total {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--secondary);
+}

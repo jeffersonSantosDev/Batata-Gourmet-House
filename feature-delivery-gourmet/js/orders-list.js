@@ -42,13 +42,29 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
       hideLoading();
       pedidos.forEach(p => {
+        const data = new Date(p.criadoEm).toLocaleDateString("pt-BR");
+      
+        // formata números no padrão pt-BR
+        const fmt = num => num.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+      
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${new Date(p.criadoEm).toLocaleDateString("pt-BR")}</td>
-          <td>R$ ${p.total.toFixed(2)}</td>
+          <td>${data}</td>
+          <td>
+            <div class="order-breakdown">
+              <span>Sub:</span>
+              <span class="val sub">R$ ${fmt(p.subtotal)}</span>
+              <span>Frete:</span>
+              <span class="val freight">R$ ${fmt(p.frete)}</span>
+            </div>
+            <div class="order-total">
+              Total: <span class="val total">R$ ${fmt(p.total)}</span>
+            </div>
+          </td>
           <td>
             <a href="order.html?id=${p.pedidoId}" class="pedido-link">Ver Pedido</a>
-          </td>`;
+          </td>
+        `;
         tableBody.appendChild(tr);
       });
     } catch (err) {
