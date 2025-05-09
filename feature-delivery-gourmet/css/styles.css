@@ -302,7 +302,7 @@ body {
   background: var(--primary);
   border-top: 1px solid var(--border);
   padding: 0.75rem;
-  display: flex;
+  display: none;
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
