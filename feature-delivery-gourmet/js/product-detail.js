@@ -145,10 +145,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
       // 2) monta o payload
+      const notes = document.getElementById("notes").value.trim();
       const payload = {
         whatsapp: localStorage.getItem("bgHouse_whatsapp"),
         produtoId: prod.id,
         quantidade: mainQty,
+        observacoes: notes,           // novo
         adicionais: Object.entries(selectedAddons).map(([idx, qty]) => {
           const addon = addonsData[idx];
           return {
