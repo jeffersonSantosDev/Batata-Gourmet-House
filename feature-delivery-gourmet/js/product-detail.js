@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const finalPrice = document.getElementById("finalPrice");
   const addCartBtn = document.getElementById("addCartBtn");
   const backBtn    = document.getElementById("backBtn");
+  const notesInput   = document.getElementById("notes");
 
   // Inserção dinâmica da seção de imagem/descrição
   const infoSection = document.createElement("section");
