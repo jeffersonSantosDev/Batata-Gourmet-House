@@ -1,3 +1,16 @@
+// js/cart.js
+async function fetchInfoLoja() {
+  const resp = await fetch('/api/Loja/GetInfoLoja', {
+    method: 'GET',
+    headers: { 'Accept': 'application/json' }
+  });
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  const data = await resp.json();
+  localStorage.setItem('bgHouse_lojaId', data.lojaId);
+  localStorage.setItem('bgHouse_fidelidadeId', data.programaFidelidadeId);
+  return data;
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   const loading     = document.getElementById("loadingOverlay");
   const backBtn     = document.getElementById("backBtn");
@@ -10,28 +23,42 @@ document.addEventListener("DOMContentLoaded", async () => {
   const loyaltyDots = document.querySelectorAll(".loyalty-progress .dot");
   const fmt         = v => v.toFixed(2).replace(".",",");
 
+  backBtn.onclick = () => history.back();
+
+  // 1) Credenciais mínimas
   const whatsapp     = localStorage.getItem("bgHouse_whatsapp");
   const usuarioIdEnc = localStorage.getItem("bgHouse_id");
   const usuarioId    = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
-  const lojaId       = parseInt(localStorage.getItem("bgHouse_lojaId"));
-  const programaId   = parseInt(localStorage.getItem("bgHouse_fidelidadeId"));
-
-  backBtn.onclick = () => history.back();
-  if (!whatsapp || !usuarioId || !lojaId || !programaId) {
-    swal("Ops!", "Identifique-se novamente.", "warning")
+  if (!whatsapp || !usuarioId) {
+    return swal("Ops!", "Identifique-se para ver o carrinho.", "warning")
       .then(() => window.location.href = "identify.html?return=cart.html");
-    return;
+  }
+
+  // 2) IDs de loja/fidelidade: se faltando, recarrega via API
+  let lojaId       = parseInt(localStorage.getItem("bgHouse_lojaId"));
+  let programaId   = parseInt(localStorage.getItem("bgHouse_fidelidadeId"));
+  if (!lojaId || !programaId) {
+    try {
+      const info = await fetchInfoLoja();
+      lojaId     = info.lojaId;
+      programaId = info.programaFidelidadeId;
+    } catch {
+      return swal("Ops!", "Erro ao obter informações da loja.", "error");
+    }
   }
 
   let subtotal = 0, desconto = 0;
 
+  // Fecha todos os popovers
   const fecharPopovers = () =>
     document.querySelectorAll(".popover").forEach(p => p.classList.add("hidden"));
 
+  // Fecha popover ao clicar fora
   document.addEventListener("click", e => {
     if (!e.target.closest(".item-info")) fecharPopovers();
   });
 
+  // Função principal: (re)renderiza o carrinho
   async function carregarCarrinho() {
     loading.classList.remove("hidden");
     try {
@@ -46,8 +73,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       cartList.innerHTML = "";
       subtotal = 0;
-
-      cart.items.forEach(item => {
+      for (const item of cart.items) {
         subtotal += item.precoUnitario * item.quantidade;
         const tr = document.createElement("tr");
         tr.className  = "item-row";
@@ -73,8 +99,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           </td>
           <td>R$ ${item.precoUnitario.toFixed(2).replace(".",",")}</td>`;
         cartList.appendChild(tr);
-      });
-
+      }
       atualizarResumo();
     } catch {
       swal("Erro", "Não foi possível carregar seu carrinho.", "error");
@@ -88,8 +113,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     totalEl.textContent    = `R$ ${fmt(subtotal - desconto)}`;
   }
 
+  // Eventos dentro do carrinho: quantidade, popover e remoção
   cartList.addEventListener("click", async e => {
-    // quantidade
     const dec = e.target.closest(".qty-btn.decrease");
     const inc = e.target.closest(".qty-btn.increase");
     if (dec || inc) {
@@ -119,7 +144,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // popover
     const editBtn = e.target.closest(".edit-btn");
     if (editBtn) {
       e.stopPropagation();
@@ -128,7 +152,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // remover
     const rem = e.target.closest(".confirm-remove");
     if (rem) {
       const pop    = rem.closest(".popover");
@@ -161,7 +184,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // cupom salvo
+  // Aplica cupom salvo
   async function aplicarCupomSalvo() {
     const codigo = localStorage.getItem("bgHouse_appliedCoupon");
     if (!codigo) return;
@@ -173,10 +196,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
       const data = await resp.json();
       if (data.sucesso) {
-        desconto              = data.dados;
-        couponInput.value     = codigo;
-        couponInput.disabled  = true;
-        applyBtn.disabled     = true;
+        desconto             = data.dados;
+        couponInput.value    = codigo;
+        couponInput.disabled = true;
+        applyBtn.disabled    = true;
         atualizarResumo();
       } else {
         localStorage.removeItem("bgHouse_appliedCoupon");
@@ -186,7 +209,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // verificar cupom
+  // Verificar cupom novo
   applyBtn.onclick = async () => {
     const codigo = couponInput.value.trim();
     if (!codigo) {
@@ -219,7 +242,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   };
 
-  // fidelidade
+  // Progresso de fidelidade
   async function carregarFidelidade() {
     try {
       const resp = await fetch(
@@ -227,15 +250,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       );
       if (!resp.ok) return;
       const pontos = await resp.json();
-      loyaltyDots.forEach((dot,i) => {
-        dot.classList.toggle("filled", i < pontos);
-      });
+      loyaltyDots.forEach((dot,i) => dot.classList.toggle("filled", i < pontos));
     } catch {}
   }
 
   nextBtn.onclick = () => window.location.href = "checkout.html";
 
-  // Init
+  // Inicialização
   await carregarCarrinho();
   await aplicarCupomSalvo();
   await carregarFidelidade();
