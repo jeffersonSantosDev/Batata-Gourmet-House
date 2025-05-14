@@ -1,135 +1,175 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const loading   = document.getElementById("loadingOverlay");
-    const backBtn   = document.getElementById("backBtn");
-    const cartList  = document.getElementById("cartList");
-    const subtotalEl= document.getElementById("subtotal");
-    const totalEl   = document.getElementById("total");
-    const nextBtn   = document.getElementById("nextBtn");
-    const whatsapp  = localStorage.getItem("bgHouse_whatsapp");
+  const loading     = document.getElementById("loadingOverlay");
+  const backBtn     = document.getElementById("backBtn");
+  const cartList    = document.getElementById("cartList");
+  const subtotalEl  = document.getElementById("subtotal");
+  const totalEl     = document.getElementById("total");
+  const nextBtn     = document.getElementById("nextBtn");
+  const couponInput = document.getElementById("couponCode");
+  const applyBtn    = document.getElementById("applyCoupon");
+  const loyaltyDots = document.querySelectorAll(".loyalty-progress .dot");
+
+  // 1) Recupera credenciais e IDs de loja/fidelidade do localStorage
+  const whatsapp       = localStorage.getItem("bgHouse_whatsapp");
+  const usuarioIdEnc   = localStorage.getItem("bgHouse_id");
+  const usuarioId      = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
+  const lojaId         = parseInt(localStorage.getItem("bgHouse_lojaId"));
+  const fidelidadeId   = parseInt(localStorage.getItem("bgHouse_fidelidadeId"));
   
-    backBtn.onclick = () => history.back();
-  
-    if (!whatsapp) {
-      swal("Ops!", "Identifique-se para ver o carrinho.", "warning")
-        .then(() => window.location.href = "identify.html?return=cart.html");
+  backBtn.onclick = () => history.back();
+
+  if (!whatsapp || !usuarioId || !lojaId || !fidelidadeId) {
+    swal("Ops!", "Identifique-se novamente.", "warning")
+      .then(() => window.location.href = "identify.html?return=cart.html");
+    return;
+  }
+
+  let subtotal = 0;
+  let desconto = 0;
+  const fmt = v => v.toFixed(2).replace(".",",");
+
+  try {
+    loading.classList.remove("hidden");
+    const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
+    if (!resp.ok) throw new Error();
+    const cart = await resp.json();
+
+    // Renderiza itens
+    cartList.innerHTML = "";
+    if (!cart.items.length) {
+      cartList.innerHTML = `
+        <tr><td colspan="2" style="text-align:center; padding:1rem">
+          Seu carrinho está vazio.
+        </td></tr>`;
+      nextBtn.disabled = true;
       return;
     }
-  
-    try {
-      loading.classList.remove("hidden");
-      const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
-      if (!resp.ok) throw new Error();
-      const cart = await resp.json();
-  
-      cartList.innerHTML = "";
-      if (!cart.items.length) {
-        cartList.innerHTML = `
-          <tr><td colspan="2" style="text-align:center; padding:1rem">
-            Seu carrinho está vazio.
-          </td></tr>`;
-        nextBtn.disabled = true;
+    cart.items.forEach(item => {
+      const tr = document.createElement("tr");
+      tr.className = "item-row";
+      tr.innerHTML = `
+        <td>
+          <div class="item-info">
+            <span>${item.quantidade}× ${item.produtoNome}</span>
+            <button class="edit-btn" data-id="${item.itemId}" title="Opções">
+              <i class="fas fa-pencil-alt"></i>
+            </button>
+            <div class="popover hidden" data-id="${item.itemId}">
+              <button class="confirm-remove">
+                <i class="fas fa-trash-alt"></i> Excluir
+              </button>
+            </div>
+          </div>
+        </td>
+        <td>R$ ${item.precoUnitario.toFixed(2).replace(".",",")}</td>`;
+      cartList.appendChild(tr);
+    });
+
+    // Calcula subtotal inicial e total
+    subtotal = cart.items.reduce((sum,i) => sum + i.precoUnitario * i.quantidade, 0);
+    const atualizarResumo = () => {
+      subtotalEl.textContent = `+ R$ ${fmt(subtotal)}`;
+      totalEl.textContent    = `R$ ${fmt(subtotal - desconto)}`;
+    };
+    atualizarResumo();
+
+    // Fecha popovers ao clicar fora
+    document.addEventListener("click", e => {
+      if (!e.target.closest(".item-info"))
+        document.querySelectorAll(".popover")
+          .forEach(p => p.classList.add("hidden"));
+    });
+
+    // Popover e remoção de item
+    cartList.addEventListener("click", async e => {
+      const editBtn = e.target.closest(".edit-btn");
+      if (editBtn) {
+        e.stopPropagation();
+        const id = editBtn.dataset.id;
+        document.querySelectorAll(".popover").forEach(p => p.classList.add("hidden"));
+        editBtn.parentNode.querySelector(`.popover[data-id="${id}"]`)
+               .classList.toggle("hidden");
         return;
       }
-  
-      // Renderiza cada linha com popover já oculto
-      cart.items.forEach(item => {
-        const tr = document.createElement("tr");
-        tr.className = "item-row";
-        tr.innerHTML = `
-          <td>
-            <div class="item-info">
-              <span>${item.quantidade}× ${item.produtoNome}</span>
-              <button class="edit-btn" data-id="${item.itemId}" title="Opções">
-                <i class="fas fa-pencil-alt"></i>
-              </button>
-              <div class="popover hidden" data-id="${item.itemId}">
-                <button class="confirm-remove">
-                  <i class="fas fa-trash-alt"></i> Excluir
-                </button>
-              </div>
-            </div>
-          </td>
-          <td>
-            R$ ${item.precoUnitario.toFixed(2).replace(".",",")}
-          </td>`;
-        cartList.appendChild(tr);
-      });
-  
-      // Calcula subtotal e total
-      const subtotal = cart.items.reduce((sum,i) => sum + i.precoUnitario * i.quantidade, 0);
-      subtotalEl.textContent = `+ R$ ${subtotal.toFixed(2).replace(".",",")}`;
-      totalEl.textContent    = `R$ ${subtotal.toFixed(2).replace(".",",")}`;
-  
-      // Fecha popovers ao clicar fora
-      document.addEventListener("click", e => {
-        if (!e.target.closest(".item-info")) {
-          document.querySelectorAll(".popover")
-            .forEach(p => p.classList.add("hidden"));
+      const remBtn = e.target.closest(".confirm-remove");
+      if (remBtn) {
+        const pop = remBtn.closest(".popover");
+        const itemId = pop.dataset.id;
+        pop.classList.add("hidden");
+        const willDelete = await swal({
+          title: "Remover item?",
+          text: "Deseja mesmo apagar este item do carrinho?",
+          icon: "warning",
+          buttons: ["Não","Sim"],
+          dangerMode: true
+        });
+        if (!willDelete) return;
+        loading.classList.remove("hidden");
+        try {
+          const del = await fetch(
+            `/api/Cart/RemoveItem/${itemId}?whatsapp=${encodeURIComponent(whatsapp)}`,
+            { method: "DELETE" }
+          );
+          if (!del.ok) throw new Error();
+          window.location.reload();
+        } catch {
+          swal("Erro", "Não foi possível remover o item.", "error");
+        } finally {
+          loading.classList.add("hidden");
         }
-      });
-  
-      // Lógica de popover e remoção
-      cartList.addEventListener("click", e => {
-        // 1) Clique no lápis: só toggle popover
-        const editBtn = e.target.closest(".edit-btn");
-        if (editBtn) {
-          e.stopPropagation();
-          const id = editBtn.dataset.id;
-          // fecha outros e abre o correto
-          document.querySelectorAll(".popover").forEach(p => p.classList.add("hidden"));
-          const pop = editBtn.parentNode.querySelector(`.popover[data-id="${id}"]`);
-          pop.classList.toggle("hidden");
-          return;
-        }
-  
-        // 2) Clique em "Excluir" no popover
-        const remBtn = e.target.closest(".confirm-remove");
-        if (remBtn) {
-          const pop = remBtn.closest(".popover");
-          const itemId = pop.dataset.id;
-          pop.classList.add("hidden");
-  
-          // confirmação final
-          swal({
-            title: "Remover item?",
-            text: "Deseja mesmo apagar este item do carrinho?",
-            icon: "warning",
-            buttons: ["Não","Sim"],
-            dangerMode: true
-          }).then(async willDelete => {
-            if (!willDelete) return;
-  
-            loading.classList.remove("hidden");
-            try {
-              const del = await fetch(
-                `/api/Cart/RemoveItem/${itemId}?whatsapp=${encodeURIComponent(whatsapp)}`,
-                { method: "DELETE" }
-              );
-              if (!del.ok) throw new Error();
-  
-              // se ficar vazio, volta pra index
-              const remaining = cart.items.filter(i => i.itemId != itemId).length;
-              if (remaining === 0) {
-                window.location.href = "index.html";
-              } else {
-                window.location.reload();
-              }
-            } catch {
-              swal("Erro", "Não foi possível remover o item.", "error");
-            } finally {
-              loading.classList.add("hidden");
-            }
-          });
-        }
-      });
-  
-      nextBtn.onclick = () => window.location.href = "checkout.html";
-  
-    } catch (err) {
-      console.error("Erro ao carregar carrinho:", err);
-      swal("Erro", "Não foi possível carregar seu carrinho.", "error");
-    } finally {
-      loading.classList.add("hidden");
-    }
-  });
-  
+      }
+    });
+
+    // 2) Simular e aplicar cupom
+    applyBtn.onclick = async () => {
+      const codigo = couponInput.value.trim();
+      if (!codigo) return swal("Atenção","Informe o código do cupom.","warning");
+      loading.classList.remove("hidden");
+      try {
+        const r = await fetch("/api/Cupom/CalcularDesconto", {
+          method: "POST",
+          headers: { "Content-Type":"application/json" },
+          body: JSON.stringify({
+            Codigo:        codigo,
+            UsuarioId:     usuarioId,
+            LojaId:        lojaId,
+            ValorOriginal: subtotal
+          })
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.Erro || "Erro no cupom");
+        desconto = data.Desconto;
+        atualizarResumo();
+        swal("Sucesso","Cupom aplicado: R$ "+ fmt(desconto),"success");
+        couponInput.disabled = true;
+        applyBtn.disabled    = true;
+      } catch (err) {
+        swal("Erro", err.message || "Não foi possível validar o cupom.","error");
+      } finally {
+        loading.classList.add("hidden");
+      }
+    };
+
+    // 3) Carregar progresso de fidelidade
+    try {
+      const r2 = await fetch(
+        `/api/UsuarioFidelidade/Pontos?usuarioId=${usuarioId}&fidelidadeId=${fidelidadeId}`
+      );
+      if (r2.ok) {
+        const pontos = await r2.json();
+        loyaltyDots.forEach((dot,i) => {
+          dot.classList.toggle("filled", i < pontos);
+        });
+      }
+    } catch {}
+
+    // 4) Próximo (checkout)
+    nextBtn.onclick = () => window.location.href = "checkout.html";
+
+  } catch (err) {
+    console.error("Erro ao carregar carrinho:", err);
+    swal("Erro", "Não foi possível carregar seu carrinho.", "error");
+  } finally {
+    loading.classList.add("hidden");
+  }
+});
