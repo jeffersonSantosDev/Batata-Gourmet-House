@@ -46,9 +46,13 @@
         <label><input type="radio" name="method" value="Dinheiro" checked> Dinheiro</label>
         <label><input type="radio" name="method" value="Crédito"> Crédito</label>
         <label><input type="radio" name="method" value="Débito"> Débito</label>
-        <div id="changeSection" class="addresses-form" style="display:flex; gap:8px; align-items:center; margin-top:.5rem;">
-          <input type="text" id="changeAmount" placeholder="Troco para 0,00" style="flex:1;"/>
-          <label><input type="checkbox" id="noChange"> Não preciso de troco</label>
+        <div id="changeSection" class="change-section">
+          <label for="changeAmount" class="change-label">Troco para:</label>
+          <input type="text" id="changeAmount" placeholder="0,00" />
+          <label for="noChange" class="no-change">
+            <input type="checkbox" id="noChange" />
+            <span>Não preciso de troco</span>
+          </label>
         </div>
       </form>
     </section>

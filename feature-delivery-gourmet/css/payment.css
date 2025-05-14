@@ -128,3 +128,36 @@ body {
 .next-btn:hover {
   background:darken(var(--highlight),10%);
 }
+/* Troco */
+.change-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.change-label {
+  flex-shrink: 0;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+}
+
+.change-section input[type="text"] {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.no-change {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;        /* impede quebra */
+  font-size: 0.9rem;
+  color: var(--text-dark);
+}
+.no-change input[type="checkbox"] {
+  accent-color: var(--accent);
+}
