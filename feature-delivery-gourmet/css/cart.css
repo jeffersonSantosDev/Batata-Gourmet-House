@@ -36,7 +36,6 @@ body {
   box-shadow: 0 1px 4px var(--shadow);
   z-index: 10;
 }
-
 .back-btn {
   background: none;
   border: none;
@@ -44,7 +43,6 @@ body {
   margin-right: 1rem;
   cursor: pointer;
 }
-
 .detail-title {
   font-size: 1.25rem;
   font-weight: 600;
@@ -89,6 +87,7 @@ body {
 .cart-items td:nth-child(2) {
   color: var(--accent);
   font-weight: 700;
+  white-space: nowrap;
 }
 
 /* linha do item */
@@ -100,8 +99,41 @@ body {
 .item-row .item-info {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
+  flex-wrap: nowrap;
   position: relative;
+}
+
+/* bloqueia quebra dentro do label */
+.item-info .item-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* botões de quantidade */
+.qty-btn {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.qty-btn:hover {
+  background: var(--bg-light);
+}
+
+/* contador */
+.qty {
+  min-width: 20px;
+  text-align: center;
+  display: inline-block;
 }
 
 /* botão lápis/edit */
@@ -111,7 +143,6 @@ body {
   color: var(--accent);
   font-size: 1.2rem;
   cursor: pointer;
-  position: relative;
   z-index: 2001;
   white-space: nowrap;
 }
@@ -142,7 +173,7 @@ body {
   background: none;
   border: none;
   color: #e53e3e;
-  padding: 0.01rem 0.2rem;
+  padding: 0.2rem 0.5rem;
   width: 100%;
   text-align: left;
   cursor: pointer;
@@ -150,9 +181,6 @@ body {
 }
 .popover button:hover {
   background: rgba(229, 83, 62, 0.1);
-}
-.popover i {
-  font-size: 1rem;
 }
 
 /* seção de cupom */
@@ -305,45 +333,4 @@ body {
 }
 @keyframes spin {
   to { transform: rotate(360deg); }
-}
-/* Mantém o span e seus filhos sem quebra de linha */
-.item-info > span {
-  display: inline-flex;     /* trata tudo como um só bloco */
-  align-items: center;
-  gap: 0.25rem;
-  white-space: nowrap;      /* sem quebra dentro */
-  flex-shrink: 0;    
-}
-
-/* Ajusta os botões de quantidade */
-.qty-btn {
-  background: none;
-  width: 24px;
-  height: 24px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.qty-btn:hover {
-  background: var(--bg-light);
-}
-
-/* Ajusta o número para não esticar */
-.qty {
-  min-width: 20px;
-  text-align: center;
-  display: inline-block;
-}
-
-/* Garante que o ícone de editar/gravar fique no final sem pular linha */
-.item-info {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: nowrap;  
 }

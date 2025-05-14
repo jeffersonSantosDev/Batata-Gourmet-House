@@ -27,15 +27,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   let subtotal = 0, desconto = 0;
 
   // Fecha todos os popovers
-  function fecharPopovers() {
+  const fecharPopovers = () => {
     document.querySelectorAll(".popover").forEach(p => p.classList.add("hidden"));
-  }
+  };
 
   // Fecha popover ao clicar fora
   document.addEventListener("click", e => {
-    if (!e.target.closest(".item-info")) {
-      fecharPopovers();
-    }
+    if (!e.target.closest(".item-info")) fecharPopovers();
   });
 
   // (re)renderiza o carrinho
@@ -61,10 +59,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         tr.innerHTML = `
           <td>
             <div class="item-info">
-              <button class="qty-btn decrease" data-id="${item.itemId}">−</button>
-              <span class="qty">${item.quantidade}</span>
-              <button class="qty-btn increase" data-id="${item.itemId}">+</button>
-              × ${item.produtoNome}
+              <span class="item-label">
+                <button class="qty-btn decrease" data-id="${item.itemId}">−</button>
+                <span class="qty">${item.quantidade}</span>
+                <button class="qty-btn increase" data-id="${item.itemId}">+</button>
+                × ${item.produtoNome}
+              </span>
               <button class="edit-btn" data-id="${item.itemId}">
                 <i class="fas fa-pencil-alt"></i>
               </button>
@@ -92,18 +92,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     totalEl.textContent    = `R$ ${fmt(subtotal - desconto)}`;
   }
 
-  // manipula +, −, editar e excluir
+  // trata cliques em quantidade, editar e remover
   cartList.addEventListener("click", async e => {
-    // quantidade
-    const decreaseBtn = e.target.closest(".qty-btn.decrease");
-    const increaseBtn = e.target.closest(".qty-btn.increase");
-    if (decreaseBtn || increaseBtn) {
-      const btn = decreaseBtn || increaseBtn;
+    // + / −
+    const dec = e.target.closest(".qty-btn.decrease");
+    const inc = e.target.closest(".qty-btn.increase");
+    if (dec || inc) {
+      const btn    = dec || inc;
       const itemId = parseInt(btn.dataset.id);
-      const row = btn.closest(".item-row");
-      const qtySpan = row.querySelector(".qty");
-      let qty = parseInt(qtySpan.textContent);
-      qty += increaseBtn ? 1 : -1;
+      const row    = btn.closest(".item-row");
+      const qtyEl  = row.querySelector(".qty");
+      let qty      = parseInt(qtyEl.textContent) + (inc ? 1 : -1);
 
       loading.classList.remove("hidden");
       try {
@@ -125,26 +124,25 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // toggle popover ao clicar na lupa
+    // toggle popover
     const editBtn = e.target.closest(".edit-btn");
     if (editBtn) {
       e.stopPropagation();
-      const id = editBtn.dataset.id;
-      const pop = document.querySelector(`.popover[data-id="${id}"]`);
+      const pop = document.querySelector(`.popover[data-id="${editBtn.dataset.id}"]`);
       pop.classList.toggle("hidden");
       return;
     }
 
     // remover item
-    const remBtn = e.target.closest(".confirm-remove");
-    if (remBtn) {
-      const pop = remBtn.closest(".popover");
+    const rem = e.target.closest(".confirm-remove");
+    if (rem) {
+      const pop    = rem.closest(".popover");
       const itemId = pop.dataset.id;
       pop.classList.add("hidden");
       const willDelete = await swal({
         title: "Remover item?",
-        text: "Deseja mesmo apagar este item do carrinho?",
-        icon: "warning",
+        text:  "Deseja mesmo apagar este item do carrinho?",
+        icon:  "warning",
         buttons: ["Não","Sim"],
         dangerMode: true
       });
@@ -193,7 +191,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // verificar cupom
+  // verifica e aplica cupom
   applyBtn.onclick = async () => {
     const codigo = couponInput.value.trim();
     if (!codigo) {
@@ -234,7 +232,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       );
       if (!resp.ok) return;
       const pontos = await resp.json();
-      loyaltyDots.forEach((dot,i) => {
+      loyaltyDots.forEach((dot, i) => {
         dot.classList.toggle("filled", i < pontos);
       });
     } catch {}
