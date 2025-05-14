@@ -23,7 +23,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const loyaltyDots = document.querySelectorAll(".loyalty-progress .dot");
   const fmt         = v => v.toFixed(2).replace(".",",");
 
-  backBtn.onclick = () => history.back();
+  backBtn.onclick = () => {
+    window.location.href = "index.html";
+  };
+  
 
   // 1) Credenciais mínimas
   const whatsapp     = localStorage.getItem("bgHouse_whatsapp");
