@@ -1,6 +1,6 @@
 // js/entrega.js
 
-// Mostra e esconde loader (reaproveite do utils.js)
+// Mostra e esconde o overlay de loading
 function showLoader() {
     document.getElementById("loadingOverlay").classList.remove("hidden");
   }
@@ -8,7 +8,7 @@ function showLoader() {
     document.getElementById("loadingOverlay").classList.add("hidden");
   }
   
-  // Função que você já tem em outra tela
+  // Faz POST para buscar endereços pelo WhatsApp
   async function fetchUserAddresses(whatsapp) {
     showLoader();
     try {
@@ -24,6 +24,7 @@ function showLoader() {
       console.error(err);
       await swal("Erro", "Não foi possível carregar seus endereços. Tente novamente mais tarde.", "error");
       window.location.href = 'identify.html?return=entrega.html';
+      return [];
     } finally {
       hideLoader();
     }
@@ -39,9 +40,10 @@ function showLoader() {
     const totalEl     = document.getElementById("total");
     const fmt         = v => v.toFixed(2).replace(".",",");
   
+    // botão voltar → home
     backBtn.onclick = () => window.location.href = "index.html";
   
-    // Recupera WhatsApp e nome
+    // dados do usuário
     const whatsapp = localStorage.getItem("bgHouse_whatsapp");
     const nome     = localStorage.getItem("bgHouse_name") || "Usuário";
     if (!whatsapp) {
@@ -51,11 +53,11 @@ function showLoader() {
     userNameEl.textContent  = nome;
     userPhoneEl.textContent = whatsapp.replace(/(\d{2})(\d{5})(\d{4})/, '+$1 $2-$3');
   
-    // Total
+    // TOTAL
     const total = parseFloat(localStorage.getItem("bgHouse_total") || "0");
     totalEl.textContent = `R$ ${fmt(total)}`;
   
-    // Carrega endereços
+    // carrega e renderiza endereços
     const addresses = await fetchUserAddresses(whatsapp);
     form.innerHTML = "";
     addresses.forEach(addr => {
@@ -74,8 +76,10 @@ function showLoader() {
       form.appendChild(label);
     });
   
-    addBtn.onclick = () => window.location.href = "register-address.html";
+    // botão adicionar
+    addBtn.onclick = () => window.location.href = "novo-endereco.html";
   
+    // próximo passo
     nextBtn.onclick = () => {
       const chosen = form.addressId.value;
       if (!chosen) {
