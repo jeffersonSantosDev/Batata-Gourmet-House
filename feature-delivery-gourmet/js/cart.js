@@ -23,14 +23,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   const loyaltyDots = document.querySelectorAll(".loyalty-progress .dot");
   const fmt         = v => v.toFixed(2).replace(".",",");
 
-  couponInput.addEventListener("input", e => {
-    const tgt = e.target;
-    const start = tgt.selectionStart;
-    const end   = tgt.selectionEnd;
-    tgt.value = tgt.value.replace(/f/g, "F");
-    tgt.setSelectionRange(start, end);
-  });
-  
+  console.log("couponInput encontrado?", couponInput);
+  if (couponInput) {
+    couponInput.addEventListener("input", e => {
+      const tgt = e.target;
+      const start = tgt.selectionStart;
+      const end   = tgt.selectionEnd;
+      // troca todos os 'f' por 'F'
+      tgt.value = tgt.value.replace(/f/g, "F");
+      // restaura cursor
+      tgt.setSelectionRange(start, end);
+    });
+  }
   backBtn.onclick = () => {
     window.location.href = "index.html";
   };
