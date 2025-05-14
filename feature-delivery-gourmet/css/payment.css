@@ -160,3 +160,43 @@ body {
 .next-btn:hover {
   background: #28b46b;
 }
+
+ 
+/* Ajustes em Troco para evitar overflow */
+
+.payment-card {
+  /* garante que filhos não estourem o contêiner */
+  overflow: visible;
+}
+
+.change-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Faz o input encolher se necessário */
+.change-section input[type="text"] {
+  flex: 1 1 auto;   /* permite encolher */
+  min-width: 0;      /* essencial para flex inputs */
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+/* Label “Não preciso de troco” */
+.no-change {
+  flex-shrink: 0;  /* não deixa este label encolher demais */
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  color: var(--text-dark);
+}
+
+
