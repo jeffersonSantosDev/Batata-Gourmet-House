@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const couponInput = document.getElementById("couponCode");
   const applyBtn    = document.getElementById("applyCoupon");
   const loyaltyDots = document.querySelectorAll(".loyalty-progress .dot");
+  const fmt         = v => v.toFixed(2).replace(".",",");
 
   // Recupera credenciais e IDs
   const whatsapp     = localStorage.getItem("bgHouse_whatsapp");
@@ -15,10 +16,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const usuarioId    = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
   const lojaId       = parseInt(localStorage.getItem("bgHouse_lojaId"));
   const programaId   = parseInt(localStorage.getItem("bgHouse_fidelidadeId"));
-  const fmt          = v => v.toFixed(2).replace(".",",");
 
   backBtn.onclick = () => history.back();
-
   if (!whatsapp || !usuarioId || !lojaId || !programaId) {
     swal("Ops!", "Identifique-se novamente.", "warning")
       .then(() => window.location.href = "identify.html?return=cart.html");
@@ -27,7 +26,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let subtotal = 0, desconto = 0;
 
-  // Função para (re)carregar e renderizar o carrinho
+  // Fecha todos os popovers
+  function fecharPopovers() {
+    document.querySelectorAll(".popover").forEach(p => p.classList.add("hidden"));
+  }
+
+  // Fecha popover ao clicar fora
+  document.addEventListener("click", e => {
+    if (!e.target.closest(".item-info")) {
+      fecharPopovers();
+    }
+  });
+
+  // (re)renderiza o carrinho
   async function carregarCarrinho() {
     loading.classList.remove("hidden");
     try {
@@ -35,23 +46,25 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!resp.ok) throw new Error();
       const cart = await resp.json();
 
-      // se não houver itens, volta à tela inicial
-      if (!cart.items || cart.items.length === 0) {
+      if (!cart.items.length) {
         localStorage.removeItem("bgHouse_appliedCoupon");
-        window.location.href = "index.html";
-        return;
+        return window.location.href = "index.html";
       }
 
-      // monta a lista de itens
       cartList.innerHTML = "";
+      subtotal = 0;
       cart.items.forEach(item => {
+        subtotal += item.precoUnitario * item.quantidade;
         const tr = document.createElement("tr");
         tr.className = "item-row";
         tr.dataset.id = item.itemId;
         tr.innerHTML = `
           <td>
             <div class="item-info">
-              <span>${item.quantidade}× ${item.produtoNome}</span>
+              <button class="qty-btn decrease" data-id="${item.itemId}">−</button>
+              <span class="qty">${item.quantidade}</span>
+              <button class="qty-btn increase" data-id="${item.itemId}">+</button>
+              × ${item.produtoNome}
               <button class="edit-btn" data-id="${item.itemId}">
                 <i class="fas fa-pencil-alt"></i>
               </button>
@@ -66,8 +79,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         cartList.appendChild(tr);
       });
 
-      // subtotal e total
-      subtotal = cart.items.reduce((s,i) => s + i.precoUnitario * i.quantidade, 0);
       atualizarResumo();
     } catch {
       swal("Erro", "Não foi possível carregar seu carrinho.", "error");
@@ -81,16 +92,46 @@ document.addEventListener("DOMContentLoaded", async () => {
     totalEl.textContent    = `R$ ${fmt(subtotal - desconto)}`;
   }
 
-  // manipula popovers e remoção de item sem reload de página
+  // manipula +, −, editar e excluir
   cartList.addEventListener("click", async e => {
-    // toggle popover
+    // quantidade
+    const decreaseBtn = e.target.closest(".qty-btn.decrease");
+    const increaseBtn = e.target.closest(".qty-btn.increase");
+    if (decreaseBtn || increaseBtn) {
+      const btn = decreaseBtn || increaseBtn;
+      const itemId = parseInt(btn.dataset.id);
+      const row = btn.closest(".item-row");
+      const qtySpan = row.querySelector(".qty");
+      let qty = parseInt(qtySpan.textContent);
+      qty += increaseBtn ? 1 : -1;
+
+      loading.classList.remove("hidden");
+      try {
+        await fetch(
+          `/api/Cart/UpdateItemQuantity?whatsapp=${encodeURIComponent(whatsapp)}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ itemId, quantidade: qty })
+          }
+        );
+        await carregarCarrinho();
+        await aplicarCupomSalvo();
+        await carregarFidelidade();
+      } catch {
+        swal("Erro", "Não foi possível atualizar a quantidade.", "error");
+      } finally {
+        loading.classList.add("hidden");
+      }
+      return;
+    }
+
+    // toggle popover ao clicar na lupa
     const editBtn = e.target.closest(".edit-btn");
     if (editBtn) {
       e.stopPropagation();
       const id = editBtn.dataset.id;
-      document.querySelectorAll(".popover").forEach(p => p.classList.add("hidden"));
-      editBtn.parentNode.querySelector(`.popover[data-id="${id}"]`)
-             .classList.toggle("hidden");
+      const pop = document.querySelector(`.popover[data-id="${id}"]`);
+      pop.classList.toggle("hidden");
       return;
     }
 
@@ -116,9 +157,9 @@ document.addEventListener("DOMContentLoaded", async () => {
           { method: "DELETE" }
         );
         if (!del.ok) throw new Error();
-        // após remoção, recarrega carrinho e reaplica cupom se houver
         await carregarCarrinho();
-        await aplicarCupomSalvo(); 
+        await aplicarCupomSalvo();
+        await carregarFidelidade();
       } catch {
         swal("Erro", "Não foi possível remover o item.", "error");
       } finally {
@@ -127,7 +168,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // tenta aplicar cupom salvo
+  // aplica cupom salvo
   async function aplicarCupomSalvo() {
     const codigo = localStorage.getItem("bgHouse_appliedCoupon");
     if (!codigo) return;
@@ -140,9 +181,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       const data = await resp.json();
       if (data.sucesso) {
         desconto = data.dados;
-        couponInput.value = codigo;
-        couponInput.disabled = true;
-        applyBtn.disabled = true;
+        couponInput.value     = codigo;
+        couponInput.disabled  = true;
+        applyBtn.disabled     = true;
         atualizarResumo();
       } else {
         localStorage.removeItem("bgHouse_appliedCoupon");
@@ -152,7 +193,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // botão verificar cupom
+  // verificar cupom
   applyBtn.onclick = async () => {
     const codigo = couponInput.value.trim();
     if (!codigo) {
