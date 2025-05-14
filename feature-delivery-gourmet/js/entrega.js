@@ -159,11 +159,11 @@ function showLoader() {
         return swal("Atenção","Selecione ou crie um endereço.","warning");
       }
       // se tiver padrão, vai direto a pagamento
-      if (hasDefault) {
-        window.location.href = "payment.html";
-      } else {
-        window.location.href = `payment.html?addressId=${selId}`;
-      }
+    //   if (hasDefault) {
+    //     window.location.href = "payment.html";
+    //   } else {
+    //     window.location.href = `payment.html?addressId=${selId}`;
+    //   }
     };
   });
   
