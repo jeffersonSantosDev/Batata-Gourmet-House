@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       loading.classList.remove("hidden");
       try {
         const resp = await fetch(
-          'http://batatagourmethouse.runasp.net/api/Usuario/GetAddressesByWhatsApp',
+          'api/Usuario/GetAddressesByWhatsApp',
           {
             method: "POST",
             headers: {
