@@ -161,3 +161,43 @@ body {
 .no-change input[type="checkbox"] {
   accent-color: var(--accent);
 }
+
+
+/* --------------------
+   Evita overflow horizontal
+   -------------------- */
+   html, body {
+    overflow-x: hidden;
+  }
+  
+  /* Garante que o container não ultrapasse a largura da viewport */
+  .detail-main,
+  .container {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding-right: 1rem; /* espaço pro scroll vertical */
+    padding-left:  1rem;
+  }
+  
+  /* Cards sempre encaixados */
+  .card,
+  .address-section,
+  .cart-summary,
+  .payment-card,
+  .payment-card .addresses-form {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  /* Ajusta footer fixo sem criar overflow */
+  .detail-footer {
+    left: 0;
+    right: 0;
+  }
+  
+  /* Opcional: se ainda aparecer uma faixa extra, força ocultar */
+  body {
+    margin-right: calc(-1 * (100vw - 100%));
+  }
+  
