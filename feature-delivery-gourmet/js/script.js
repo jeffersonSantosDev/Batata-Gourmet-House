@@ -14,22 +14,31 @@ const scheduleBtn       = document.querySelector(".btn.info");
 const badge             = document.getElementById("storeBadge");
 
 // ——— FETCH LOJA ———
-async function fetchLojaInfo(lojaId) {
-  const resp = await fetch('/api/Usuario/GetStatusById', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: lojaId })
+async function fetchInfoLoja() {
+  const resp = await fetch('/api/Loja/GetInfoLoja', {
+    method: 'GET',
+    headers: { 'Accept': 'application/json' }
   });
   if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-  return await resp.json();
+  const data = await resp.json();
+  
+  // salva no localStorage
+  localStorage.setItem('bgHouse_lojaId',   data.lojaId);
+  localStorage.setItem('bgHouse_fidelidadeId', data.programaFidelidadeId);
+  
+  return data;
 }
 
-async function atualizarStatusLoja(lojaId) {
+async function atualizarStatusLoja() {
+  const badge = document.getElementById('storeBadge');
+  if (!badge) return;
+
   badge.textContent = '…';
   badge.classList.remove('aberto', 'fechado');
+
   try {
-    const { aberta } = await fetchLojaInfo(lojaId);
-    if (aberta) {
+    const { aberta } = await fetchInfoLoja();
+    if (aberta === 1) {
       badge.classList.add('aberto');
       badge.innerHTML = '<i class="fas fa-store"></i> Aberto';
     } else {
@@ -37,7 +46,7 @@ async function atualizarStatusLoja(lojaId) {
       badge.innerHTML = '<i class="fas fa-store-slash"></i> Fechado';
     }
   } catch {
-    badge.textContent = 'Erro';
+    badge.textContent = 'aguardando status do estabelecimento...';
   }
 }
 
@@ -113,7 +122,7 @@ function renderProducts() {
 // ——— MODAIS E BINDINGS ———
 document.addEventListener("DOMContentLoaded", async () => {
   // Atualiza status da loja e carrega produtos
-  atualizarStatusLoja(1);
+  atualizarStatusLoja();
   loadProducts();
 
   // Info modal
