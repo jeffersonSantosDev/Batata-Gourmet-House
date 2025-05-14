@@ -59,12 +59,12 @@ function showLoader() {
     const finalTotal  = document.getElementById("finalTotal");
     const fmt         = v => v.toFixed(2).replace(".",",");
   
-    backBtn.onclick = () => window.location.href = "index.html";
+    backBtn.onclick = () => history.back();
   
-    const whatsapp  = localStorage.getItem("bgHouse_whatsapp");
-    const nome      = localStorage.getItem("bgHouse_name") || "Você";
-    const lojaId    = parseInt(localStorage.getItem("bgHouse_lojaId"));
-    const usuarioId = localStorage.getItem("bgHouse_id")
+    const whatsapp   = localStorage.getItem("bgHouse_whatsapp");
+    const nome       = localStorage.getItem("bgHouse_name") || "Você";
+    const lojaId     = parseInt(localStorage.getItem("bgHouse_lojaId"));
+    const usuarioId  = localStorage.getItem("bgHouse_id")
                         ? parseInt(atob(localStorage.getItem("bgHouse_id")))
                         : null;
     if (!whatsapp || !usuarioId) {
@@ -114,35 +114,46 @@ function showLoader() {
       form.appendChild(label);
     });
   
+    // Ajusta texto do botão dependendo de padrão
+    const hasDefault = addresses.some(a => a.padrao);
+    nextBtn.textContent = hasDefault ? "Ir Para Pagamento" : "Escolha a Entrega!";
+  
     // 4) Limite 2 endereços
-    if (addresses.length>=2) addBtn.classList.add("disabled");
+    if (addresses.length >= 2) addBtn.classList.add("disabled");
     addBtn.onclick = () => {
-      if (addresses.length>=2) {
+      if (addresses.length >= 2) {
         swal("Atenção","Você já cadastrou 2 endereços. Edite-os na sua conta.","info");
       } else {
         window.location.href="novo-endereco.html";
       }
     };
   
-    // 5) Seleção de endereço => frete + total
+    // 5) Atualiza frete + total ao selecionar
     form.addEventListener("change", () => {
       const sel = addresses.find(a => a.id===+form.addressId.value);
       if (sel) {
         frete = sel.frete;
-        freteEl.textContent = `R$ ${fmt(frete)}`;
+        freteEl.textContent    = `R$ ${fmt(frete)}`;
         finalTotal.textContent = `R$ ${fmt(subtotal - desconto + frete)}`;
       }
     });
     if (form.addressId.value) form.dispatchEvent(new Event("change"));
   
-    // 6) Próximo
+    // 6) Clique no botão
     nextBtn.onclick = () => {
-      const chosen = form.addressId.value;
-      if (!chosen) {
-        swal("Atenção","Escolha um endereço.","warning");
-        return;
+      if (addresses.length === 0) {
+        return swal("Atenção","Cadastre um endereço primeiro.","warning");
       }
-      window.location.href=`checkout.html?addressId=${chosen}`;
+      if (!hasDefault) {
+        const chosen = form.addressId.value;
+        if (!chosen) {
+          return swal("Atenção","Escolha um endereço de entrega.","warning");
+        }
+        window.location.href=`checkout.html?addressId=${chosen}`;
+      } else {
+        // já tem padrão
+        window.location.href="checkout.html";
+      }
     };
   });
   

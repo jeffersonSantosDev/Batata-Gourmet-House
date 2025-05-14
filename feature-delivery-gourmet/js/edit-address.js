@@ -85,7 +85,7 @@ function renderAddressList(addresses) {
       <label for="addr-${a.id}" class="address-line1">
         <strong>${a.bairro}, ${a.numero}</strong>
       </label>
-      <div class="address-street">Rua ${a.rua || ''}</div>
+      <div class="address-street">${a.rua || ''}</div>
       <div class="address-city">${a.cidade} – ${a.uf.toUpperCase()}</div>
       <div class="address-meta">
         ${a.distanciaKm.toFixed(1)} km • ${a.tempoMinutos} min • R$ ${a.frete.toFixed(2)}
