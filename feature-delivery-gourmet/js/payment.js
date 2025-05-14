@@ -72,10 +72,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     await swal("Ops!","Identifique-se.","warning");
     return window.location.href = 'identify.html?return=entrega.html';
   }
-  userNameEl.textContent  = nome;
-  userPhoneEl.textContent = whatsapp.replace(/(\d{2})(\d{5})(\d{4})/, '+$1 $2-$3');
 
-  // 1) Carrinho
+  // Preenche nome e telefone
+  if (userNameEl)  userNameEl.textContent  = nome;
+  if (userPhoneEl) userPhoneEl.textContent = whatsapp.replace(/(\d{2})(\d{5})(\d{4})/, '+$1 $2-$3');
+
+  // 1) Carrinho → subtotal
   let cart, subtotal = 0, desconto = 0, frete = 0;
   try {
     cart = await fetchCart(whatsapp);
@@ -85,7 +87,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     subtotalEl.textContent = `R$ 0,00`;
   }
 
-  // 2) Cupom
+  // 2) Cupom salvo
   const savedCupom = localStorage.getItem("bgHouse_appliedCoupon");
   if (savedCupom) {
     const res = await calcularCupom(savedCupom, usuarioId, lojaId, subtotal);
@@ -98,7 +100,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // 3) Endereços
+  // 3) Carrega endereços e renderiza
   const addresses = await fetchUserAddresses(whatsapp);
   form.innerHTML = "";
   addresses.forEach(addr => {
@@ -131,44 +133,40 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   };
 
-  // 6) Quando muda seleção de endereço, recalcula e salva o frete
+  // 6) Quando muda seleção de endereço
   form.addEventListener("change", () => {
     const selId = form.addressId.value;
-    // visual
+    // marca visualmente
     document.querySelectorAll(".address-option").forEach(l => {
       l.classList.toggle("selected",
         l.querySelector("input").value === selId
       );
     });
-    // habilita + altera texto
+    // habilita botão
     nextBtn.disabled = false;
     nextBtn.classList.remove("disabled");
     nextBtn.textContent = "Ir Para Pagamento";
+
     // pega dados do endereço selecionado
     const sel = addresses.find(a => a.id === +selId);
     if (sel) {
       frete = sel.frete;
-      // atualiza na tela
       freteEl.textContent    = `R$ ${fmt(frete)}`;
       finalTotal.textContent = `R$ ${fmt(subtotal - desconto + frete)}`;
-      // salva no localStorage para a próxima página
+      // salva para a próxima página
       localStorage.setItem("bgHouse_frete", frete.toFixed(2));
     }
   });
 
-  // dispara se tiver padrão para já exibir
+  // dispara um evento de change se já existir padrão
   if (hasDefault) form.dispatchEvent(new Event("change"));
 
-  // 7) Clique em Próximo
+  // 7) Próximo → pagamento
   nextBtn.onclick = () => {
     if (addresses.length === 0) {
       return swal("Atenção","Cadastre um endereço primeiro.","warning");
     }
-    const selId = form.addressId.value;
-    if (!selId && !hasDefault) {
-      return swal("Atenção","Selecione um endereço de entrega.","warning");
-    }
-    // redireciona para pagamento (addressId é lido lá, e frete já está em localStorage)
-    window.location.href = `payment.html?addressId=${selId || addresses.find(a=>a.padrao).id}`;
+    const selId = form.addressId.value || addresses.find(a=>a.padrao).id;
+    window.location.href = `payment.html?addressId=${selId}`;
   };
 });
