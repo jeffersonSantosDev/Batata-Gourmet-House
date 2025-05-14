@@ -124,7 +124,7 @@ function showLoader() {
       if (addresses.length >= 2) {
         swal("Atenção","Você já cadastrou 2 endereços. Edite-os na sua conta.","info");
       } else {
-        window.location.href="novo-endereco.html";
+        window.location.href="register-address.html";
       }
     };
   
