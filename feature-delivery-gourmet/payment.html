@@ -21,44 +21,41 @@
     <h1 class="detail-title">Pagamento</h1>
   </header>
 
-  <main class="container">
+  <main class="detail-main">
     <!-- 1) Resumo de Entrega -->
-    <div class="card delivery-card" id="deliveryCard" style="display:none;">
-      <h2>O Pedido Será Entregue À:</h2>
-      <p id="delivName" class="deliv-name"></p>
-      <p id="delivPhone" class="deliv-phone"></p>
-      <p id="delivAddress" class="deliv-address"></p>
-    </div>
+    <section class="address-section" id="deliverySection" style="display:none;">
+      <h3>O Pedido Será Entregue à:</h3>
+      <p id="delivName" class="user-name"></p>
+      <p id="delivPhone" class="user-phone"></p>
+      <p id="delivAddress" class="address-label"></p>
+    </section>
 
     <!-- 2) Resumo do Pedido -->
-    <div class="card summary-card">
-      <h2>Resumo do Pedido</h2>
-      <div class="line"><span>Subtotal</span><span id="subtotal">R$ 0,00</span></div>
-      <div class="line" id="cupomLine"><span>Cupom</span><span id="desconto">- R$ 0,00</span></div>
-      <div class="line" id="freteLine"><span>Frete</span><span id="frete">R$ 0,00</span></div>
-      <hr>
-      <div class="line total"><strong>TOTAL</strong><strong id="total">R$ 0,00</strong></div>
-    </div>
+    <section class="cart-summary">
+      <h3>Resumo do Pedido</h3>
+      <div class="summary-line"><span>Subtotal</span><span id="subtotal">R$ 0,00</span></div>
+      <div class="summary-line" id="cupomLine"><span>Cupom</span><span id="desconto">- R$ 0,00</span></div>
+      <div class="summary-line" id="freteLine"><span>Frete</span><span id="frete">R$ 0,00</span></div>
+      <div class="summary-line total"><span>TOTAL</span><span id="total">R$ 0,00</span></div>
+    </section>
 
-    <!-- 3) Métodos de Pagamento -->
-    <div class="card payment-card">
-      <h2>Forma de Pagamento</h2>
-      <form id="paymentForm">
+    <!-- 3) Formas de Pagamento -->
+    <section class="address-section">
+      <h3>Forma de Pagamento</h3>
+      <form id="paymentForm" class="addresses-form">
         <label><input type="radio" name="method" value="Dinheiro" checked> Dinheiro</label>
         <label><input type="radio" name="method" value="Crédito"> Crédito</label>
         <label><input type="radio" name="method" value="Débito"> Débito</label>
-
-        <div id="changeSection" class="change-section">
-          <label for="changeAmount">Troco para:</label>
-          <input type="text" id="changeAmount" placeholder="0,00" />
+        <div id="changeSection" class="addresses-form" style="display:flex; gap:8px; align-items:center; margin-top:.5rem;">
+          <input type="text" id="changeAmount" placeholder="Troco para 0,00" style="flex:1;"/>
           <label><input type="checkbox" id="noChange"> Não preciso de troco</label>
         </div>
       </form>
-    </div>
+    </section>
   </main>
 
   <footer class="detail-footer">
-    <button id="finishBtn" class="btn finish-btn">Finalizar Pedido</button>
+    <button id="finishBtn" class="next-btn">Finalizar Pedido</button>
   </footer>
 </body>
 </html>
