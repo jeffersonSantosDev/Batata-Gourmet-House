@@ -123,39 +123,48 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 2) Simular e aplicar cupom
     applyBtn.onclick = async () => {
       const codigo = couponInput.value.trim();
-      if (!codigo) return swal("Atenção","Informe o código do cupom.","warning");
+      if (!codigo) {
+        swal("Atenção", "Informe o código do cupom.", "warning");
+        return;
+      }
+    
       loading.classList.remove("hidden");
       try {
-         var teste = JSON.stringify({
-          Codigo:        codigo,
-          UsuarioId:     usuarioId,
-          LojaId:        lojaId,
-          ValorOriginal: subtotal
-        }); 
-        console.log("teste",teste); 
-        // const r = await fetch("/api/Cupom/CalcularDesconto", {
-        //   method: "POST",
-        //   headers: { "Content-Type":"application/json" },
-        //   body: JSON.stringify({
-        //     Codigo:        codigo,
-        //     UsuarioId:     usuarioId,
-        //     LojaId:        lojaId,
-        //     ValorOriginal: subtotal
-        //   })
-        // });
-        // const data = await r.json();
-        // if (!r.ok) throw new Error(data.Erro || "Erro no cupom");
-        // desconto = data.Desconto;
-        // atualizarResumo();
-        // swal("Sucesso","Cupom aplicado: R$ "+ fmt(desconto),"success");
-        // couponInput.disabled = true;
-        // applyBtn.disabled    = true;
+        const resp = await fetch("/api/Cupom/CalcularDesconto", {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            codigo:        codigo,
+            usuarioId:     usuarioId,
+            lojaId:        lojaId,
+            valorOriginal: subtotal
+          })
+        });
+    
+        const data = await resp.json();
+        // data tem: { sucesso: bool, dados?: number, mensagem?: string }
+        if (!data.sucesso) {
+          swal("Erro", data.mensagem, "error");
+          return;
+        }
+    
+        desconto = data.dados;
+        atualizarResumo();
+        swal("Sucesso", `Cupom aplicado: R$ ${fmt(desconto)}`, "success");
+        couponInput.disabled = true;
+        applyBtn.disabled    = true;
+    
       } catch (err) {
-        swal("Erro", err.message || "Não foi possível validar o cupom.","error");
+        console.error("Falha ao chamar cupom:", err);
+        swal("Erro", "Não foi possível validar o cupom.", "error");
       } finally {
         loading.classList.add("hidden");
       }
     };
+    
 
     // 3) Carregar progresso de fidelidade
     try {
