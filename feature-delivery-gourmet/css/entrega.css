@@ -120,4 +120,32 @@
   @media(max-width:480px) {
     .detail-main, .detail-header, .detail-footer { padding:.5rem; }
   }
+  .cart-summary {
+    background: var(--primary);
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px var(--shadow);
+    margin-top: 1rem;
+  }
+  .cart-summary h3 {
+    margin-bottom: .5rem;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .cart-summary .summary-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: .25rem;
+  }
+  .cart-summary .summary-line.total span:first-child {
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .cart-summary .summary-line.total span:last-child {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+  .limit-msg {
+    font-size: .9rem;
+  }
   
