@@ -152,6 +152,7 @@ function showLoader() {
     if (hasDefault) form.dispatchEvent(new Event("change"));
   
     // 7) clique no "Escolha a Entrega!" / "Ir Para Pagamento"
+    
     nextBtn.onclick = () => {
       // se nenhum endereço cadastrado
       if (addresses.length === 0) {
