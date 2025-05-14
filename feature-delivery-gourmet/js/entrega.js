@@ -1,5 +1,3 @@
-// js/entrega.js
-
 function showLoader() {
     document.getElementById("loadingOverlay").classList.remove("hidden");
   }
@@ -7,7 +5,6 @@ function showLoader() {
     document.getElementById("loadingOverlay").classList.add("hidden");
   }
   
-  // Busca endereços
   async function fetchUserAddresses(whatsapp) {
     showLoader();
     try {
@@ -29,14 +26,12 @@ function showLoader() {
     }
   }
   
-  // Busca carrinho
   async function fetchCart(whatsapp) {
     const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
     if (!resp.ok) throw new Error('Erro ao carregar carrinho');
     return await resp.json();
   }
   
-  // Calcula desconto se houver cupom
   async function calcularCupom(codigo, usuarioId, lojaId, subtotal) {
     const resp = await fetch('/api/Cupom/CalcularDesconto', {
       method: 'POST',
@@ -44,7 +39,7 @@ function showLoader() {
       body: JSON.stringify({ codigo, usuarioId, lojaId, valorOriginal: subtotal })
     });
     if (!resp.ok) return { sucesso: false };
-    return await resp.json(); // { sucesso, dados, mensagem }
+    return await resp.json();
   }
   
   document.addEventListener("DOMContentLoaded", async () => {
@@ -58,18 +53,18 @@ function showLoader() {
     const subtotalEl  = document.getElementById("subtotal");
     const cupomLine   = document.getElementById("cupomLine");
     const cupomValue  = document.getElementById("cupomValue");
+    const freteEl     = document.getElementById("frete");
     const finalTotal  = document.getElementById("finalTotal");
     const fmt         = v => v.toFixed(2).replace(".",",");
   
     backBtn.onclick = () => window.location.href = "index.html";
   
-    // Usuário
-    const whatsapp   = localStorage.getItem("bgHouse_whatsapp");
-    const nome       = localStorage.getItem("bgHouse_name") || "Você";
-    const lojaId     = parseInt(localStorage.getItem("bgHouse_lojaId"));
-    const usuarioId  = localStorage.getItem("bgHouse_id")
-                        ? parseInt(atob(localStorage.getItem("bgHouse_id")))
-                        : null;
+    const whatsapp  = localStorage.getItem("bgHouse_whatsapp");
+    const nome      = localStorage.getItem("bgHouse_name") || "Você";
+    const lojaId    = parseInt(localStorage.getItem("bgHouse_lojaId"));
+    const usuarioId = localStorage.getItem("bgHouse_id")
+                       ? parseInt(atob(localStorage.getItem("bgHouse_id")))
+                       : null;
     if (!whatsapp || !usuarioId) {
       await swal("Ops!","Identifique-se.","warning");
       return window.location.href = "identify.html?return=entrega.html";
@@ -77,8 +72,8 @@ function showLoader() {
     userNameEl.textContent  = nome;
     userPhoneEl.textContent = whatsapp.replace(/(\d{2})(\d{5})(\d{4})/, '+$1 $2-$3');
   
-    // 1) Carrega carrinho e mostra valores
-    let cart, subtotal = 0, desconto = 0;
+    // 1) Carrinho
+    let cart, subtotal = 0, desconto = 0, frete = 0;
     try {
       cart = await fetchCart(whatsapp);
       subtotal = cart.items.reduce((s,i)=> s + i.precoUnitario*i.quantidade, 0);
@@ -87,7 +82,7 @@ function showLoader() {
       subtotalEl.textContent = `R$ 0,00`;
     }
   
-    // 2) Se cupom no storage, re-calcula
+    // 2) Cupom
     const savedCupom = localStorage.getItem("bgHouse_appliedCoupon");
     if (savedCupom) {
       const res = await calcularCupom(savedCupom, usuarioId, lojaId, subtotal);
@@ -99,7 +94,6 @@ function showLoader() {
         localStorage.removeItem("bgHouse_appliedCoupon");
       }
     }
-    finalTotal.textContent = `R$ ${fmt(subtotal - desconto)}`;
   
     // 3) Endereços
     const addresses = await fetchUserAddresses(whatsapp);
@@ -111,23 +105,41 @@ function showLoader() {
         <input type="radio" name="addressId" value="${addr.id}"
                ${addr.padrao ? "checked" : ""} />
         <div class="address-label">
-          ${addr.rua}, ${addr.numero}${addr.referencia ? ` (<i>${addr.referencia}</i>)` : ""}
+          <div>${addr.rua}, ${addr.numero}</div>
+          ${addr.referencia ? `<div><i>${addr.referencia}</i></div>` : ""}
           <small>${addr.bairro} - ${addr.cidade}/${addr.uf}</small>
-          <small>Dist: ${addr.distanciaKm.toFixed(1)} km • ${addr.tempoMinutos} min • Frete R$ ${fmt(addr.frete)}</small>
+          <small>${addr.distanciaKm.toFixed(1)} km • ${addr.tempoMinutos} min • Frete R$ ${fmt(addr.frete)}</small>
         </div>`;
       form.appendChild(label);
     });
   
     // 4) Limite de 2 endereços
     if (addresses.length >= 2) {
-      addBtn.disabled = true;
-      limitMsg.style.display = "block";
+      addBtn.classList.add("disabled");
     }
     addBtn.onclick = () => {
-      if (!addBtn.disabled) window.location.href = "novo-endereco.html";
+      if (addresses.length >=2) {
+        swal("Atenção","Você já cadastrou 2 endereços. Edite-os na sua conta.","info");
+      } else {
+        window.location.href = "novo-endereco.html";
+      }
     };
   
-    // 5) Próximo
+    // 5) Seleção de endereço: atualiza frete e total
+    form.addEventListener("change", e => {
+      const sel = addresses.find(a => a.id === parseInt(form.addressId.value));
+      if (sel) {
+        frete = sel.frete;
+        freteEl.textContent   = `R$ ${fmt(frete)}`;
+        finalTotal.textContent = `R$ ${fmt(subtotal - desconto + frete)}`;
+      }
+    });
+    // dispara a mudança inicial no padrão
+    if (form.addressId.value) {
+      form.dispatchEvent(new Event("change"));
+    }
+  
+    // 6) Próximo passo
     nextBtn.onclick = () => {
       const chosen = form.addressId.value;
       if (!chosen) {

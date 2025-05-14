@@ -1,14 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Entrega | Batata Gourmet House</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <!-- ... metas e links iguais ... -->
   <link rel="stylesheet" href="css/entrega.css"/>
-  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-  <script src="js/utils.js"></script>
   <script defer src="js/entrega.js"></script>
 </head>
 <body>
@@ -36,6 +30,9 @@
       <div class="summary-line" id="cupomLine" style="display:none">
         <span>Cupom</span><span id="cupomValue">- R$ 0,00</span>
       </div>
+      <div class="summary-line">
+        <span>Frete</span><span id="frete">R$ 0,00</span>
+      </div>
       <div class="summary-line total">
         <span>TOTAL</span><span id="finalTotal">R$ 0,00</span>
       </div>
@@ -49,9 +46,7 @@
       </div>
       <form id="addressesForm"></form>
       <button id="addAddressBtn" class="btn add-btn">Adicionar Endereço</button>
-      <p id="limitMsg" class="limit-msg" style="display:none; color:#e53e3e; margin-top: .5rem;">
-        Você já cadastrou 2 endereços. Edite-os na sua conta.
-      </p>
+      <p id="limitMsg" class="limit-msg">Você já cadastrou 2 endereços. Edite-os na sua conta.</p>
     </section>
   </main>
 

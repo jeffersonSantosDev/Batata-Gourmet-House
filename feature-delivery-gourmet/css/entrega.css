@@ -148,4 +148,44 @@
   .limit-msg {
     font-size: .9rem;
   }
-  
+  /* ... todo o CSS anterior permanece ... */
+
+/* Mensagem de limite fica sempre oculta até click */
+.limit-msg {
+  display: none;
+  margin-top: .5rem;
+  font-size: .9rem;
+  color: #e53e3e;
+}
+
+/* Botão “Adicionar Endereço” quando em classe .disabled */
+.add-btn.disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.add-btn.disabled:hover {
+  background: none;
+  color: var(--accent);
+}
+
+/* Resumo do carrinho: já incluía, só certifique de ter o bloco */
+.cart-summary {
+  background: var(--primary);
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px var(--shadow);
+  margin-top: 1rem;
+}
+/* torna o endereço mais legível */
+.address-option .address-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.address-option .address-label > div:first-child {
+  font-weight: 600;
+}
+.address-option .address-label small {
+  font-size: .8rem;
+  color: #555;
+}
