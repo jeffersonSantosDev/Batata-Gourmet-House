@@ -149,8 +149,9 @@ body {
   opacity:.5; cursor:default;
 }
 .limit-msg {
+  display:none;
   font-size:.85rem; color:#e53e3e;
-  margin-top:.5rem; text-align:center; display:none;
+  margin-top:.5rem; text-align:center;
 }
 
 /* Footer */
