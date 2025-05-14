@@ -3,602 +3,1577 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batata Gourmet House - Admin</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Batata Gourmet House - Painel Administrativo</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        :root {
+            --primary: #d28b4b;
+            --secondary: #2ecc71;
+            --light: #f8f7f3;
+            --dark: #2c3e50;
+            --gray: #e2e2e2;
+        }
+        
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f8f7f3;
+            background-color: var(--light);
+            color: var(--dark);
         }
+        
         .sidebar {
-            transition: all 0.3s ease;
+            background-color: var(--dark);
+            color: white;
+            min-height: 100vh;
+            transition: all 0.3s;
         }
-        .status-received {
-            background-color: #e2e2e2;
-            color: #2c3e50;
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.75rem 1.5rem;
+            margin-bottom: 0.25rem;
+            border-radius: 0.25rem;
         }
-        .status-preparing {
-            background-color: #f39c12;
+        
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
             color: white;
         }
-        .status-on-the-way {
-            background-color: #d28b4b;
+        
+        .sidebar .nav-link i {
+            margin-right: 0.5rem;
+            width: 1.25rem;
+            text-align: center;
+        }
+        
+        .sidebar-brand {
+            padding: 1.5rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .sidebar-brand i {
+            color: var(--primary);
+        }
+        
+        .card {
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid var(--gray);
+            font-weight: 600;
+        }
+        
+        .kpi-card {
+            text-align: center;
+            padding: 1.5rem;
+        }
+        
+        .kpi-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .kpi-card .label {
+            color: var(--dark);
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+        
+        .kpi-card.secondary .value {
+            color: var(--secondary);
+        }
+        
+        .badge-primary {
+            background-color: var(--primary);
+        }
+        
+        .badge-secondary {
+            background-color: var(--secondary);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: #c07d3d;
+            border-color: #c07d3d;
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary);
             color: white;
         }
-        .status-delivered {
-            background-color: #2ecc71;
-            color: white;
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(210, 139, 75, 0.25);
         }
-        .card-shadow {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        
+        .status-badge {
+            padding: 0.35rem 0.65rem;
+            border-radius: 50rem;
+            font-size: 0.75rem;
+            font-weight: 600;
         }
-        .input-focus:focus {
-            border-color: #d28b4b;
-            box-shadow: 0 0 0 1px #d28b4b;
+        
+        .status-badge.received {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-badge.preparing {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-badge.delivered {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-badge.canceled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .table th {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .table td {
+            vertical-align: middle;
+        }
+        
+        .product-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        
+        .main-content {
+            transition: all 0.3s;
+        }
+        
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .navbar .navbar-toggler {
+            border: none;
+            font-size: 1.25rem;
+        }
+        
+        .navbar .navbar-toggler:focus {
+            box-shadow: none;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dropdown-item:active {
+            background-color: var(--light);
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                position: fixed;
+                z-index: 1000;
+                left: -100%;
+                width: 80%;
+            }
+            
+            .sidebar.show {
+                left: 0;
+            }
+            
+            .main-content {
+                width: 100% !important;
+            }
         }
     </style>
 </head>
-<body class="text-[#2c3e50]">
-    <!-- Login Page -->
-    <div id="login-page" class="min-h-screen flex items-center justify-center bg-[#f8f7f3]">
-        <div class="w-full max-w-md p-8 space-y-8 bg-white rounded-lg card-shadow">
-            <div class="text-center">
-                <img src="imagens/logo_boot.png" alt="Batata Gourmet House" class="mx-auto h-12">
-                <h2 class="mt-6 text-2xl font-bold">Painel Administrativo</h2>
-            </div>
-            <form class="mt-8 space-y-6" id="login-form">
-                <div class="rounded-md shadow-sm space-y-4">
-                    <div>
-                        <label for="email" class="sr-only">E-mail</label>
-                        <input id="email" name="email" type="email" autocomplete="email" required 
-                            class="relative block w-full px-3 py-2 border border-[#e2e2e2] rounded-md input-focus placeholder-gray-400 focus:outline-none"
-                            placeholder="E-mail">
-                    </div>
-                    <div>
-                        <label for="password" class="sr-only">Senha</label>
-                        <input id="password" name="password" type="password" autocomplete="current-password" required 
-                            class="relative block w-full px-3 py-2 border border-[#e2e2e2] rounded-md input-focus placeholder-gray-400 focus:outline-none"
-                            placeholder="Senha">
-                    </div>
-                </div>
-
-                <div>
-                    <button type="submit" 
-                            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#d28b4b] hover:bg-[#b8773a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#d28b4b]">
-                        Entrar
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Admin Dashboard -->
-    <div id="admin-dashboard" class="hidden min-h-screen">
-        <!-- Mobile Header -->
-        <div class="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white shadow-sm p-4 flex justify-between items-center">
-            <button id="mobile-menu-button" class="text-[#2c3e50]">
-                <i class="fas fa-bars text-xl"></i>
-            </button>
-            <img src="imagens/logo_boot.png" alt="Batata Gourmet House" class="h-8">
-            <div class="w-6"></div> <!-- Spacer for alignment -->
-        </div>
-
+<body>
+    <div class="d-flex">
         <!-- Sidebar -->
-        <div id="sidebar" class="sidebar fixed top-0 left-0 bottom-0 z-30 w-64 bg-white shadow-lg transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
-            <div class="flex items-center justify-center h-16 px-4 border-b border-[#e2e2e2]">
-                <img src="imagens/logo_boot.png" alt="Batata Gourmet House" class="h-10">
-            </div>
-            <div class="p-4">
-                <div class="flex items-center p-3 bg-[#f8f7f3] rounded-lg">
-                    <div class="w-10 h-10 rounded-full bg-[#d28b4b] flex items-center justify-center text-white">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm font-medium">Admin</p>
-                        <p class="text-xs text-gray-500">admin@batatagourmet.com</p>
-                    </div>
-                </div>
-            </div>
-            <nav class="mt-2 px-2">
-                <a href="#" class="dashboard-link flex items-center p-3 text-sm font-medium rounded-lg hover:bg-[#f8f7f3] text-[#d28b4b] bg-[#f8f7f3]">
-                    <i class="fas fa-tachometer-alt mr-3"></i>
-                    Dashboard
-                </a>
-                <a href="#" class="orders-link flex items-center p-3 text-sm font-medium rounded-lg hover:bg-[#f8f7f3] text-[#2c3e50]">
-                    <i class="fas fa-shopping-bag mr-3"></i>
-                    Pedidos
-                </a>
-                <a href="#" class="products-link flex items-center p-3 text-sm font-medium rounded-lg hover:bg-[#f8f7f3] text-[#2c3e50]">
-                    <i class="fas fa-utensils mr-3"></i>
-                    Produtos
-                </a>
-                <a href="#" class="categories-link flex items-center p-3 text-sm font-medium rounded-lg hover:bg-[#f8f7f3] text-[#2c3e50]">
-                    <i class="fas fa-tags mr-3"></i>
-                    Categorias
-                </a>
-                <a href="#" class="users-link flex items-center p-3 text-sm font-medium rounded-lg hover:bg-[#f8f7f3] text-[#2c3e50]">
-                    <i class="fas fa-users mr-3"></i>
-                    Clientes
-                </a>
-                <a href="#" class="addresses-link flex items-center p-3 text-sm font-medium rounded-lg hover:bg-[#f8f7f3] text-[#2c3e50]">
-                    <i class="fas fa-map-marker-alt mr-3"></i>
-                    Endereços
-                </a>
-                <a href="#" class="reports-link flex items-center p-3 text-sm font-medium rounded-lg hover:bg-[#f8f7f3] text-[#2c3e50]">
-                    <i class="fas fa-chart-bar mr-3"></i>
-                    Relatórios
-                </a>
-                <a href="#" class="settings-link flex items-center p-3 text-sm font-medium rounded-lg hover:bg-[#f8f7f3] text-[#2c3e50]">
-                    <i class="fas fa-cog mr-3"></i>
-                    Configurações
-                </a>
-            </nav>
-            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-[#e2e2e2]">
-                <button id="logout-button" class="w-full flex items-center justify-center p-2 text-sm font-medium rounded-lg hover:bg-[#f8f7f3] text-[#2c3e50]">
-                    <i class="fas fa-sign-out-alt mr-2"></i>
-                    Sair
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <span><i class="fas fa-utensils me-2"></i> Batata Gourmet</span>
+                <button class="btn btn-sm d-lg-none" id="sidebarClose">
+                    <i class="fas fa-times"></i>
                 </button>
+            </div>
+            <hr class="my-0 bg-secondary">
+            <div class="sidebar-nav px-3 py-4">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#dashboard" data-bs-toggle="tab">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#orders" data-bs-toggle="tab">
+                            <i class="fas fa-clipboard-list"></i> Pedidos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#products" data-bs-toggle="tab">
+                            <i class="fas fa-hamburger"></i> Produtos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#categories" data-bs-toggle="tab">
+                            <i class="fas fa-tags"></i> Categorias
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#users" data-bs-toggle="tab">
+                            <i class="fas fa-users"></i> Usuários
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#addresses" data-bs-toggle="tab">
+                            <i class="fas fa-map-marker-alt"></i> Endereços
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#reports" data-bs-toggle="tab">
+                            <i class="fas fa-chart-bar"></i> Relatórios
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#settings" data-bs-toggle="tab">
+                            <i class="fas fa-cog"></i> Configurações
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
 
         <!-- Main Content -->
-        <div class="lg:ml-64">
-            <!-- Top Navigation -->
-            <header class="hidden lg:block bg-white shadow-sm">
-                <div class="flex items-center justify-between px-6 py-4">
-                    <h1 class="text-xl font-bold">Dashboard</h1>
-                    <div class="flex items-center space-x-4">
-                        <div class="relative">
-                            <button class="p-2 rounded-full hover:bg-[#f8f7f3]">
-                                <i class="fas fa-bell text-[#2c3e50]"></i>
-                                <span class="absolute top-0 right-0 w-2 h-2 bg-[#2ecc71] rounded-full"></span>
-                            </button>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 rounded-full bg-[#d28b4b] flex items-center justify-center text-white">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <span class="ml-2 text-sm font-medium">Admin</span>
+        <div class="main-content w-100" style="width: 80%;">
+            <!-- Top Navbar -->
+            <nav class="navbar navbar-expand-lg">
+                <div class="container-fluid">
+                    <button class="btn me-2 d-lg-none" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="d-flex align-items-center ms-auto">
+                        <div class="dropdown">
+                            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Admin" class="user-avatar me-2">
+                                <span class="d-none d-sm-inline">Admin</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUser">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Perfil</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Configurações</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i> Sair</a></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
-            </header>
+            </nav>
 
-            <!-- Dashboard Content -->
-            <main class="pt-16 lg:pt-0 px-4 pb-6">
-                <!-- Dashboard Page -->
-                <div id="dashboard-page" class="space-y-6">
+            <!-- Page Content -->
+            <div class="container-fluid px-4 py-3 tab-content">
+                <!-- Dashboard Tab -->
+                <div class="tab-pane fade show active" id="dashboard">
+                    <h2 class="mb-4"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</h2>
+                    
                     <!-- KPI Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="bg-white p-6 rounded-lg card-shadow">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm font-medium text-gray-500">Pedidos Hoje</p>
-                                    <p class="text-2xl font-bold mt-1">24</p>
-                                </div>
-                                <div class="p-3 rounded-full bg-[#f8f7f3] text-[#d28b4b]">
-                                    <i class="fas fa-shopping-bag text-xl"></i>
-                                </div>
+                    <div class="row">
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card kpi-card">
+                                <div class="value">42</div>
+                                <div class="label">Pedidos Hoje</div>
+                                <small class="text-muted">+12% vs ontem</small>
                             </div>
-                            <p class="text-xs text-[#2ecc71] mt-2">+12% em relação a ontem</p>
                         </div>
-                        <div class="bg-white p-6 rounded-lg card-shadow">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm font-medium text-gray-500">Receita Total</p>
-                                    <p class="text-2xl font-bold mt-1">R$ 1.245,80</p>
-                                </div>
-                                <div class="p-3 rounded-full bg-[#f8f7f3] text-[#2ecc71]">
-                                    <i class="fas fa-dollar-sign text-xl"></i>
-                                </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card kpi-card secondary">
+                                <div class="value">R$ 1.284,50</div>
+                                <div class="label">Receita Hoje</div>
+                                <small class="text-muted">+8% vs ontem</small>
                             </div>
-                            <p class="text-xs text-[#2ecc71] mt-2">+8% em relação a ontem</p>
                         </div>
-                        <div class="bg-white p-6 rounded-lg card-shadow">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm font-medium text-gray-500">Pedidos em Aberto</p>
-                                    <p class="text-2xl font-bold mt-1">8</p>
-                                </div>
-                                <div class="p-3 rounded-full bg-[#f8f7f3] text-[#f39c12]">
-                                    <i class="fas fa-clock text-xl"></i>
-                                </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card kpi-card">
+                                <div class="value">18</div>
+                                <div class="label">Em Preparo</div>
+                                <small class="text-muted">5 novos</small>
                             </div>
-                            <p class="text-xs text-gray-500 mt-2">2 em preparo, 6 recebidos</p>
                         </div>
-                        <div class="bg-white p-6 rounded-lg card-shadow">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm font-medium text-gray-500">Clientes Cadastrados</p>
-                                    <p class="text-2xl font-bold mt-1">156</p>
-                                </div>
-                                <div class="p-3 rounded-full bg-[#f8f7f3] text-[#2c3e50]">
-                                    <i class="fas fa-users text-xl"></i>
-                                </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card kpi-card">
+                                <div class="value">156</div>
+                                <div class="label">Usuários</div>
+                                <small class="text-muted">+3 hoje</small>
                             </div>
-                            <p class="text-xs text-[#2ecc71] mt-2">+5 novos esta semana</p>
                         </div>
                     </div>
-
-                    <!-- Charts -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white p-6 rounded-lg card-shadow">
-                            <h3 class="font-bold mb-4">Vendas por Categoria (7 dias)</h3>
-                            <canvas id="categoryChart" height="250"></canvas>
+                    
+                    <!-- Charts Row -->
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    Vendas por Categoria (Últimos 7 dias)
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="categoryChart" height="250"></canvas>
+                                </div>
+                            </div>
                         </div>
-                        <div class="bg-white p-6 rounded-lg card-shadow">
-                            <h3 class="font-bold mb-4">Evolução de Receitas (30 dias)</h3>
-                            <canvas id="revenueChart" height="250"></canvas>
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    Evolução de Receita Diária (Último mês)
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="revenueChart" height="250"></canvas>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
+                    
                     <!-- Recent Orders -->
-                    <div class="bg-white rounded-lg card-shadow overflow-hidden">
-                        <div class="p-6 border-b border-[#e2e2e2]">
-                            <h3 class="font-bold">Pedidos Recentes</h3>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-[#e2e2e2]">
-                                <thead class="bg-[#f8f7f3]">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Pedido</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Cliente</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Status</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Total</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-[#e2e2e2]">
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium">#BGH-2023-0015</div>
-                                            <div class="text-xs text-gray-500">10/06/2023 19:30</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium">João Silva</div>
-                                            <div class="text-xs text-gray-500">(11) 98765-4321</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-2 py-1 text-xs rounded-full status-delivered">Entregue</span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">R$ 42,90</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <button class="text-[#d28b4b] hover:text-[#b8773a] mr-2">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button class="text-gray-500 hover:text-gray-700">
-                                                <i class="fas fa-print"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium">#BGH-2023-0014</div>
-                                            <div class="text-xs text-gray-500">10/06/2023 18:45</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium">Maria Souza</div>
-                                            <div class="text-xs text-gray-500">(11) 91234-5678</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-2 py-1 text-xs rounded-full status-on-the-way">Saiu para entrega</span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">R$ 38,50</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <button class="text-[#d28b4b] hover:text-[#b8773a] mr-2">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button class="text-gray-500 hover:text-gray-700">
-                                                <i class="fas fa-print"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium">#BGH-2023-0013</div>
-                                            <div class="text-xs text-gray-500">10/06/2023 17:20</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium">Carlos Oliveira</div>
-                                            <div class="text-xs text-gray-500">(11) 99876-5432</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-2 py-1 text-xs rounded-full status-preparing">Em preparo</span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">R$ 55,80</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <button class="text-[#d28b4b] hover:text-[#b8773a] mr-2">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button class="text-gray-500 hover:text-gray-700">
-                                                <i class="fas fa-print"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium">#BGH-2023-0012</div>
-                                            <div class="text-xs text-gray-500">10/06/2023 16:10</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium">Ana Santos</div>
-                                            <div class="text-xs text-gray-500">(11) 98765-1234</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-2 py-1 text-xs rounded-full status-received">Recebido</span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">R$ 29,90</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <button class="text-[#d28b4b] hover:text-[#b8773a] mr-2">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button class="text-gray-500 hover:text-gray-700">
-                                                <i class="fas fa-print"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium">#BGH-2023-0011</div>
-                                            <div class="text-xs text-gray-500">10/06/2023 15:30</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium">Pedro Costa</div>
-                                            <div class="text-xs text-gray-500">(11) 91234-8765</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-2 py-1 text-xs rounded-full status-delivered">Entregue</span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">R$ 47,50</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <button class="text-[#d28b4b] hover:text-[#b8773a] mr-2">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button class="text-gray-500 hover:text-gray-700">
-                                                <i class="fas fa-print"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="px-6 py-3 bg-[#f8f7f3] text-right">
-                            <button class="text-sm font-medium text-[#d28b4b] hover:text-[#b8773a]">
-                                Ver todos os pedidos
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Orders Page (Hidden by default) -->
-                <div id="orders-page" class="hidden">
-                    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-                        <h2 class="text-xl font-bold mb-4 md:mb-0">Gestão de Pedidos</h2>
-                        <div class="flex space-x-2">
-                            <div class="relative">
-                                <input type="text" placeholder="Buscar pedido..." class="pl-10 pr-4 py-2 border border-[#e2e2e2] rounded-lg input-focus focus:outline-none">
-                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                            </div>
-                            <select class="border border-[#e2e2e2] rounded-lg px-4 py-2 input-focus focus:outline-none">
-                                <option>Todos status</option>
-                                <option>Recebido</option>
-                                <option>Em preparo</option>
-                                <option>Saiu para entrega</option>
-                                <option>Entregue</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-lg card-shadow overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-[#e2e2e2]">
-                                <thead class="bg-[#f8f7f3]">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Pedido</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Cliente</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Endereço</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Data/Hora</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Status</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Total</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-[#e2e2e2]">
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium text-[#d28b4b]">#BGH-2023-0015</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium">João Silva</div>
-                                            <div class="text-xs text-gray-500">(11) 98765-4321</div>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <div class="text-sm">Vila Mariana, SP</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm">10/06/2023</div>
-                                            <div class="text-xs text-gray-500">19:30</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-2 py-1 text-xs rounded-full status-delivered">Entregue</span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">R$ 42,90</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <button class="text-[#d28b4b] hover:text-[#b8773a] mr-2">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button class="text-gray-500 hover:text-gray-700">
-                                                <i class="fas fa-print"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <!-- More rows would be here in a real application -->
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="px-6 py-3 bg-[#f8f7f3] flex items-center justify-between">
-                            <div class="text-sm text-gray-500">
-                                Mostrando 1 a 10 de 25 pedidos
-                            </div>
-                            <div class="flex space-x-1">
-                                <button class="px-3 py-1 border border-[#e2e2e2] rounded bg-white text-sm">Anterior</button>
-                                <button class="px-3 py-1 border border-[#e2e2e2] rounded bg-[#d28b4b] text-white text-sm">1</button>
-                                <button class="px-3 py-1 border border-[#e2e2e2] rounded bg-white text-sm">2</button>
-                                <button class="px-3 py-1 border border-[#e2e2e2] rounded bg-white text-sm">3</button>
-                                <button class="px-3 py-1 border border-[#e2e2e2] rounded bg-white text-sm">Próximo</button>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <span>Pedidos Recentes</span>
+                                    <a href="#orders" class="btn btn-sm btn-outline-primary" data-bs-toggle="tab">Ver Todos</a>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Cliente</th>
+                                                    <th>Status</th>
+                                                    <th>Total</th>
+                                                    <th>Data/Hora</th>
+                                                    <th>Ações</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>#1254</td>
+                                                    <td>João Silva</td>
+                                                    <td><span class="status-badge preparing">Em Preparo</span></td>
+                                                    <td>R$ 42,90</td>
+                                                    <td>01/05/2023 12:34</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>#1253</td>
+                                                    <td>Maria Souza</td>
+                                                    <td><span class="status-badge delivered">Entregue</span></td>
+                                                    <td>R$ 38,50</td>
+                                                    <td>01/05/2023 11:22</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>#1252</td>
+                                                    <td>Carlos Oliveira</td>
+                                                    <td><span class="status-badge received">Recebido</span></td>
+                                                    <td>R$ 55,80</td>
+                                                    <td>01/05/2023 10:15</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>#1251</td>
+                                                    <td>Ana Pereira</td>
+                                                    <td><span class="status-badge preparing">Em Preparo</span></td>
+                                                    <td>R$ 29,90</td>
+                                                    <td>30/04/2023 21:45</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>#1250</td>
+                                                    <td>Pedro Costa</td>
+                                                    <td><span class="status-badge canceled">Cancelado</span></td>
+                                                    <td>R$ 47,50</td>
+                                                    <td>30/04/2023 20:30</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Products Page (Hidden by default) -->
-                <div id="products-page" class="hidden">
-                    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-                        <h2 class="text-xl font-bold mb-4 md:mb-0">Gestão de Produtos</h2>
-                        <div class="flex space-x-2">
-                            <div class="relative">
-                                <input type="text" placeholder="Buscar produto..." class="pl-10 pr-4 py-2 border border-[#e2e2e2] rounded-lg input-focus focus:outline-none">
-                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                            </div>
-                            <button class="bg-[#d28b4b] hover:bg-[#b8773a] text-white px-4 py-2 rounded-lg flex items-center">
-                                <i class="fas fa-plus mr-2"></i>
-                                Novo Produto
+                
+                <!-- Orders Tab -->
+                <div class="tab-pane fade" id="orders">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2><i class="fas fa-clipboard-list me-2"></i> Pedidos</h2>
+                        <div>
+                            <button class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i> Novo Pedido
                             </button>
                         </div>
                     </div>
-
-                    <div class="bg-white rounded-lg card-shadow overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-[#e2e2e2]">
-                                <thead class="bg-[#f8f7f3]">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Imagem</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Nome</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Categoria</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Preço</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Status</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-[#2c3e50] uppercase tracking-wider">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-[#e2e2e2]">
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="w-10 h-10 rounded-md bg-gray-200 overflow-hidden">
-                                                <img src="https://via.placeholder.com/100x100.png?text=Batata" alt="Produto" class="w-full h-full object-cover">
+                    
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <span class="me-3">Filtrar por:</span>
+                                <select class="form-select form-select-sm me-2" style="width: 150px;">
+                                    <option selected>Todos Status</option>
+                                    <option>Recebido</option>
+                                    <option>Em Preparo</option>
+                                    <option>Entregue</option>
+                                    <option>Cancelado</option>
+                                </select>
+                                <input type="date" class="form-control form-control-sm me-2" style="width: 150px;">
+                                <button class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-filter me-1"></i> Aplicar
+                                </button>
+                            </div>
+                            <div class="input-group" style="width: 250px;">
+                                <input type="text" class="form-control form-control-sm" placeholder="Buscar pedido...">
+                                <button class="btn btn-sm btn-outline-secondary" type="button">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Cliente</th>
+                                            <th>WhatsApp</th>
+                                            <th>Endereço</th>
+                                            <th>Data/Hora</th>
+                                            <th>Status</th>
+                                            <th>Total</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>#1254</td>
+                                            <td>João Silva</td>
+                                            <td>(11) 98765-4321</td>
+                                            <td>Rua A, 123 - Centro</td>
+                                            <td>01/05/2023 12:34</td>
+                                            <td><span class="status-badge preparing">Em Preparo</span></td>
+                                            <td>R$ 42,90</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Ver">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-secondary me-1" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" title="Cancelar">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#1253</td>
+                                            <td>Maria Souza</td>
+                                            <td>(11) 98765-1234</td>
+                                            <td>Av. B, 456 - Jardins</td>
+                                            <td>01/05/2023 11:22</td>
+                                            <td><span class="status-badge delivered">Entregue</span></td>
+                                            <td>R$ 38,50</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Ver">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-secondary me-1" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" title="Cancelar">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#1252</td>
+                                            <td>Carlos Oliveira</td>
+                                            <td>(11) 98765-5678</td>
+                                            <td>Rua C, 789 - Vila Nova</td>
+                                            <td>01/05/2023 10:15</td>
+                                            <td><span class="status-badge received">Recebido</span></td>
+                                            <td>R$ 55,80</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Ver">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-secondary me-1" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" title="Cancelar">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#1251</td>
+                                            <td>Ana Pereira</td>
+                                            <td>(11) 98765-9012</td>
+                                            <td>Rua D, 321 - Centro</td>
+                                            <td>30/04/2023 21:45</td>
+                                            <td><span class="status-badge preparing">Em Preparo</span></td>
+                                            <td>R$ 29,90</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Ver">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-secondary me-1" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" title="Cancelar">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#1250</td>
+                                            <td>Pedro Costa</td>
+                                            <td>(11) 98765-3456</td>
+                                            <td>Av. E, 654 - Jardins</td>
+                                            <td>30/04/2023 20:30</td>
+                                            <td><span class="status-badge canceled">Cancelado</span></td>
+                                            <td>R$ 47,50</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Ver">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-secondary me-1" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" title="Cancelar">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <nav aria-label="Page navigation" class="mt-3">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                                    </li>
+                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">Próxima</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Products Tab -->
+                <div class="tab-pane fade" id="products">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2><i class="fas fa-hamburger me-2"></i> Produtos</h2>
+                        <div>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                                <i class="fas fa-plus me-1"></i> Novo Produto
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div class="input-group" style="width: 300px;">
+                                <input type="text" class="form-control" placeholder="Buscar produto...">
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <div>
+                                <select class="form-select form-select-sm me-2" style="width: 150px;">
+                                    <option selected>Todas Categorias</option>
+                                    <option>Clássicas</option>
+                                    <option>Especiais</option>
+                                    <option>Doces</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Imagem</th>
+                                            <th>Nome</th>
+                                            <th>Categoria</th>
+                                            <th>Preço</th>
+                                            <th>Estoque</th>
+                                            <th>Status</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <img src="https://via.placeholder.com/50" class="product-img" alt="Bacon & Cheddar">
+                                            </td>
+                                            <td>Bacon & Cheddar</td>
+                                            <td>Clássicas</td>
+                                            <td>R$ 32,50</td>
+                                            <td>15</td>
+                                            <td><span class="badge bg-success">Ativo</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <img src="https://via.placeholder.com/50" class="product-img" alt="Frango Catupiry">
+                                            </td>
+                                            <td>Frango Catupiry</td>
+                                            <td>Clássicas</td>
+                                            <td>R$ 28,90</td>
+                                            <td>20</td>
+                                            <td><span class="badge bg-success">Ativo</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <img src="https://via.placeholder.com/50" class="product-img" alt="Costela BBQ">
+                                            </td>
+                                            <td>Costela BBQ</td>
+                                            <td>Especiais</td>
+                                            <td>R$ 36,90</td>
+                                            <td>8</td>
+                                            <td><span class="badge bg-success">Ativo</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <img src="https://via.placeholder.com/50" class="product-img" alt="Nutella com Morango">
+                                            </td>
+                                            <td>Nutella com Morango</td>
+                                            <td>Doces</td>
+                                            <td>R$ 29,90</td>
+                                            <td>12</td>
+                                            <td><span class="badge bg-success">Ativo</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <img src="https://via.placeholder.com/50" class="product-img" alt="Calabresa">
+                                            </td>
+                                            <td>Calabresa</td>
+                                            <td>Clássicas</td>
+                                            <td>R$ 26,50</td>
+                                            <td>0</td>
+                                            <td><span class="badge bg-danger">Indisponível</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <nav aria-label="Page navigation" class="mt-3">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                                    </li>
+                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">Próxima</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Categories Tab -->
+                <div class="tab-pane fade" id="categories">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2><i class="fas fa-tags me-2"></i> Categorias</h2>
+                        <div>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                                <i class="fas fa-plus me-1"></i> Nova Categoria
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Nome</th>
+                                            <th>Descrição</th>
+                                            <th>Produtos</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>Clássicas</td>
+                                            <td>As batatas mais tradicionais</td>
+                                            <td>8</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td>Especiais</td>
+                                            <td>Combinações premium</td>
+                                            <td>5</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+                                            <td>Doces</td>
+                                            <td>Para quem prefere sabores adocicados</td>
+                                            <td>3</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Users Tab -->
+                <div class="tab-pane fade" id="users">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2><i class="fas fa-users me-2"></i> Usuários</h2>
+                        <div>
+                            <button class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i> Novo Usuário
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="input-group" style="width: 300px;">
+                                <input type="text" class="form-control" placeholder="Buscar usuário...">
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Nome</th>
+                                            <th>WhatsApp</th>
+                                            <th>Cadastro</th>
+                                            <th>Endereço</th>
+                                            <th>Último Pedido</th>
+                                            <th>Status</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>5</td>
+                                            <td>Maria Souza</td>
+                                            <td>(11) 98765-1234</td>
+                                            <td>20/04/2023</td>
+                                            <td>Av. B, 456 - Jardins</td>
+                                            <td>01/05/2023</td>
+                                            <td><span class="badge bg-success">Ativo</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Ver">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" title="Bloquear">
+                                                    <i class="fas fa-ban"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>4</td>
+                                            <td>João Silva</td>
+                                            <td>(11) 98765-4321</td>
+                                            <td>15/04/2023</td>
+                                            <td>Rua A, 123 - Centro</td>
+                                            <td>01/05/2023</td>
+                                            <td><span class="badge bg-success">Ativo</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Ver">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" title="Bloquear">
+                                                    <i class="fas fa-ban"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+                                            <td>Carlos Oliveira</td>
+                                            <td>(11) 98765-5678</td>
+                                            <td>10/04/2023</td>
+                                            <td>Rua C, 789 - Vila Nova</td>
+                                            <td>01/05/2023</td>
+                                            <td><span class="badge bg-success">Ativo</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Ver">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" title="Bloquear">
+                                                    <i class="fas fa-ban"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td>Ana Pereira</td>
+                                            <td>(11) 98765-9012</td>
+                                            <td>05/04/2023</td>
+                                            <td>Rua D, 321 - Centro</td>
+                                            <td>30/04/2023</td>
+                                            <td><span class="badge bg-success">Ativo</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Ver">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" title="Bloquear">
+                                                    <i class="fas fa-ban"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>Pedro Costa</td>
+                                            <td>(11) 98765-3456</td>
+                                            <td>01/04/2023</td>
+                                            <td>Av. E, 654 - Jardins</td>
+                                            <td>30/04/2023</td>
+                                            <td><span class="badge bg-danger">Bloqueado</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Ver">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-success" title="Desbloquear">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <nav aria-label="Page navigation" class="mt-3">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                                    </li>
+                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">Próxima</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Addresses Tab -->
+                <div class="tab-pane fade" id="addresses">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2><i class="fas fa-map-marker-alt me-2"></i> Endereços</h2>
+                        <div>
+                            <button class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i> Novo Endereço
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="input-group" style="width: 300px;">
+                                <input type="text" class="form-control" placeholder="Buscar endereço...">
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Usuário</th>
+                                            <th>UF</th>
+                                            <th>Cidade</th>
+                                            <th>Bairro</th>
+                                            <th>Número</th>
+                                            <th>Distância (km)</th>
+                                            <th>Tempo (min)</th>
+                                            <th>Frete (R$)</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>7</td>
+                                            <td>Maria Souza</td>
+                                            <td>SP</td>
+                                            <td>São Paulo</td>
+                                            <td>Jardins</td>
+                                            <td>456</td>
+                                            <td>3.4</td>
+                                            <td>15</td>
+                                            <td>5.00</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger me-1" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-success" title="Padrão">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>6</td>
+                                            <td>João Silva</td>
+                                            <td>SP</td>
+                                            <td>São Paulo</td>
+                                            <td>Centro</td>
+                                            <td>123</td>
+                                            <td>2.1</td>
+                                            <td>10</td>
+                                            <td>4.50</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger me-1" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-success" title="Padrão">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>5</td>
+                                            <td>Carlos Oliveira</td>
+                                            <td>SP</td>
+                                            <td>São Paulo</td>
+                                            <td>Vila Nova</td>
+                                            <td>789</td>
+                                            <td>4.2</td>
+                                            <td>18</td>
+                                            <td>6.00</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger me-1" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-success" title="Padrão">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>4</td>
+                                            <td>Ana Pereira</td>
+                                            <td>SP</td>
+                                            <td>São Paulo</td>
+                                            <td>Centro</td>
+                                            <td>321</td>
+                                            <td>1.8</td>
+                                            <td>8</td>
+                                            <td>4.00</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger me-1" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-success" title="Padrão">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+                                            <td>Pedro Costa</td>
+                                            <td>SP</td>
+                                            <td>São Paulo</td>
+                                            <td>Jardins</td>
+                                            <td>654</td>
+                                            <td>3.8</td>
+                                            <td>16</td>
+                                            <td>5.50</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger me-1" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-success" title="Padrão">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <nav aria-label="Page navigation" class="mt-3">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                                    </li>
+                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">Próxima</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Reports Tab -->
+                <div class="tab-pane fade" id="reports">
+                    <h2 class="mb-4"><i class="fas fa-chart-bar me-2"></i> Relatórios</h2>
+                    
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    Filtros
+                                </div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="mb-3">
+                                            <label class="form-label">Tipo de Relatório</label>
+                                            <select class="form-select">
+                                                <option selected>Vendas</option>
+                                                <option>Clientes</option>
+                                                <option>Frete</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Período</label>
+                                            <div class="row g-2">
+                                                <div class="col">
+                                                    <input type="date" class="form-control" placeholder="De">
+                                                </div>
+                                                <div class="col">
+                                                    <input type="date" class="form-control" placeholder="Até">
+                                                </div>
                                             </div>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <div class="text-sm font-medium">Batata Recheada Frango Catupiry</div>
-                                            <div class="text-xs text-gray-500 truncate max-w-xs">Batata assada recheada com frango desfiado e catupiry</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm">Salgadas</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">R$ 22,90</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-2 py-1 text-xs rounded-full bg-[#2ecc71] text-white">Ativo</span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <button class="text-[#d28b4b] hover:text-[#b8773a] mr-2">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="text-red-500 hover:text-red-700">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Categoria</label>
+                                            <select class="form-select">
+                                                <option selected>Todas</option>
+                                                <option>Clássicas</option>
+                                                <option>Especiais</option>
+                                                <option>Doces</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Status</label>
+                                            <select class="form-select">
+                                                <option selected>Todos</option>
+                                                <option>Recebido</option>
+                                                <option>Em Preparo</option>
+                                                <option>Entregue</option>
+                                                <option>Cancelado</option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <i class="fas fa-filter me-1"></i> Aplicar Filtros
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <span>Relatório de Vendas</span>
+                                    <button class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-download me-1"></i> Exportar CSV
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="salesReportChart" height="300"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-header">
+                                    Top Clientes
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Cliente</th>
+                                                    <th>Pedidos</th>
+                                                    <th>Total Gasto</th>
+                                                    <th>Último Pedido</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Maria Souza</td>
+                                                    <td>12</td>
+                                                    <td>R$ 486,80</td>
+                                                    <td>01/05/2023</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>João Silva</td>
+                                                    <td>9</td>
+                                                    <td>R$ 342,50</td>
+                                                    <td>01/05/2023</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Carlos Oliveira</td>
+                                                    <td>7</td>
+                                                    <td>R$ 295,60</td>
+                                                    <td>01/05/2023</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Ana Pereira</td>
+                                                    <td>5</td>
+                                                    <td>R$ 189,90</td>
+                                                    <td>30/04/2023</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Pedro Costa</td>
+                                                    <td>4</td>
+                                                    <td>R$ 156,00</td>
+                                                    <td>30/04/2023</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Settings Tab -->
+                <div class="tab-pane fade" id="settings">
+                    <h2 class="mb-4"><i class="fas fa-cog me-2"></i> Configurações</h2>
+                    
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    Perfil do Administrador
+                                </div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="mb-3">
+                                            <label class="form-label">Nome</label>
+                                            <input type="text" class="form-control" value="Admin">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">E-mail</label>
+                                            <input type="email" class="form-control" value="admin@batatagourmet.com">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Senha</label>
+                                            <input type="password" class="form-control" placeholder="Digite a nova senha">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Confirmar Senha</label>
+                                            <input type="password" class="form-control" placeholder="Confirme a nova senha">
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-1"></i> Salvar Alterações
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    Configurações do Restaurante
+                                </div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="mb-3">
+                                            <label class="form-label">Nome do Restaurante</label>
+                                            <input type="text" class="form-control" value="Batata Gourmet House">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Horário de Funcionamento</label>
+                                            <div class="row g-2">
+                                                <div class="col">
+                                                    <input type="time" class="form-control" value="18:00">
+                                                </div>
+                                                <div class="col-auto">
+                                                    até
+                                                </div>
+                                                <div class="col">
+                                                    <input type="time" class="form-control" value="23:00">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Taxa Extra Fixa (R$)</label>
+                                            <input type="number" class="form-control" value="2.50" step="0.10">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Logotipo</label>
+                                            <input type="file" class="form-control">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Cor Primária</label>
+                                            <input type="color" class="form-control form-control-color" value="#d28b4b">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Cor Secundária</label>
+                                            <input type="color" class="form-control form-control-color" value="#2ecc71">
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-1"></i> Salvar Configurações
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Product Modal -->
+    <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addProductModalLabel">Adicionar Novo Produto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Nome do Produto</label>
+                                    <input type="text" class="form-control" placeholder="Ex: Bacon & Cheddar">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Categoria</label>
+                                    <select class="form-select">
+                                        <option selected>Selecione uma categoria</option>
+                                        <option>Clássicas</option>
+                                        <option>Especiais</option>
+                                        <option>Doces</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Preço (R$)</label>
+                                    <input type="number" class="form-control" placeholder="Ex: 32,50" step="0.01">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Imagem do Produto</label>
+                                    <input type="file" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Estoque Inicial</label>
+                                    <input type="number" class="form-control" placeholder="Ex: 15">
+                                </div>
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="activeProduct" checked>
+                                    <label class="form-check-label" for="activeProduct">Produto Ativo</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descrição</label>
+                            <textarea class="form-control" rows="3" placeholder="Descreva o produto..."></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Extras/Adicionais</label>
+                            <div id="extrasContainer">
+                                <div class="extra-item mb-3 p-3 border rounded">
+                                    <div class="row g-2">
+                                        <div class="col-md-4">
+                                            <input type="text" class="form-control" placeholder="Nome do extra">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="number" class="form-control" placeholder="Preço" step="0.01">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select class="form-select">
+                                                <option value="optional">Opcional</option>
+                                                <option value="required">Obrigatório</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="button" class="btn btn-outline-danger w-100">
                                                 <i class="fas fa-trash"></i>
                                             </button>
-                                        </td>
-                                    </tr>
-                                    <!-- More rows would be here in a real application -->
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="px-6 py-3 bg-[#f8f7f3] flex items-center justify-between">
-                            <div class="text-sm text-gray-500">
-                                Mostrando 1 a 10 de 15 produtos
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flex space-x-1">
-                                <button class="px-3 py-1 border border-[#e2e2e2] rounded bg-white text-sm">Anterior</button>
-                                <button class="px-3 py-1 border border-[#e2e2e2] rounded bg-[#d28b4b] text-white text-sm">1</button>
-                                <button class="px-3 py-1 border border-[#e2e2e2] rounded bg-white text-sm">2</button>
-                                <button class="px-3 py-1 border border-[#e2e2e2] rounded bg-white text-sm">Próximo</button>
-                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="addExtra">
+                                <i class="fas fa-plus me-1"></i> Adicionar Extra
+                            </button>
                         </div>
-                    </div>
+                    </form>
                 </div>
-
-                <!-- Other pages would be here (Categories, Users, Addresses, Reports, Settings) -->
-                <!-- For brevity, they're not included in this example but would follow the same pattern -->
-            </main>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary">Salvar Produto</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Category Modal -->
+    <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCategoryModalLabel">Adicionar Nova Categoria</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Nome da Categoria</label>
+                            <input type="text" class="form-control" placeholder="Ex: Especiais">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descrição</label>
+                            <textarea class="form-control" rows="3" placeholder="Descreva a categoria..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary">Salvar Categoria</button>
+                </div>
+            </div>
         </div>
     </div>
 
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script>
-        // Toggle mobile menu
-        document.getElementById('mobile-menu-button').addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        // Sidebar toggle for mobile
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.add('show');
         });
-
-        // Simulate login
-        document.getElementById('login-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            document.getElementById('login-page').classList.add('hidden');
-            document.getElementById('admin-dashboard').classList.remove('hidden');
-            initializeCharts();
+        
+        document.getElementById('sidebarClose').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.remove('show');
         });
-
-        // Logout
-        document.getElementById('logout-button').addEventListener('click', function() {
-            document.getElementById('login-page').classList.remove('hidden');
-            document.getElementById('admin-dashboard').classList.add('hidden');
-        });
-
-        // Navigation links
-        const navLinks = document.querySelectorAll('nav a');
-        navLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                // Remove active class from all links
-                navLinks.forEach(l => l.classList.remove('text-[#d28b4b]', 'bg-[#f8f7f3]'));
-                
-                // Add active class to clicked link
-                this.classList.add('text-[#d28b4b]', 'bg-[#f8f7f3]');
-                
-                // Hide all pages
-                document.querySelectorAll('main > div').forEach(page => {
-                    page.classList.add('hidden');
-                });
-                
-                // Show the corresponding page
-                const pageId = this.className.split(' ')[0].replace('-link', '-page');
-                document.getElementById(pageId).classList.remove('hidden');
+        
+        // Add extra field in product form
+        document.getElementById('addExtra').addEventListener('click', function() {
+            const container = document.getElementById('extrasContainer');
+            const newExtra = document.createElement('div');
+            newExtra.className = 'extra-item mb-3 p-3 border rounded';
+            newExtra.innerHTML = `
+                <div class="row g-2">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" placeholder="Nome do extra">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" class="form-control" placeholder="Preço" step="0.01">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select">
+                            <option value="optional">Opcional</option>
+                            <option value="required">Obrigatório</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-outline-danger w-100 remove-extra">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(newExtra);
+            
+            // Add event listener to the new remove button
+            newExtra.querySelector('.remove-extra').addEventListener('click', function() {
+                container.removeChild(newExtra);
             });
         });
-
+        
         // Initialize charts
-        function initializeCharts() {
-            // Category Chart
+        document.addEventListener('DOMContentLoaded', function() {
+            // Category Sales Chart
             const categoryCtx = document.getElementById('categoryChart').getContext('2d');
             const categoryChart = new Chart(categoryCtx, {
                 type: 'bar',
                 data: {
-                    labels: ['Salgadas', 'Doces', 'Especiais', 'Vegetarianas'],
+                    labels: ['Clássicas', 'Especiais', 'Doces', 'Bebidas', 'Combos'],
                     datasets: [{
-                        label: 'Vendas',
-                        data: [45, 30, 15, 10],
+                        label: 'Vendas (últimos 7 dias)',
+                        data: [45, 28, 15, 22, 18],
                         backgroundColor: [
-                            '#d28b4b',
-                            '#2ecc71',
-                            '#3498db',
-                            '#9b59b6'
+                            'rgba(210, 139, 75, 0.7)',
+                            'rgba(46, 204, 113, 0.7)',
+                            'rgba(155, 89, 182, 0.7)',
+                            'rgba(52, 152, 219, 0.7)',
+                            'rgba(231, 76, 60, 0.7)'
                         ],
                         borderColor: [
-                            '#b8773a',
-                            '#27ae60',
-                            '#2980b9',
-                            '#8e44ad'
+                            'rgba(210, 139, 75, 1)',
+                            'rgba(46, 204, 113, 1)',
+                            'rgba(155, 89, 182, 1)',
+                            'rgba(52, 152, 219, 1)',
+                            'rgba(231, 76, 60, 1)'
                         ],
                         borderWidth: 1
                     }]
@@ -607,7 +1582,7 @@
                     responsive: true,
                     plugins: {
                         legend: {
-                            display: false
+                            position: 'top',
                         }
                     },
                     scales: {
@@ -617,19 +1592,19 @@
                     }
                 }
             });
-
+            
             // Revenue Chart
             const revenueCtx = document.getElementById('revenueChart').getContext('2d');
             const revenueChart = new Chart(revenueCtx, {
                 type: 'line',
                 data: {
-                    labels: ['1 Jun', '5 Jun', '10 Jun', '15 Jun', '20 Jun', '25 Jun', '30 Jun'],
+                    labels: ['1/04', '5/04', '10/04', '15/04', '20/04', '25/04', '30/04'],
                     datasets: [{
-                        label: 'Receita (R$)',
-                        data: [1200, 1900, 1500, 2000, 1800, 2500, 2200],
+                        label: 'Receita Diária (R$)',
+                        data: [850, 920, 1020, 1150, 980, 1240, 1320],
                         fill: false,
-                        backgroundColor: '#d28b4b',
-                        borderColor: '#d28b4b',
+                        backgroundColor: 'rgba(210, 139, 75, 0.7)',
+                        borderColor: 'rgba(210, 139, 75, 1)',
                         tension: 0.1
                     }]
                 },
@@ -637,17 +1612,64 @@
                     responsive: true,
                     plugins: {
                         legend: {
-                            display: false
+                            position: 'top',
                         }
                     },
                     scales: {
                         y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+            
+            // Sales Report Chart
+            const salesReportCtx = document.getElementById('salesReportChart').getContext('2d');
+            const salesReportChart = new Chart(salesReportCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
+                    datasets: [
+                        {
+                            label: 'Clássicas',
+                            data: [1200, 1350, 1420, 1550],
+                            backgroundColor: 'rgba(210, 139, 75, 0.7)'
+                        },
+                        {
+                            label: 'Especiais',
+                            data: [850, 920, 980, 1050],
+                            backgroundColor: 'rgba(46, 204, 113, 0.7)'
+                        },
+                        {
+                            label: 'Doces',
+                            data: [450, 520, 580, 620],
+                            backgroundColor: 'rgba(155, 89, 182, 0.7)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Vendas por Categoria (Abril 2023)'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: false,
+                        },
+                        y: {
+                            stacked: false,
                             beginAtZero: true
                         }
                     }
                 }
             });
-        }
+        });
     </script>
 </body>
 </html>
