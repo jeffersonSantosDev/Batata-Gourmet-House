@@ -150,7 +150,11 @@ function showLoader() {
       if (addresses.length === 0) {
         return swal("Atenção","Cadastre um endereço primeiro.","warning");
       }
+
+      console.log('addresses',addresses.length) ;
       const selId = form.addressId.value;
+
+      console.log('nextBtn', selId, hasDefault) ;
       if (!selId && !hasDefault) {
         return swal("Atenção","Selecione ou crie um endereço.","warning");
       }
