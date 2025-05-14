@@ -305,3 +305,43 @@ body {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+/* Mantém o span e seus filhos sem quebra de linha */
+.item-info > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+/* Ajusta os botões de quantidade */
+.qty-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  font-size: 1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.qty-btn:hover {
+  background: var(--bg-light);
+}
+
+/* Ajusta o número para não esticar */
+.qty {
+  min-width: 24px;
+  text-align: center;
+  display: inline-block;
+}
+
+/* Garante que o ícone de editar/gravar fique no final sem pular linha */
+.item-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
