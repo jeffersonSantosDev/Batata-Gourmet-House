@@ -9,13 +9,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   const applyBtn    = document.getElementById("applyCoupon");
   const loyaltyDots = document.querySelectorAll(".loyalty-progress .dot");
 
-  // 1) Recupera credenciais e IDs de loja/fidelidade do localStorage
+  // 1) Recupera credenciais e IDs de loja/fidelidade
   const whatsapp       = localStorage.getItem("bgHouse_whatsapp");
   const usuarioIdEnc   = localStorage.getItem("bgHouse_id");
   const usuarioId      = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
   const lojaId         = parseInt(localStorage.getItem("bgHouse_lojaId"));
   const fidelidadeId   = parseInt(localStorage.getItem("bgHouse_fidelidadeId"));
-  
+
   backBtn.onclick = () => history.back();
 
   if (!whatsapp || !usuarioId || !lojaId || !fidelidadeId) {
@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       cartList.appendChild(tr);
     });
 
-    // Calcula subtotal inicial e total
+    // Calcula subtotal e total
     subtotal = cart.items.reduce((sum,i) => sum + i.precoUnitario * i.quantidade, 0);
     const atualizarResumo = () => {
       subtotalEl.textContent = `+ R$ ${fmt(subtotal)}`;
@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           .forEach(p => p.classList.add("hidden"));
     });
 
-    // Popover e remoção de item
+    // Remoção de item
     cartList.addEventListener("click", async e => {
       const editBtn = e.target.closest(".edit-btn");
       if (editBtn) {
@@ -120,14 +120,49 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
 
-    // 2) Simular e aplicar cupom
+    // 2) Se há cupom salvo, simula aplicação automática
+    const savedCoupon = localStorage.getItem("bgHouse_appliedCoupon");
+    if (savedCoupon) {
+      loading.classList.remove("hidden");
+      try {
+        const respC = await fetch("/api/Cupom/CalcularDesconto", {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            codigo:        savedCoupon,
+            usuarioId:     usuarioId,
+            lojaId:        lojaId,
+            valorOriginal: subtotal
+          })
+        });
+        const dataC = await respC.json();
+        if (dataC.sucesso) {
+          desconto = dataC.dados;
+          couponInput.value = savedCoupon;
+          couponInput.disabled = true;
+          applyBtn.disabled    = true;
+          atualizarResumo();
+        } else {
+          // cupom expirado ou inválido, limpa o storage
+          localStorage.removeItem("bgHouse_appliedCoupon");
+        }
+      } catch {
+        // falha silenciosa
+      } finally {
+        loading.classList.add("hidden");
+      }
+    }
+
+    // 3) Clique em Verificar cupom: aplica e salva em localStorage
     applyBtn.onclick = async () => {
       const codigo = couponInput.value.trim();
       if (!codigo) {
         swal("Atenção", "Informe o código do cupom.", "warning");
         return;
       }
-    
       loading.classList.remove("hidden");
       try {
         const resp = await fetch("/api/Cupom/CalcularDesconto", {
@@ -143,30 +178,25 @@ document.addEventListener("DOMContentLoaded", async () => {
             valorOriginal: subtotal
           })
         });
-    
         const data = await resp.json();
-        // data tem: { sucesso: bool, dados?: number, mensagem?: string }
         if (!data.sucesso) {
           swal("Erro", data.mensagem, "error");
           return;
         }
-    
         desconto = data.dados;
         atualizarResumo();
         swal("Sucesso", `Cupom aplicado: R$ ${fmt(desconto)}`, "success");
         couponInput.disabled = true;
         applyBtn.disabled    = true;
-    
-      } catch (err) {
-        console.error("Falha ao chamar cupom:", err);
+        localStorage.setItem("bgHouse_appliedCoupon", codigo);
+      } catch {
         swal("Erro", "Não foi possível validar o cupom.", "error");
       } finally {
         loading.classList.add("hidden");
       }
     };
-    
 
-    // 3) Carregar progresso de fidelidade
+    // 4) Carregar progresso de fidelidade
     try {
       const r2 = await fetch(
         `/api/UsuarioFidelidade/Pontos?usuarioId=${usuarioId}&fidelidadeId=${fidelidadeId}`
@@ -179,7 +209,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     } catch {}
 
-    // 4) Próximo (checkout)
+    // 5) Próximo (checkout)
     nextBtn.onclick = () => window.location.href = "checkout.html";
 
   } catch (err) {
