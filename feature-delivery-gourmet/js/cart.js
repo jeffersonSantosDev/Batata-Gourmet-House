@@ -257,7 +257,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch {}
   }
 
-  nextBtn.onclick = () => window.location.href = "checkout.html";
+  nextBtn.onclick = () => { 
+    window.location.href = "entrega.html";
+  };
 
   // Inicialização
   await carregarCarrinho();
