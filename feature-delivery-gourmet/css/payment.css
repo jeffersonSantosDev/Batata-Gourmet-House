@@ -120,24 +120,34 @@ body {
 
 /* Troco */
 .change-section {
-  display: flex; align-items: center;
-  gap: 8px; margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;      /* permite quebrar em múltiplas linhas */
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
 }
 .change-label {
   flex-shrink: 0;
   font-size: .95rem;
 }
 .change-section input[type="text"] {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
   padding: 6px 8px;
   border: 1px solid var(--border);
   border-radius: 6px;
   font-size: .95rem;
 }
 .no-change {
-  display: flex; align-items: center;
-  gap: 4px; white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
   font-size: .9rem;
+  color: var(--text-dark);
+
+  flex: 1 1 100%;       /* ocupa 100% da largura e empurra para a próxima linha */
+  margin-top: 4px;
 }
 .no-change input[type="checkbox"] {
   accent-color: var(--accent);
