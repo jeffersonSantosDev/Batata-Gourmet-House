@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const loyaltyDots = document.querySelectorAll(".loyalty-progress .dot");
   const fmt         = v => v.toFixed(2).replace(".",",");
 
-  // Recupera credenciais e IDs
   const whatsapp     = localStorage.getItem("bgHouse_whatsapp");
   const usuarioIdEnc = localStorage.getItem("bgHouse_id");
   const usuarioId    = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
@@ -26,17 +25,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let subtotal = 0, desconto = 0;
 
-  // Fecha todos os popovers
-  const fecharPopovers = () => {
+  const fecharPopovers = () =>
     document.querySelectorAll(".popover").forEach(p => p.classList.add("hidden"));
-  };
 
-  // Fecha popover ao clicar fora
   document.addEventListener("click", e => {
     if (!e.target.closest(".item-info")) fecharPopovers();
   });
 
-  // (re)renderiza o carrinho
   async function carregarCarrinho() {
     loading.classList.remove("hidden");
     try {
@@ -51,10 +46,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       cartList.innerHTML = "";
       subtotal = 0;
+
       cart.items.forEach(item => {
         subtotal += item.precoUnitario * item.quantidade;
         const tr = document.createElement("tr");
-        tr.className = "item-row";
+        tr.className  = "item-row";
         tr.dataset.id = item.itemId;
         tr.innerHTML = `
           <td>
@@ -63,7 +59,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <button class="qty-btn decrease" data-id="${item.itemId}">−</button>
                 <span class="qty">${item.quantidade}</span>
                 <button class="qty-btn increase" data-id="${item.itemId}">+</button>
-                × ${item.produtoNome}
+                × <span class="product-name">${item.produtoNome}</span>
               </span>
               <button class="edit-btn" data-id="${item.itemId}">
                 <i class="fas fa-pencil-alt"></i>
@@ -92,9 +88,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     totalEl.textContent    = `R$ ${fmt(subtotal - desconto)}`;
   }
 
-  // trata cliques em quantidade, editar e remover
   cartList.addEventListener("click", async e => {
-    // + / −
+    // quantidade
     const dec = e.target.closest(".qty-btn.decrease");
     const inc = e.target.closest(".qty-btn.increase");
     if (dec || inc) {
@@ -109,7 +104,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         await fetch(
           `/api/Cart/UpdateItemQuantity?whatsapp=${encodeURIComponent(whatsapp)}`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type":"application/json" },
             body: JSON.stringify({ itemId, quantidade: qty })
           }
         );
@@ -124,7 +119,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // toggle popover
+    // popover
     const editBtn = e.target.closest(".edit-btn");
     if (editBtn) {
       e.stopPropagation();
@@ -133,7 +128,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // remover item
+    // remover
     const rem = e.target.closest(".confirm-remove");
     if (rem) {
       const pop    = rem.closest(".popover");
@@ -143,8 +138,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         title: "Remover item?",
         text:  "Deseja mesmo apagar este item do carrinho?",
         icon:  "warning",
-        buttons: ["Não","Sim"],
-        dangerMode: true
+        buttons:["Não","Sim"],
+        dangerMode:true
       });
       if (!willDelete) return;
 
@@ -166,19 +161,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // aplica cupom salvo
+  // cupom salvo
   async function aplicarCupomSalvo() {
     const codigo = localStorage.getItem("bgHouse_appliedCoupon");
     if (!codigo) return;
     try {
       const resp = await fetch("/api/Cupom/CalcularDesconto", {
         method: "POST",
-        headers: {"Accept":"application/json","Content-Type":"application/json"},
+        headers:{"Accept":"application/json","Content-Type":"application/json"},
         body: JSON.stringify({ codigo, usuarioId, lojaId, valorOriginal: subtotal })
       });
       const data = await resp.json();
       if (data.sucesso) {
-        desconto = data.dados;
+        desconto              = data.dados;
         couponInput.value     = codigo;
         couponInput.disabled  = true;
         applyBtn.disabled     = true;
@@ -191,11 +186,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // verifica e aplica cupom
+  // verificar cupom
   applyBtn.onclick = async () => {
     const codigo = couponInput.value.trim();
     if (!codigo) {
-      swal("Atenção", "Informe o código do cupom.", "warning");
+      swal("Atenção","Informe o código do cupom.","warning");
       return;
     }
     loading.classList.remove("hidden");
@@ -203,7 +198,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       const resp = await fetch("/api/Cupom/CalcularDesconto", {
         method: "POST",
-        headers: {"Accept":"application/json","Content-Type":"application/json"},
+        headers:{"Accept":"application/json","Content-Type":"application/json"},
         body: JSON.stringify({ codigo, usuarioId, lojaId, valorOriginal: subtotal })
       });
       const data = await resp.json();
@@ -218,13 +213,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       applyBtn.disabled    = true;
       localStorage.setItem("bgHouse_appliedCoupon", codigo);
     } catch {
-      swal("Erro", "Não foi possível validar o cupom.", "error");
+      swal("Erro","Não foi possível validar o cupom.","error");
     } finally {
       loading.classList.add("hidden");
     }
   };
 
-  // progresso de fidelidade
+  // fidelidade
   async function carregarFidelidade() {
     try {
       const resp = await fetch(
@@ -232,16 +227,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       );
       if (!resp.ok) return;
       const pontos = await resp.json();
-      loyaltyDots.forEach((dot, i) => {
+      loyaltyDots.forEach((dot,i) => {
         dot.classList.toggle("filled", i < pontos);
       });
     } catch {}
   }
 
-  // próximo
   nextBtn.onclick = () => window.location.href = "checkout.html";
 
-  // inicialização
+  // Init
   await carregarCarrinho();
   await aplicarCupomSalvo();
   await carregarFidelidade();

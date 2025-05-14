@@ -23,9 +23,7 @@ body {
   height: 100vh;
 }
 
-.hidden {
-  display: none;
-}
+.hidden { display: none; }
 
 /* HEADER */
 .detail-header {
@@ -110,7 +108,14 @@ body {
   align-items: center;
   gap: 0.5rem;
   white-space: nowrap;
-  flex-shrink: 0;
+  overflow: hidden;
+}
+.item-info .product-name {
+  display: inline-block;
+  max-width: 8ch;               /* até ~8 caracteres */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* botões de quantidade */
