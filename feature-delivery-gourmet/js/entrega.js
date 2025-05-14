@@ -58,10 +58,10 @@ function showLoader() {
     const finalTotal  = document.getElementById("finalTotal");
     const fmt         = v => v.toFixed(2).replace(".",",");
   
-    // ← usa history.back()
+    // Voltar à tela anterior
     backBtn.onclick = () => history.back();
   
-    // carrega credenciais do localStorage
+    // Carrega credenciais
     const whatsapp  = localStorage.getItem("bgHouse_whatsapp");
     const nome      = localStorage.getItem("bgHouse_name")     || "Você";
     const lojaId    = parseInt(localStorage.getItem("bgHouse_lojaId"));
@@ -77,17 +77,17 @@ function showLoader() {
     userNameEl.textContent  = nome;
     userPhoneEl.textContent = whatsapp.replace(/(\d{2})(\d{5})(\d{4})/, '+$1 $2-$3');
   
-    // 1) busca e exibe carrinho
+    // 1) Carrega carrinho
     let cart, subtotal = 0, desconto = 0, frete = 0;
     try {
       cart = await fetchCart(whatsapp);
-      subtotal = cart.items.reduce((sum, i) => sum + i.precoUnitario*i.quantidade, 0);
+      subtotal = cart.items.reduce((sum,i)=> sum + i.precoUnitario * i.quantidade, 0);
       subtotalEl.textContent = `R$ ${fmt(subtotal)}`;
     } catch {
       subtotalEl.textContent = `R$ 0,00`;
     }
   
-    // 2) re-aplica cupom
+    // 2) Reaplica cupom
     const savedCupom = localStorage.getItem("bgHouse_appliedCoupon");
     if (savedCupom) {
       const res = await calcularCupom(savedCupom, usuarioId, lojaId, subtotal);
@@ -100,7 +100,7 @@ function showLoader() {
       }
     }
   
-    // 3) busca e renderiza endereços
+    // 3) Carrega endereços
     const addresses = await fetchUserAddresses(whatsapp);
     form.innerHTML = "";
     addresses.forEach(addr => {
@@ -110,37 +110,37 @@ function showLoader() {
         <input type="radio" name="addressId" value="${addr.id}" ${addr.padrao?"checked":""}/>
         <div class="address-label">
           <div>${addr.rua}, ${addr.numero}</div>
-          ${addr.referencia ? `<div><i>${addr.referencia}</i></div>` : ""}
+          ${addr.referencia?`<div><i>${addr.referencia}</i></div>`:""}
           <small>${addr.bairro} - ${addr.cidade}/${addr.uf}</small>
           <small>${addr.distanciaKm.toFixed(1)} km • ${addr.tempoMinutos} min • Frete R$ ${fmt(addr.frete)}</small>
         </div>`;
       form.appendChild(lbl);
     });
   
-    // 4) texto dinâmico do botão
+    // 4) Texto do botão
     const hasDefault = addresses.some(a => a.padrao);
     nextBtn.textContent = hasDefault ? "Ir Para Pagamento" : "Escolha a Entrega!";
   
-    // 5) botão "Adicionar Endereço"
+    // 5) "Adicionar Endereço"
     if (addresses.length >= 2) addBtn.classList.add("disabled");
     addBtn.onclick = () => {
       if (addresses.length >= 2) {
-        swal("Atenção","Você já cadastrou 2 endereços. Edite-os na sua conta.","info");
+        swal("Atenção", "Você já cadastrou 2 endereços. Edite-os na sua conta.", "info");
       } else {
         window.location.href = "register-address.html";
       }
     };
   
-    // 6) ao mudar seleção de endereço
+    // 6) Ao escolher um rádio:
     form.addEventListener("change", () => {
       const selId = form.addressId.value;
-      // marca visual
+      // Marca visualmente
       document.querySelectorAll(".address-option").forEach(l => {
         l.classList.toggle("selected",
           l.querySelector("input").value === selId
         );
       });
-      // recalcula frete+total
+      // Recalcula frete e total
       const sel = addresses.find(a => a.id === +selId);
       if (sel) {
         frete = sel.frete;
@@ -148,26 +148,24 @@ function showLoader() {
         finalTotal.textContent = `R$ ${fmt(subtotal - desconto + frete)}`;
       }
     });
-    // dispara se já houver padrão
     if (hasDefault) form.dispatchEvent(new Event("change"));
   
-    // 7) clique no "Escolha a Entrega!" / "Ir Para Pagamento"
-    
+    // 7) Clique no botão principal
     nextBtn.onclick = () => {
-      // se nenhum endereço cadastrado
+      // Sem nenhum endereço cadastrado
       if (addresses.length === 0) {
-        return swal("Atenção","Cadastre um endereço primeiro.","warning");
+        return swal("Atenção", "Cadastre um endereço primeiro.", "warning");
       }
-      // se não há padrão e nada selecionado
+      // Sem padrão e sem seleção
       const selId = form.addressId.value;
       if (!selId && !hasDefault) {
-        return swal("Atenção","Selecione ou crie um endereço.","warning");
+        return swal("Atenção", "Selecione ou crie um endereço.", "warning");
       }
-      // caso tenha endereço marcado como padrão
+      // Se houver padrão, vai direto
       if (hasDefault) {
         return window.location.href = "payment.html";
       }
-      // se não, avança com o escolhido
+      // Senão, avança com o escolhido
       window.location.href = `payment.html?addressId=${selId}`;
     };
   });
