@@ -13,10 +13,10 @@ async function fetchCart(whatsapp) {
   return resp.json();
 }
 
-async function calcularCupomNoPagamento(codigo, usuarioId, lojaId, subtotal) {
+async function calcularCupom(codigo, usuarioId, lojaId, subtotal) {
   const resp = await fetch('/api/Cupom/CalcularDesconto', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ codigo, usuarioId, lojaId, valorOriginal: subtotal })
   });
   if (!resp.ok) return 0;
@@ -24,49 +24,43 @@ async function calcularCupomNoPagamento(codigo, usuarioId, lojaId, subtotal) {
   return data.sucesso ? data.dados : 0;
 }
 
-function formatBRL(value) {
-  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+function formatBRL(v) {
+  return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
   showLoader();
-
   try {
-    const backBtn     = document.getElementById('backBtn');
-    const subtotalEl  = document.getElementById('subtotal');
-    const freteEl     = document.getElementById('frete');
-    const descontoEl  = document.getElementById('desconto');
-    const totalEl     = document.getElementById('total');
-    const changeSec   = document.getElementById('changeSection');
-    const changeInput = document.getElementById('changeAmount');
-    const noChangeChk = document.getElementById('noChange');
-    const finishBtn   = document.getElementById('finishBtn');
-    const form        = document.getElementById('paymentForm');
-    const fmt         = v => v.toFixed(2).replace('.',',');
+    const backBtn    = document.getElementById('backBtn');
+    const subEl      = document.getElementById('subtotal');
+    const freteEl    = document.getElementById('frete');
+    const descEl     = document.getElementById('desconto');
+    const totalEl    = document.getElementById('total');
+    const changeSec  = document.getElementById('changeSection');
+    const changeInp  = document.getElementById('changeAmount');
+    const noChange   = document.getElementById('noChange');
+    const finishBtn  = document.getElementById('finishBtn');
+    const form       = document.getElementById('paymentForm');
 
     backBtn.onclick = () => history.back();
 
-    // 1) Carrega credenciais do usuário
+    // Usuário
     const whatsapp = localStorage.getItem('bgHouse_whatsapp');
-    const usuarioIdEnc = localStorage.getItem('bgHouse_id');
-    const usuarioId = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
-    if (!whatsapp || !usuarioId) {
+    const userEnc  = localStorage.getItem('bgHouse_id');
+    const userId   = userEnc ? parseInt(atob(userEnc)) : null;
+    if (!whatsapp || !userId) {
       swal('Ops!', 'Identifique-se primeiro.', 'warning')
         .then(() => window.location.href = 'identify.html?return=payment.html');
       return;
     }
 
-    // 2) Busca carrinho e calcula subtotal
+    // Carrinho
     let cart = { items: [] };
-    try {
-      cart = await fetchCart(whatsapp);
-    } catch {
-      console.error('Falha ao buscar carrinho');
-    }
-    const subtotal = cart.items.reduce((acc, i) => acc + i.precoUnitario * i.quantidade, 0);
-    subtotalEl.textContent = formatBRL(subtotal);
+    try { cart = await fetchCart(whatsapp); } catch {}
+    const subtotal = cart.items.reduce((s,i)=>s + i.precoUnitario*i.quantidade, 0);
+    subEl.textContent = formatBRL(subtotal);
 
-    // 3) Carrega frete de localStorage ou URL
+    // Frete (Storage ou URL)
     const params = new URLSearchParams(window.location.search);
     let frete = 0;
     if (params.has('frete')) {
@@ -77,24 +71,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     freteEl.textContent = formatBRL(frete);
 
-    // 4) Aplica cupom salvo
+    // Cupom
     let desconto = 0;
-    const cupomCode = localStorage.getItem('bgHouse_appliedCoupon');
-    if (cupomCode) {
-      desconto = await calcularCupomNoPagamento(
-        cupomCode,
-        parseInt(atob(localStorage.getItem('bgHouse_id'))),
-        parseInt(localStorage.getItem('bgHouse_lojaId')),
-        subtotal
-      );
+    const cupom = localStorage.getItem('bgHouse_appliedCoupon');
+    if (cupom) {
+      const lojaId = parseInt(localStorage.getItem('bgHouse_lojaId'));
+      desconto = await calcularCupom(cupom, userId, lojaId, subtotal);
     }
-    descontoEl.textContent = '- ' + formatBRL(desconto);
+    descEl.textContent = '- ' + formatBRL(desconto);
 
-    // 5) Calcula total
+    // Total
     const total = Math.max(0, subtotal - desconto + frete);
     totalEl.textContent = formatBRL(total);
 
-    // 6) Controle de troco (Dinheiro)
+    // Troco (Dinheiro)
     form.method.forEach(radio => {
       radio.addEventListener('change', () => {
         changeSec.style.display = radio.value === 'Dinheiro' ? 'flex' : 'none';
@@ -103,41 +93,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (form.method.value !== 'Dinheiro') {
       changeSec.style.display = 'none';
     }
-
-    noChangeChk.addEventListener('change', () => {
-      changeInput.disabled = noChangeChk.checked;
-      if (noChangeChk.checked) changeInput.value = '0.00';
+    noChange.addEventListener('change', () => {
+      changeInp.disabled = noChange.checked;
+      if (noChange.checked) changeInp.value = '0,00';
     });
 
-    // 7) Finalizar pedido
+    // Finalizar
     finishBtn.onclick = () => {
       const method = form.method.value;
-      let changeFor = 0;
-
-      if (method === 'Dinheiro' && !noChangeChk.checked) {
-        changeFor = parseFloat(changeInput.value.replace(',', '.')) || 0;
-        if (changeFor < total) {
-          return swal('Atenção', 'Troco abaixo do valor da compra.', 'warning');
+      let troco = 0;
+      if (method === 'Dinheiro' && !noChange.checked) {
+        troco = parseFloat(changeInp.value.replace(',', '.')) || 0;
+        if (troco < total) {
+          return swal('Atenção','Troco abaixo do valor da compra.','warning');
         }
       }
-
       const order = {
-        whatsapp,
-        addressId: params.get('addressId')
-          ? parseInt(params.get('addressId'))
-          : null,
-        paymentMethod: method,
-        changeFor: method === 'Dinheiro' ? changeFor : 0,
-        cartItems: cart.items,
-        subtotal,
-        frete,
-        desconto,
-        total
+        whatsapp, addressId: params.get('addressId')||null,
+        paymentMethod: method, changeFor: method==='Dinheiro'?troco:0,
+        cartItems: cart.items, subtotal, frete, desconto, total
       };
-
-      console.log('Order to submit:', order);
-      swal('Sucesso', 'Pedido finalizado! Veja o console para detalhes.', 'success');
+      console.log('Pedido:', order);
+      swal('Sucesso','Pedido finalizado! Confira console.','success');
     };
+
   } finally {
     hideLoader();
   }

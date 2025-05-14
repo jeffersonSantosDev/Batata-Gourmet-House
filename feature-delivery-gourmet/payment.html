@@ -12,57 +12,53 @@
   <script defer src="js/payment.js"></script>
 </head>
 <body>
-  <!-- Loader -->
   <div id="loadingOverlay" class="loading-overlay hidden">
     <div class="spinner"></div>
   </div>
 
-  <!-- HEADER -->
   <header class="detail-header">
-    <button id="backBtn" class="back-btn">←</button>
+    <button id="backBtn" class="back-btn"><i class="fas fa-arrow-left"></i></button>
     <h1 class="detail-title">Pagamento</h1>
   </header>
 
-  <!-- RESUMO DO PEDIDO -->
-  <section class="order-summary">
-    <h2>Resumo do Pedido</h2>
-    <div class="summary-line">
-      <span>Subtotal</span>
-      <span id="subtotal">R$ 0,00</span>
-    </div>
-    <div class="summary-line">
-      <span>Cupom</span>
-      <span id="desconto">R$ 0,00</span>
-    </div>
-    <div class="summary-line">
-      <span>Frete</span>
-      <span id="frete">R$ 0,00</span>
-    </div>
-    <hr>
-    <div class="summary-line total">
-      <strong>TOTAL</strong>
-      <strong id="total">R$ 0,00</strong>
-    </div>
-  </section>
-
-  <!-- OPÇÕES DE PAGAMENTO -->
-  <section class="payment-methods">
-    <form id="paymentForm">
-      <legend>Forma de Pagamento</legend>
-      <label><input type="radio" name="method" value="Dinheiro" checked> Dinheiro</label>
-      <label><input type="radio" name="method" value="Crédito"> Crédito</label>
-      <label><input type="radio" name="method" value="Débito"> Débito</label>
-
-      <!-- Troco (só para Dinheiro) -->
-      <div id="changeSection" class="change-section">
-        <label for="changeAmount">Troco para:</label>
-        <input type="text" id="changeAmount" placeholder="0,00" />
-        <label><input type="checkbox" id="noChange"> Não preciso de troco</label>
+  <main class="container">
+    <div class="card summary-card">
+      <h2>Resumo do Pedido</h2>
+      <div class="line">
+        <span>Subtotal</span>
+        <span id="subtotal">R$ 0,00</span>
       </div>
-    </form>
-  </section>
+      <div class="line">
+        <span>Cupom</span>
+        <span id="desconto">R$ 0,00</span>
+      </div>
+      <div class="line">
+        <span>Frete</span>
+        <span id="frete">R$ 0,00</span>
+      </div>
+      <hr>
+      <div class="line total">
+        <strong>TOTAL</strong>
+        <strong id="total">R$ 0,00</strong>
+      </div>
+    </div>
 
-  <!-- BOTÃO FINALIZAR -->
+    <div class="card payment-card">
+      <h2>Forma de Pagamento</h2>
+      <form id="paymentForm">
+        <label><input type="radio" name="method" value="Dinheiro" checked> Dinheiro</label>
+        <label><input type="radio" name="method" value="Crédito"> Crédito</label>
+        <label><input type="radio" name="method" value="Débito"> Débito</label>
+
+        <div id="changeSection" class="change-section">
+          <label for="changeAmount">Troco para:</label>
+          <input type="text" id="changeAmount" placeholder="0,00" />
+          <label><input type="checkbox" id="noChange"> Não preciso de troco</label>
+        </div>
+      </form>
+    </div>
+  </main>
+
   <footer class="detail-footer">
     <button id="finishBtn" class="btn finish-btn">Finalizar Pedido</button>
   </footer>
