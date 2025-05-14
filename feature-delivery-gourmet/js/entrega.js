@@ -57,7 +57,7 @@ function showLoader() {
     const finalTotal  = document.getElementById("finalTotal");
     const fmt         = v => v.toFixed(2).replace(".",",");
   
-    backBtn.onclick = () => window.location.href = "index.html";
+    backBtn.onclick = () => history.back();
   
     const whatsapp  = localStorage.getItem("bgHouse_whatsapp");
     const nome      = localStorage.getItem("bgHouse_name") || "Você";
