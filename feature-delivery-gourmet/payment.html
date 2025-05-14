@@ -22,27 +22,25 @@
   </header>
 
   <main class="container">
-    <div class="card summary-card">
-      <h2>Resumo do Pedido</h2>
-      <div class="line">
-        <span>Subtotal</span>
-        <span id="subtotal">R$ 0,00</span>
-      </div>
-      <div class="line">
-        <span>Cupom</span>
-        <span id="desconto">R$ 0,00</span>
-      </div>
-      <div class="line">
-        <span>Frete</span>
-        <span id="frete">R$ 0,00</span>
-      </div>
-      <hr>
-      <div class="line total">
-        <strong>TOTAL</strong>
-        <strong id="total">R$ 0,00</strong>
-      </div>
+    <!-- 1) Resumo de Entrega -->
+    <div class="card delivery-card" id="deliveryCard" style="display:none;">
+      <h2>O Pedido Será Entregue À:</h2>
+      <p id="delivName" class="deliv-name"></p>
+      <p id="delivPhone" class="deliv-phone"></p>
+      <p id="delivAddress" class="deliv-address"></p>
     </div>
 
+    <!-- 2) Resumo do Pedido -->
+    <div class="card summary-card">
+      <h2>Resumo do Pedido</h2>
+      <div class="line"><span>Subtotal</span><span id="subtotal">R$ 0,00</span></div>
+      <div class="line" id="cupomLine"><span>Cupom</span><span id="desconto">- R$ 0,00</span></div>
+      <div class="line" id="freteLine"><span>Frete</span><span id="frete">R$ 0,00</span></div>
+      <hr>
+      <div class="line total"><strong>TOTAL</strong><strong id="total">R$ 0,00</strong></div>
+    </div>
+
+    <!-- 3) Métodos de Pagamento -->
     <div class="card payment-card">
       <h2>Forma de Pagamento</h2>
       <form id="paymentForm">
