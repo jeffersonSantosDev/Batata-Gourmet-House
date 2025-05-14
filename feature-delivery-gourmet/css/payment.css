@@ -15,6 +15,7 @@
 }
 
 html, body {
+  width: 100%;
   overflow-x: hidden;
 }
 
@@ -25,8 +26,6 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  /* corrige scroll extra */
-  margin-right: calc(-1 * (100vw - 100%));
 }
 
 /* Loader */
@@ -60,26 +59,21 @@ body {
   font-size: 1.25rem; font-weight: 600;
 }
 
-/* Main container */
+/* Main content */
 .detail-main {
   flex: 1;
   overflow-y: auto;
-  width: 100%;
-  max-width: 100%;
   padding: 1rem;
 }
 
-/* Sections/images/cards */
-.address-section,
-.cart-summary,
-.payment-card {
+/* Card comum */
+.card {
   background: var(--primary);
   padding: 1rem;
   border-radius: 8px;
   box-shadow: 0 2px 8px var(--shadow);
   margin-bottom: 1.5rem;
   width: 100%;
-  max-width: 100%;
 }
 
 /* Entrega */
@@ -98,7 +92,8 @@ body {
 }
 
 /* Resumo do Pedido */
-.cart-summary h3 {
+.cart-summary h3,
+.payment-card h3 {
   font-size: 1rem; font-weight: 600; margin-bottom: .75rem;
 }
 .summary-line {
@@ -112,46 +107,37 @@ body {
   font-size: 1.2rem; font-weight: 700;
 }
 
-/* Forma de Pagamento */
-.payment-card h3 {
-  font-size: 1rem; font-weight: 600; margin-bottom: .75rem;
-}
-.addresses-form label {
+/* Formulário de Pagamento */
+.payment-card label {
   display: flex; align-items: center;
   margin-bottom: .5rem; font-size: .95rem;
   cursor: pointer;
 }
-.addresses-form input[type="radio"] {
+.payment-card input[type="radio"] {
   margin-right: .5rem;
   accent-color: var(--accent);
 }
 
 /* Troco */
 .change-section {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 12px;
+  display: flex; align-items: center;
+  gap: 8px; margin-top: 12px;
 }
 .change-label {
   flex-shrink: 0;
-  font-size: 0.95rem;
-  color: var(--text-dark);
+  font-size: .95rem;
 }
 .change-section input[type="text"] {
   flex: 1;
   padding: 6px 8px;
   border: 1px solid var(--border);
   border-radius: 6px;
-  font-size: 0.95rem;
+  font-size: .95rem;
 }
 .no-change {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  white-space: nowrap;
-  font-size: 0.9rem;
-  color: var(--text-dark);
+  display: flex; align-items: center;
+  gap: 4px; white-space: nowrap;
+  font-size: .9rem;
 }
 .no-change input[type="checkbox"] {
   accent-color: var(--accent);
@@ -169,9 +155,8 @@ body {
   border: none; padding: .65rem 1.5rem;
   font-size: .95rem; font-weight: 600;
   border-radius: 6px; cursor: pointer;
-  width: 100%;
-  transition: background .2s;
+  width: 100%; transition: background .2s;
 }
 .next-btn:hover {
-  background: #28b46b; /* tom um pouco mais escuro que var(--highlight) */
+  background: #28b46b;
 }

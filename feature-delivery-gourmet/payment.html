@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Pagamento | Batata Gourmet House</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
@@ -22,16 +22,16 @@
   </header>
 
   <main class="detail-main">
-    <!-- 1) Resumo de Entrega -->
-    <section class="address-section" id="deliverySection" style="display:none;">
+    <!-- Seção de Entrega (se existir) -->
+    <section class="card address-section" id="deliverySection" style="display:none;">
       <h3>O Pedido Será Entregue à:</h3>
       <p id="delivName" class="user-name"></p>
       <p id="delivPhone" class="user-phone"></p>
       <p id="delivAddress" class="address-label"></p>
     </section>
 
-    <!-- 2) Resumo do Pedido -->
-    <section class="cart-summary">
+    <!-- Resumo do Pedido -->
+    <section class="card cart-summary">
       <h3>Resumo do Pedido</h3>
       <div class="summary-line"><span>Subtotal</span><span id="subtotal">R$ 0,00</span></div>
       <div class="summary-line" id="cupomLine"><span>Cupom</span><span id="desconto">- R$ 0,00</span></div>
@@ -39,13 +39,14 @@
       <div class="summary-line total"><span>TOTAL</span><span id="total">R$ 0,00</span></div>
     </section>
 
-    <!-- 3) Formas de Pagamento -->
-    <section class="address-section">
+    <!-- Formulário de Pagamento -->
+    <section class="card payment-card">
       <h3>Forma de Pagamento</h3>
-      <form id="paymentForm" class="addresses-form">
+      <form id="paymentForm" class="payment-form">
         <label><input type="radio" name="method" value="Dinheiro" checked> Dinheiro</label>
         <label><input type="radio" name="method" value="Crédito"> Crédito</label>
         <label><input type="radio" name="method" value="Débito"> Débito</label>
+
         <div id="changeSection" class="change-section">
           <label for="changeAmount" class="change-label">Troco para:</label>
           <input type="text" id="changeAmount" placeholder="0,00" />
