@@ -7,58 +7,60 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <link rel="stylesheet" href="css/entrega.css"/>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <script defer src="js/utils.js"></script>
   <script defer src="js/entrega.js"></script>
 </head>
 <body>
   <div id="loadingOverlay" class="loading-overlay hidden"><div class="spinner"></div></div>
 
-  <div class="container">
-    <header class="detail-header">
-      <button id="backBtn" class="back-btn">←</button>
-      <h1 class="detail-title">Entrega</h1>
-    </header>
+  <!-- HEADER igual ao Carrinho -->
+  <header class="detail-header">
+    <button id="backBtn" class="back-btn">←</button>
+    <h1 class="detail-title">Entrega</h1>
+  </header>
 
-    <main class="detail-main">
-      <!-- Usuário -->
-      <section class="user-info">
-        <h2>O Pedido Será Entregue À:</h2>
-        <p id="userName" class="user-name"></p>
-        <p id="userPhone" class="user-phone"></p>
-      </section>
+  <!-- MAIN igual ao Carrinho, mas com nossas seções -->
+  <main class="detail-main">
+    <!-- Usuário -->
+    <section class="user-info">
+      <h2>O Pedido Será Entregue À:</h2>
+      <p id="userName" class="user-name"></p>
+      <p id="userPhone" class="user-phone"></p>
+    </section>
 
-      <!-- Resumo do Pedido -->
-      <section class="cart-summary">
-        <h3>Resumo do Pedido</h3>
-        <div class="summary-line">
-          <span>Subtotal</span><span id="subtotal">R$ 0,00</span>
-        </div>
-        <div class="summary-line" id="cupomLine" style="display:none">
-          <span>Cupom</span><span id="cupomValue">- R$ 0,00</span>
-        </div>
-        <div class="summary-line">
-          <span>Frete</span><span id="frete">R$ 0,00</span>
-        </div>
-        <div class="summary-line total">
-          <span>TOTAL</span><span id="finalTotal">R$ 0,00</span>
-        </div>
-      </section>
+    <!-- Resumo do Pedido -->
+    <section class="cart-summary">
+      <h3>Resumo do Pedido</h3>
+      <div class="summary-line">
+        <span>Subtotal</span><span id="subtotal">R$ 0,00</span>
+      </div>
+      <div class="summary-line" id="cupomLine" style="display:none">
+        <span>Cupom</span><span id="cupomValue">- R$ 0,00</span>
+      </div>
+      <div class="summary-line">
+        <span>Frete</span><span id="frete">R$ 0,00</span>
+      </div>
+      <div class="summary-line total">
+        <span>TOTAL</span><span id="finalTotal">R$ 0,00</span>
+      </div>
+    </section>
 
-      <!-- Seleção de Endereço -->
-      <section class="address-section">
-        <div class="section-header">
-          <h3>Escolha a Entrega</h3>
-          <span class="required">OBRIGATÓRIO</span>
-        </div>
-        <form id="addressesForm" class="addresses-form"></form>
-        <button id="addAddressBtn" class="btn add-btn">Adicionar Endereço</button>
-        <p id="limitMsg" class="limit-msg">Você já cadastrou 2 endereços. Edite-os na sua conta.</p>
-      </section>
-    </main>
+    <!-- Seleção de Endereço -->
+    <section class="address-section">
+      <div class="section-header">
+        <h3>Escolha a Entrega</h3>
+        <span class="required">OBRIGATÓRIO</span>
+      </div>
+      <form id="addressesForm" class="addresses-form"></form>
+      <button id="addAddressBtn" class="btn add-btn">Adicionar Endereço</button>
+      <p id="limitMsg" class="limit-msg">Você já cadastrou 2 endereços. Edite-os na sua conta.</p>
+    </section>
+  </main>
 
-    <footer class="detail-footer">
-      <button id="nextBtn" class="btn next-btn">Escolha a Entrega!</button>
-    </footer>
-  </div>
+  <!-- FOOTER com botão igual ao Carrinho -->
+  <footer class="detail-footer">
+    <button id="nextBtn" class="btn next-btn">Escolha a Entrega!</button>
+  </footer>
 </body>
 </html>

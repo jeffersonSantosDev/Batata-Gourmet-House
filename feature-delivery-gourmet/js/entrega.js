@@ -11,8 +11,8 @@ function showLoader() {
     showLoader();
     try {
       const resp = await fetch('/api/Usuario/GetAddressesByWhatsApp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ numero: whatsapp })
       });
       if (resp.status === 204) return [];
@@ -20,8 +20,8 @@ function showLoader() {
       return await resp.json();
     } catch (err) {
       console.error(err);
-      await swal("Erro", "Não foi possível carregar seus endereços.", "error");
-      window.location.href = 'identify.html?return=entrega.html';
+      await swal("Erro","Não foi possível carregar seus endereços.","error");
+      window.location.href='identify.html?return=entrega.html';
       return [];
     } finally {
       hideLoader();
@@ -36,11 +36,11 @@ function showLoader() {
   
   async function calcularCupom(codigo, usuarioId, lojaId, subtotal) {
     const resp = await fetch('/api/Cupom/CalcularDesconto', {
-      method: 'POST',
-      headers: { 'Content-Type':'application/json','Accept':'application/json' },
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
       body: JSON.stringify({ codigo, usuarioId, lojaId, valorOriginal: subtotal })
     });
-    if (!resp.ok) return { sucesso: false };
+    if (!resp.ok) return { sucesso:false };
     return resp.json();
   }
   
@@ -61,15 +61,15 @@ function showLoader() {
   
     backBtn.onclick = () => window.location.href = "index.html";
   
-    const whatsapp   = localStorage.getItem("bgHouse_whatsapp");
-    const nome       = localStorage.getItem("bgHouse_name") || "Você";
-    const lojaId     = parseInt(localStorage.getItem("bgHouse_lojaId"));
-    const usuarioId  = localStorage.getItem("bgHouse_id")
+    const whatsapp  = localStorage.getItem("bgHouse_whatsapp");
+    const nome      = localStorage.getItem("bgHouse_name") || "Você";
+    const lojaId    = parseInt(localStorage.getItem("bgHouse_lojaId"));
+    const usuarioId = localStorage.getItem("bgHouse_id")
                         ? parseInt(atob(localStorage.getItem("bgHouse_id")))
                         : null;
     if (!whatsapp || !usuarioId) {
       await swal("Ops!","Identifique-se.","warning");
-      return window.location.href = "identify.html?return=entrega.html";
+      return window.location.href='identify.html?return=entrega.html';
     }
     userNameEl.textContent  = nome;
     userPhoneEl.textContent = whatsapp.replace(/(\d{2})(\d{5})(\d{4})/, '+$1 $2-$3');
@@ -78,7 +78,7 @@ function showLoader() {
     let cart, subtotal=0, desconto=0, frete=0;
     try {
       cart = await fetchCart(whatsapp);
-      subtotal = cart.items.reduce((s,i)=> s + i.precoUnitario*i.quantidade, 0);
+      subtotal = cart.items.reduce((s,i)=> s + i.precoUnitario*i.quantidade,0);
       subtotalEl.textContent = `R$ ${fmt(subtotal)}`;
     } catch {
       subtotalEl.textContent = `R$ 0,00`;
@@ -102,7 +102,7 @@ function showLoader() {
     form.innerHTML = "";
     addresses.forEach(addr => {
       const label = document.createElement("label");
-      label.className = "address-option" + (addr.padrao ? " address-default" : "");
+      label.className = "address-option"+(addr.padrao?" address-default":"");
       label.innerHTML = `
         <input type="radio" name="addressId" value="${addr.id}" ${addr.padrao?"checked":""}/>
         <div class="address-label">
@@ -115,27 +115,24 @@ function showLoader() {
     });
   
     // 4) Limite 2 endereços
-    if (addresses.length >= 2) {
-      addBtn.classList.add("disabled");
-    }
+    if (addresses.length>=2) addBtn.classList.add("disabled");
     addBtn.onclick = () => {
-      if (addresses.length >= 2) {
+      if (addresses.length>=2) {
         swal("Atenção","Você já cadastrou 2 endereços. Edite-os na sua conta.","info");
       } else {
-        window.location.href = "novo-endereco.html";
+        window.location.href="novo-endereco.html";
       }
     };
   
-    // 5) Ao mudar de endereço, atualiza frete e total
+    // 5) Seleção de endereço => frete + total
     form.addEventListener("change", () => {
-      const sel = addresses.find(a => a.id === parseInt(form.addressId.value));
+      const sel = addresses.find(a => a.id===+form.addressId.value);
       if (sel) {
         frete = sel.frete;
-        freteEl.textContent    = `R$ ${fmt(frete)}`;
+        freteEl.textContent = `R$ ${fmt(frete)}`;
         finalTotal.textContent = `R$ ${fmt(subtotal - desconto + frete)}`;
       }
     });
-    // dispara para o padrão logo
     if (form.addressId.value) form.dispatchEvent(new Event("change"));
   
     // 6) Próximo
@@ -145,7 +142,7 @@ function showLoader() {
         swal("Atenção","Escolha um endereço.","warning");
         return;
       }
-      window.location.href = `checkout.html?addressId=${chosen}`;
+      window.location.href=`checkout.html?addressId=${chosen}`;
     };
   });
   
