@@ -1,3 +1,5 @@
+// js/entrega.js
+
 function showLoader() {
     document.getElementById("loadingOverlay").classList.remove("hidden");
   }
@@ -29,7 +31,7 @@ function showLoader() {
   async function fetchCart(whatsapp) {
     const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
     if (!resp.ok) throw new Error('Erro ao carregar carrinho');
-    return await resp.json();
+    return resp.json();
   }
   
   async function calcularCupom(codigo, usuarioId, lojaId, subtotal) {
@@ -39,7 +41,7 @@ function showLoader() {
       body: JSON.stringify({ codigo, usuarioId, lojaId, valorOriginal: subtotal })
     });
     if (!resp.ok) return { sucesso: false };
-    return await resp.json();
+    return resp.json();
   }
   
   document.addEventListener("DOMContentLoaded", async () => {
@@ -57,14 +59,14 @@ function showLoader() {
     const finalTotal  = document.getElementById("finalTotal");
     const fmt         = v => v.toFixed(2).replace(".",",");
   
-    backBtn.onclick = () => history.back();
+    backBtn.onclick = () => window.location.href = "index.html";
   
-    const whatsapp  = localStorage.getItem("bgHouse_whatsapp");
-    const nome      = localStorage.getItem("bgHouse_name") || "Você";
-    const lojaId    = parseInt(localStorage.getItem("bgHouse_lojaId"));
-    const usuarioId = localStorage.getItem("bgHouse_id")
-                       ? parseInt(atob(localStorage.getItem("bgHouse_id")))
-                       : null;
+    const whatsapp   = localStorage.getItem("bgHouse_whatsapp");
+    const nome       = localStorage.getItem("bgHouse_name") || "Você";
+    const lojaId     = parseInt(localStorage.getItem("bgHouse_lojaId"));
+    const usuarioId  = localStorage.getItem("bgHouse_id")
+                        ? parseInt(atob(localStorage.getItem("bgHouse_id")))
+                        : null;
     if (!whatsapp || !usuarioId) {
       await swal("Ops!","Identifique-se.","warning");
       return window.location.href = "identify.html?return=entrega.html";
@@ -73,7 +75,7 @@ function showLoader() {
     userPhoneEl.textContent = whatsapp.replace(/(\d{2})(\d{5})(\d{4})/, '+$1 $2-$3');
   
     // 1) Carrinho
-    let cart, subtotal = 0, desconto = 0, frete = 0;
+    let cart, subtotal=0, desconto=0, frete=0;
     try {
       cart = await fetchCart(whatsapp);
       subtotal = cart.items.reduce((s,i)=> s + i.precoUnitario*i.quantidade, 0);
@@ -102,44 +104,41 @@ function showLoader() {
       const label = document.createElement("label");
       label.className = "address-option" + (addr.padrao ? " address-default" : "");
       label.innerHTML = `
-        <input type="radio" name="addressId" value="${addr.id}"
-               ${addr.padrao ? "checked" : ""} />
+        <input type="radio" name="addressId" value="${addr.id}" ${addr.padrao?"checked":""}/>
         <div class="address-label">
           <div>${addr.rua}, ${addr.numero}</div>
-          ${addr.referencia ? `<div><i>${addr.referencia}</i></div>` : ""}
+          ${addr.referencia?`<div><i>${addr.referencia}</i></div>`:""}
           <small>${addr.bairro} - ${addr.cidade}/${addr.uf}</small>
           <small>${addr.distanciaKm.toFixed(1)} km • ${addr.tempoMinutos} min • Frete R$ ${fmt(addr.frete)}</small>
         </div>`;
       form.appendChild(label);
     });
   
-    // 4) Limite de 2 endereços
+    // 4) Limite 2 endereços
     if (addresses.length >= 2) {
       addBtn.classList.add("disabled");
     }
     addBtn.onclick = () => {
-      if (addresses.length >=2) {
+      if (addresses.length >= 2) {
         swal("Atenção","Você já cadastrou 2 endereços. Edite-os na sua conta.","info");
       } else {
         window.location.href = "novo-endereco.html";
       }
     };
   
-    // 5) Seleção de endereço: atualiza frete e total
-    form.addEventListener("change", e => {
+    // 5) Ao mudar de endereço, atualiza frete e total
+    form.addEventListener("change", () => {
       const sel = addresses.find(a => a.id === parseInt(form.addressId.value));
       if (sel) {
         frete = sel.frete;
-        freteEl.textContent   = `R$ ${fmt(frete)}`;
+        freteEl.textContent    = `R$ ${fmt(frete)}`;
         finalTotal.textContent = `R$ ${fmt(subtotal - desconto + frete)}`;
       }
     });
-    // dispara a mudança inicial no padrão
-    if (form.addressId.value) {
-      form.dispatchEvent(new Event("change"));
-    }
+    // dispara para o padrão logo
+    if (form.addressId.value) form.dispatchEvent(new Event("change"));
   
-    // 6) Próximo passo
+    // 6) Próximo
     nextBtn.onclick = () => {
       const chosen = form.addressId.value;
       if (!chosen) {
