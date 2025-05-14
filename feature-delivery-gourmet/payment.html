@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Escolha a Entrega | Batata Gourmet House</title>
+  <title>Pagamento | Batata Gourmet House</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <link rel="stylesheet" href="css/entrega.css"/>
+  <link rel="stylesheet" href="css/payment.css"/>
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <script defer src="js/utils.js"></script>
-  <script defer src="js/entrega.js"></script>
+  <script defer src="js/payment.js"></script>
 </head>
 <body>
   <!-- Loader -->
@@ -20,48 +20,51 @@
   <!-- HEADER -->
   <header class="detail-header">
     <button id="backBtn" class="back-btn">←</button>
-    <h1 class="detail-title">Escolha a Entrega</h1>
+    <h1 class="detail-title">Pagamento</h1>
   </header>
 
-  <!-- INFO DO USUÁRIO -->
-  <section class="user-info">
-    <p id="userName" class="user-name">Você</p>
-    <p id="userPhone" class="user-phone">+00 00000-0000</p>
+  <!-- RESUMO DO PEDIDO -->
+  <section class="order-summary">
+    <h2>Resumo do Pedido</h2>
+    <div class="summary-line">
+      <span>Subtotal</span>
+      <span id="subtotal">R$ 0,00</span>
+    </div>
+    <div class="summary-line">
+      <span>Cupom</span>
+      <span id="desconto">R$ 0,00</span>
+    </div>
+    <div class="summary-line">
+      <span>Frete</span>
+      <span id="frete">R$ 0,00</span>
+    </div>
+    <hr>
+    <div class="summary-line total">
+      <strong>TOTAL</strong>
+      <strong id="total">R$ 0,00</strong>
+    </div>
   </section>
 
-  <!-- LISTA DE ENDEREÇOS -->
-  <main class="detail-main">
-    <form id="addressesForm" class="addresses-form">
-      <!-- os labels com opções serão injetados pelo JS -->
+  <!-- OPÇÕES DE PAGAMENTO -->
+  <section class="payment-methods">
+    <form id="paymentForm">
+      <legend>Forma de Pagamento</legend>
+      <label><input type="radio" name="method" value="Dinheiro" checked> Dinheiro</label>
+      <label><input type="radio" name="method" value="Crédito"> Crédito</label>
+      <label><input type="radio" name="method" value="Débito"> Débito</label>
+
+      <!-- Troco (só para Dinheiro) -->
+      <div id="changeSection" class="change-section">
+        <label for="changeAmount">Troco para:</label>
+        <input type="text" id="changeAmount" placeholder="0,00" />
+        <label><input type="checkbox" id="noChange"> Não preciso de troco</label>
+      </div>
     </form>
+  </section>
 
-    <button id="addAddressBtn" class="btn add-btn">+ Adicionar Endereço</button>
-
-    <!-- RESUMO -->
-    <div class="summary-box">
-      <div class="summary-line">
-        <span>Subtotal</span>
-        <span id="subtotal">R$ 0,00</span>
-      </div>
-      <div id="cupomLine" class="summary-line" style="display:none;">
-        <span>Desconto</span>
-        <span id="cupomValue">- R$ 0,00</span>
-      </div>
-      <div class="summary-line">
-        <span>Frete</span>
-        <span id="frete">R$ 0,00</span>
-      </div>
-      <hr>
-      <div class="summary-line total">
-        <strong>TOTAL</strong>
-        <strong id="finalTotal">R$ 0,00</strong>
-      </div>
-    </div>
-  </main>
-
-  <!-- RODAPÉ -->
+  <!-- BOTÃO FINALIZAR -->
   <footer class="detail-footer">
-    <button id="nextBtn" class="btn next-btn disabled" disabled>Escolha a Entrega!</button>
+    <button id="finishBtn" class="btn finish-btn">Finalizar Pedido</button>
   </footer>
 </body>
 </html>
