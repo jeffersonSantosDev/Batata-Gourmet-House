@@ -32,32 +32,44 @@ document.addEventListener('DOMContentLoaded', async () => {
   showLoader();
   try {
     // --- Elementos da tela ---
-    const backBtn       = document.getElementById('backBtn');
-    const deliverySec   = document.getElementById('deliverySection');
-    const delivName     = document.getElementById('delivName');
-    const delivPhone    = document.getElementById('delivPhone');
-    const delivAddress  = document.getElementById('delivAddress');
+    const backBtn     = document.getElementById('backBtn');
+    const deliverySec = document.getElementById('deliverySection');
+    const delivName   = document.getElementById('delivName');
+    const delivPhone  = document.getElementById('delivPhone');
+    const delivAddr   = document.getElementById('delivAddress');
 
-    const subEl         = document.getElementById('subtotal');
-    const cupLine       = document.getElementById('cupomLine');
-    const descEl        = document.getElementById('desconto');
-    const fretLine      = document.getElementById('freteLine');
-    const freteEl       = document.getElementById('frete');
-    const totalEl       = document.getElementById('total');
+    const subEl   = document.getElementById('subtotal');
+    const cupLine = document.getElementById('cupomLine');
+    const descEl  = document.getElementById('desconto');
+    const fretLine= document.getElementById('freteLine');
+    const freteEl = document.getElementById('frete');
+    const totalEl = document.getElementById('total');
 
-    const form          = document.getElementById('paymentForm');
-    const radios        = form.elements['method'];    // RadioNodeList
-    const changeSec     = document.getElementById('changeSection');
-    const changeInp     = document.getElementById('changeAmount');
-    const noChangeChk   = document.getElementById('noChange');
-    const finishBtn     = document.getElementById('finishBtn');
+    const form        = document.getElementById('paymentForm');
+    const radios      = form.elements['method'];    // RadioNodeList
+    const changeSec   = document.getElementById('changeSection');
+    const changeInp   = document.getElementById('changeAmount');
+    const noChangeChk = document.getElementById('noChange');
+    const finishBtn   = document.getElementById('finishBtn');
 
     backBtn.onclick = () => history.back();
 
-    // --- 1) Dados de entrega ---
+    // --- Variáveis de contexto, definidas no topo para uso em qualquer bloco ---
+    const whatsapp   = localStorage.getItem('bgHouse_whatsapp');
+    const userId     = whatsapp ? parseInt(atob(localStorage.getItem('bgHouse_id'))) : null;
+    const storeId    = parseInt(localStorage.getItem('bgHouse_lojaId'));
+    const programId  = parseInt(localStorage.getItem("bgHouse_fidelidadeId"));
+    const cupomCode  = localStorage.getItem('bgHouse_appliedCoupon');
     const rawAddress = localStorage.getItem('bgHouse_selectedAddress');
     const rawFrete   = localStorage.getItem('bgHouse_frete');
 
+    if (!whatsapp || !userId) {
+      swal("Ops!", "Identifique-se para continuar.", "warning")
+        .then(() => window.location.href = "identify.html?return=payment.html");
+      return;
+    }
+
+    // --- 1) Dados de entrega ---
     let storedFrete = 0;
     if (rawFrete) {
       storedFrete = parseFloat(rawFrete);
@@ -66,15 +78,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         fretLine.style.display = '';
       }
     }
-
     if (rawAddress) {
       try {
         const addr = JSON.parse(rawAddress);
-        delivName.textContent    = localStorage.getItem('bgHouse_name') || 'Você';
-        delivPhone.textContent   = localStorage.getItem('bgHouse_whatsapp')
-                                     .replace(/(\d{2})(\d{5})(\d{4})/,'+$1 $2-$3');
-        delivAddress.textContent = `${addr.rua}, ${addr.numero}` +
-                                    (addr.referencia ? ` (${addr.referencia})` : '');
+        delivName.textContent   = localStorage.getItem('bgHouse_name') || 'Você';
+        delivPhone.textContent  = localStorage.getItem('bgHouse_whatsapp')
+                                    .replace(/(\d{2})(\d{5})(\d{4})/,'+$1 $2-$3');
+        delivAddr.textContent   = `${addr.rua}, ${addr.numero}` +
+                                  (addr.referencia ? ` (${addr.referencia})` : '');
         deliverySec.style.display = '';
       } catch {
         localStorage.removeItem('bgHouse_selectedAddress');
@@ -82,7 +93,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // --- 2) Carrinho & Subtotal (incluindo adicionais) ---
-    const whatsapp = localStorage.getItem('bgHouse_whatsapp');
     let cart = { items: [] }, subtotal = 0;
     try {
       cart = await fetchCart(whatsapp);
@@ -95,20 +105,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         return sum + base + addons;
       }, 0);
     } catch {
-      // se der erro, subtotal permanece 0
+      subtotal = 0;
     }
     subEl.textContent = fmtBRL(subtotal);
 
     // --- 3) Cupom ---
     let desconto = 0;
-    const cupomCode = localStorage.getItem('bgHouse_appliedCoupon');
-    const userId    = parseInt(atob(localStorage.getItem('bgHouse_id')));
-    const storeId   = parseInt(localStorage.getItem('bgHouse_lojaId'));
-
     if (cupomCode) {
       desconto = await calcularCupom(cupomCode, userId, storeId, subtotal);
     }
-    // mostramos sempre a linha, mesmo com zero
     descEl.textContent = '- ' + fmtBRL(desconto);
     cupLine.style.display = '';
 
@@ -117,15 +122,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     totalEl.textContent = fmtBRL(total);
 
     // --- 5) Controle de Troco ---
-    // exibe o campo "troco" apenas quando "Dinheiro" estiver marcado
     Array.from(radios).forEach(radio => {
       radio.addEventListener('change', () => {
-        changeSec.style.display = radio.value === 'Dinheiro' ? 'flex' : 'none';
-        // limpa valor de troco ao alternar
-        if (radio.value !== 'Dinheiro') {
+        if (radio.value === 'Dinheiro') {
+          changeSec.style.display = 'flex';
+          changeInp.disabled = noChangeChk.checked;
+        } else {
+          changeSec.style.display = 'none';
           noChangeChk.checked = false;
-          changeInp.disabled  = true;
-          changeInp.value     = '';
+          changeInp.disabled = true;
+          changeInp.value = '';
         }
       });
     });
@@ -136,30 +142,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     noChangeChk.addEventListener('change', () => {
-      if (noChangeChk.checked) {
-        changeInp.value    = '';
-        changeInp.disabled = true;
-      } else {
-        changeInp.disabled = false;
-        changeInp.focus();
-      }
+      changeInp.disabled = noChangeChk.checked;
+      if (noChangeChk.checked) changeInp.value = '';
+      else changeInp.focus();
     });
 
-    // só permitir números e vírgula
     changeInp.addEventListener('input', e => {
       e.target.value = e.target.value
-        .replace(/[^\d,]/g, '')         // remove tudo que não for dígito ou vírgula
-        .replace(/,(\d{2}).+/, ',$1');  // até duas casas decimais
+        .replace(/[^\d,]/g, '')
+        .replace(/,(\d{2}).+/, ',$1');
     });
 
     // --- 6) Finalizar pedido ---
     finishBtn.addEventListener('click', () => {
       const method = form.elements['method'].value;
       let changeFor = 0;
+
       if (method === 'Dinheiro' && !noChangeChk.checked) {
-        changeFor = parseFloat(
-          changeInp.value.replace(',', '.')
-        ) || 0;
+        changeFor = parseFloat(changeInp.value.replace(',', '.')) || 0;
         if (changeFor < total) {
           swal('Atenção', 'Troco abaixo do valor da compra.', 'warning');
           return;
@@ -171,11 +171,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         addressId: rawAddress ? JSON.parse(rawAddress).id : null,
         paymentMethod: method,
         changeFor,
-        lojaId:   storeId,
-        usuarioId,
+        usuarioId: userId,
+        lojaId:    storeId,
+        programaId,
         cartItems: cart.items,
         subtotal,
-        frete:    storedFrete,
+        frete: storedFrete,
         desconto,
         total
       };
