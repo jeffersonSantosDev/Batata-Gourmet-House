@@ -31,7 +31,7 @@ function fmtBRL(v) {
 document.addEventListener('DOMContentLoaded', async () => {
   showLoader();
   try {
-    // --- Elementos da Tela ---
+    /** Elementos da tela **/
     const backBtn       = document.getElementById('backBtn');
     const deliverySec   = document.getElementById('deliverySection');
     const delivName     = document.getElementById('delivName');
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     backBtn.onclick = () => history.back();
 
-    // --- 1) Dados de Entrega ---
+    /** 1) Dados de entrega **/
     const rawAddress = localStorage.getItem('bgHouse_selectedAddress');
     const rawFrete   = localStorage.getItem('bgHouse_frete');
 
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       storedFrete = parseFloat(rawFrete);
       if (storedFrete > 0) {
         freteEl.textContent = fmtBRL(storedFrete);
-        fretLine.style.display = '';  // mostra linha de frete
+        fretLine.style.display = '';
       }
     }
 
@@ -80,18 +80,27 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
-    // --- 2) Carrinho & Subtotal ---
+    /** 2) Carrinho & Subtotal (incluindo adicionais) **/
     const whatsapp = localStorage.getItem('bgHouse_whatsapp');
     let cart = { items: [] }, subtotal = 0;
     try {
       cart = await fetchCart(whatsapp);
-      subtotal = cart.items.reduce((s,i) => s + i.precoUnitario * i.quantidade, 0);
+      subtotal = cart.items.reduce((sum, item) => {
+        // preço base
+        const base = item.precoUnitario * item.quantidade;
+        // total de adicionais
+        const addons = (item.adicionais || []).reduce(
+          (s, ad) => s + ad.preco * ad.quantidade,
+          0
+        );
+        return sum + base + addons;
+      }, 0);
     } catch {
-      // keep subtotal = 0
+      // se der erro, subtotal stay 0
     }
     subEl.textContent = fmtBRL(subtotal);
 
-    // --- 3) Cupom ---
+    /** 3) Cupom **/
     let desconto = 0;
     const cupomCode = localStorage.getItem('bgHouse_appliedCoupon');
     if (cupomCode) {
@@ -99,20 +108,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       const storeId = parseInt(localStorage.getItem('bgHouse_lojaId'));
       desconto = await calcularCupom(cupomCode, userId, storeId, subtotal);
     }
-    // sempre exibe a linha do cupom; só esconde quando valor é zero
-    if (desconto > 0) {
-      descEl.textContent = '- ' + fmtBRL(desconto);
-      cupLine.style.display = '';
-    } else {
-      descEl.textContent = '- ' + fmtBRL(0);
-      cupLine.style.display = ''; 
-    }
+    // sempre exibe a linha, mas ajusta o valor
+    descEl.textContent = '- ' + fmtBRL(desconto);
+    cupLine.style.display = '';
 
-    // --- 4) Total geral ---
+    /** 4) Total **/
     const total = Math.max(0, subtotal - desconto + storedFrete);
     totalEl.textContent = fmtBRL(total);
 
-    // --- 5) Controle de Troco ---
+    /** 5) Controle de troco **/
     Array.from(form.method).forEach(radio => {
       radio.addEventListener('change', () => {
         changeSec.style.display = radio.value === 'Dinheiro' ? 'flex' : 'none';
@@ -126,7 +130,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (noChangeChk.checked) changeInp.value = '0,00';
     });
 
-    // --- 6) Finalizar Pedido ---
+    /** 6) Finalizar pedido **/
     finishBtn.onclick = () => {
       const method = form.method.value;
       let changeFor = 0;
