@@ -12,7 +12,7 @@ async function fetchUserAddresses(whatsapp) {
   try {
     const resp = await fetch('/api/Usuario/GetAddressesByWhatsApp', {
       method: 'POST',
-      headers: { 'Content-Type':'application/json' },
+      headers:{ 'Content-Type':'application/json' },
       body: JSON.stringify({ numero: whatsapp })
     });
     if (resp.status === 204) return [];
@@ -75,11 +75,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   userNameEl.textContent  = nome;
   userPhoneEl.textContent = whatsapp.replace(/(\d{2})(\d{5})(\d{4})/, '+$1 $2-$3');
 
-  // 1) Carrinho
+  // 1) Carrinho com adicionais
   let cart, subtotal = 0, desconto = 0, frete = 0;
   try {
     cart = await fetchCart(whatsapp);
-    subtotal = cart.items.reduce((s,i)=> s + i.precoUnitario*i.quantidade,0);
+    subtotal = cart.items.reduce((sum, item) => {
+      const base = item.precoUnitario * item.quantidade;
+      const adicionalTotal = (item.adicionais || [])
+        .reduce((s2, ad) => s2 + ad.preco * ad.quantidade, 0);
+      return sum + base + adicionalTotal;
+    }, 0);
     subtotalEl.textContent = `R$ ${fmt(subtotal)}`;
   } catch {
     subtotalEl.textContent = `R$ 0,00`;
@@ -131,7 +136,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   };
 
-  // 6) Seleção de rádio: recalcula, salva frete e endereço
+  // 6) Seleção de rádio: recalcula total, salva frete e endereço
   form.addEventListener("change", () => {
     const selId = form.addressId.value;
     document.querySelectorAll(".address-option").forEach(l => {
@@ -148,18 +153,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       frete = sel.frete;
       freteEl.textContent    = `R$ ${fmt(frete)}`;
       finalTotal.textContent = `R$ ${fmt(subtotal - desconto + frete)}`;
-      // === aqui salvamos ===
+      // === salva no localStorage ===
       localStorage.setItem("bgHouse_frete", frete.toFixed(2));
       localStorage.setItem("bgHouse_selectedAddress", JSON.stringify(sel));
     }
   });
 
-  // dispara se tiver padrão, para já salvar
+  // dispara se houver padrão, para já salvar
   if (hasDefault) {
     form.dispatchEvent(new Event("change"));
   }
 
-  // 7) Clique Próximo
+  // 7) Próximo
   nextBtn.onclick = () => {
     if (!addresses.length) {
       return swal("Atenção","Cadastre um endereço primeiro.","warning");
