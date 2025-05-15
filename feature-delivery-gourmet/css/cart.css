@@ -342,20 +342,3 @@ body {
 
 /* expander */
 
-.item-additionals.hidden {
-  display: none;
-}
-.expand-btn {
-  background: none;
-  border: none;
-  font-size: 1rem;
-  margin-left: 0.5rem;
-  cursor: pointer;
-}
-.additional-row {
-  padding: 4px 0;
-}
-.additionals-cell {
-  background: #f9f9f9;
-  padding-left: 2rem;
-}
