@@ -143,6 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           return swal('Atenção','Troco abaixo do valor da compra.','warning');
         }
       }
+      console.log("teste");
       const order = {
         whatsapp,
         addressId: rawAddress ? JSON.parse(rawAddress).id : null,
