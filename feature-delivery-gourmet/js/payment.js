@@ -158,48 +158,42 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- 6) Finalizar ---
      // --- 6) Finalizar pedido ---
-     finishBtn.addEventListener('click', () => {
-      console.log("click finishBtn");
-      const method = form.elements['method'].value;
-      let changeFor = 0;
+// dentro do seu DOMContentLoaded, substitua apenas a parte do finishBtn pelo código abaixo:
 
-      if (method === 'Dinheiro') {
-        if (!noChangeChk.checked) {
-          // usuário precisa digitar algo
-          if (!changeInp.value.trim()) {
-            swal('Atenção', 'Informe o valor do troco.', 'warning');
-            return;
-          }
-          changeFor = parseFloat(changeInp.value.replace(',', '.')) || 0;
-          console.log("troco informado:", changeFor, "total:", total);
-          if (changeFor < total) {
-            swal('Atenção', 'Troco abaixo do valor da compra.', 'warning');
-            return;
-          }
-        }
-        // else: noChangeChk.checked → troco fica 0
+finishBtn.addEventListener('click', () => {
+  const method = form.elements['method'].value;
+  let changeFor = 0;
+
+  if (method === 'Dinheiro') {
+    // se não marcou "Não preciso de troco", obriga digitar um valor
+    if (!noChangeChk.checked) {
+      if (!changeInp.value.trim()) {
+        swal('Atenção', 'Informe o valor do troco.', 'warning');
+        return;
       }
+      changeFor = parseFloat(changeInp.value.replace(',', '.')) || 0; 
+    } 
+  } 
+  
+  const order = {
+    whatsapp,
+    addressId: rawAddress ? JSON.parse(rawAddress).id : null,
+    paymentMethod: method,
+    changeFor,
+    usuarioId: userId,
+    lojaId:    storeId,
+    programId,
+    cartItems: cart.items,
+    subtotal,
+    frete:     storedFrete,
+    desconto,
+    total
+  };
 
-      // Para Crédito/Débito, changeFor já está em 0
+  console.log('Pedido final:', order);
+  swal('Sucesso', 'Pedido finalizado! Veja o console.', 'success');
+});
 
-      const order = {
-        whatsapp,
-        addressId: rawAddress ? JSON.parse(rawAddress).id : null,
-        paymentMethod: method,
-        changeFor,
-        usuarioId: userId,
-        lojaId:    storeId,
-        programId,
-        cartItems: cart.items,
-        subtotal,
-        frete:     storedFrete,
-        desconto,
-        total
-      };
-
-      console.log('Pedido final:', order);
-      swal('Sucesso','Pedido finalizado! Veja o console.','success');
-    });
 
   } finally {
     hideLoader();
