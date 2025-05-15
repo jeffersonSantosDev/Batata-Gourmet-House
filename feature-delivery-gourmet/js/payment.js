@@ -157,19 +157,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // --- 6) Finalizar ---
-    finishBtn.addEventListener('click', () => {
-      console.log("click finishBtn"); // confirma que o handler chegou
+     // --- 6) Finalizar pedido ---
+     finishBtn.addEventListener('click', () => {
+      console.log("click finishBtn");
       const method = form.elements['method'].value;
       let changeFor = 0;
 
-      if (method === 'Dinheiro' && !noChangeChk.checked) {
-        changeFor = parseFloat(changeInp.value.replace(',', '.')) || 0;
-        console.log("troco:", changeFor, "total:", total);
-        if (changeFor < total) {
-          swal('Atenção', 'Troco abaixo do valor da compra.', 'warning');
-          return;
+      if (method === 'Dinheiro') {
+        if (!noChangeChk.checked) {
+          // usuário precisa digitar algo
+          if (!changeInp.value.trim()) {
+            swal('Atenção', 'Informe o valor do troco.', 'warning');
+            return;
+          }
+          changeFor = parseFloat(changeInp.value.replace(',', '.')) || 0;
+          console.log("troco informado:", changeFor, "total:", total);
+          if (changeFor < total) {
+            swal('Atenção', 'Troco abaixo do valor da compra.', 'warning');
+            return;
+          }
         }
+        // else: noChangeChk.checked → troco fica 0
       }
+
+      // Para Crédito/Débito, changeFor já está em 0
 
       const order = {
         whatsapp,
@@ -185,6 +196,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         desconto,
         total
       };
+
       console.log('Pedido final:', order);
       swal('Sucesso','Pedido finalizado! Veja o console.','success');
     });
