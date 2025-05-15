@@ -160,44 +160,40 @@ document.addEventListener('DOMContentLoaded', async () => {
      // --- 6) Finalizar pedido ---
 // dentro do seu DOMContentLoaded, substitua apenas a parte do finishBtn pelo código abaixo:
 
-     // --- 6) Finalizar pedido ---
-     finishBtn.addEventListener('click', () => {
-      const method = form.elements['method'].value;
-      let changeFor = 0;
+finishBtn.addEventListener('click', () => {
+  const method = form.elements['method'].value;
+  let changeFor = 0;
 
-      // valida troco
-      if (method === 'Dinheiro') {
-        if (!noChangeChk.checked) {
-          if (!changeInp.value.trim()) {
-            swal('Atenção','Informe o valor do troco.','warning');
-            return;
-          }
-          changeFor = parseFloat(changeInp.value.replace(',', '.')) || 0;
-          if (changeFor < total) {
-            swal('Atenção','Troco abaixo do valor da compra.','warning');
-            return;
-          }
-        }
-      } 
-      const order = {
-        whatsapp,
-        addressId: rawAddress ? JSON.parse(rawAddress).id : null,
-        paymentMethod: method,
-        changeFor,
-        usuarioId: userId,
-        lojaId:    storeId, 
-        couponCode: cupomCode || null, 
-        programId,
-        cartItems: cart.items,
-        subtotal,
-        frete:     storedFrete,
-        desconto,
-        total
-      };
+  if (method === 'Dinheiro') {
+    // se não marcou "Não preciso de troco", obriga digitar um valor
+    if (!noChangeChk.checked) {
+      if (!changeInp.value.trim()) {
+        swal('Atenção', 'Informe o valor do troco.', 'warning');
+        return;
+      }
+      changeFor = parseFloat(changeInp.value.replace(',', '.')) || 0; 
+    } 
+  } 
+  
+  const order = {
+    whatsapp,
+    addressId: rawAddress ? JSON.parse(rawAddress).id : null,
+    paymentMethod: method,
+    changeFor,
+    usuarioId: userId,
+    lojaId:    storeId,
+    couponCode: cupomCode || null, 
+    programId,
+    cartItems: cart.items,
+    subtotal,
+    frete:     storedFrete,
+    desconto,
+    total      
+  };
 
-      console.log('Pedido:', order);
-      swal('Sucesso','Pedido finalizado! Veja o console.','success');
-    });
+  console.log('Pedido final:', order);
+  swal('Sucesso', 'Pedido finalizado! Veja o console.', 'success');
+});
 
 
   } finally {
