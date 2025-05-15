@@ -1,4 +1,5 @@
 // js/cart.js
+
 async function fetchInfoLoja() {
   const resp = await fetch('/api/Loja/GetInfoLoja', {
     method: 'GET',
@@ -23,21 +24,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   const loyaltyDots = document.querySelectorAll(".loyalty-progress .dot");
   const fmt         = v => v.toFixed(2).replace(".",",");
 
+  // voltar
+  backBtn.onclick = () => window.location.href = "index.html";
+
+  // cupom em maiúsculo
   if (couponInput) {
     couponInput.addEventListener("input", e => {
-      const tgt = e.target;
-      const start = tgt.selectionStart;
-      const end   = tgt.selectionEnd;
+      const tgt = e.target,
+            start = tgt.selectionStart, end = tgt.selectionEnd;
       tgt.value = tgt.value.toUpperCase();
       tgt.setSelectionRange(start, end);
     });
   }
-  backBtn.onclick = () => {
-    window.location.href = "index.html";
-  };
-  
 
-  // 1) Credenciais mínimas
+  // credenciais
   const whatsapp     = localStorage.getItem("bgHouse_whatsapp");
   const usuarioIdEnc = localStorage.getItem("bgHouse_id");
   const usuarioId    = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
@@ -46,9 +46,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       .then(() => window.location.href = "identify.html?return=cart.html");
   }
 
-  // 2) IDs de loja/fidelidade: se faltando, recarrega via API
-  let lojaId       = parseInt(localStorage.getItem("bgHouse_lojaId"));
-  let programaId   = parseInt(localStorage.getItem("bgHouse_fidelidadeId"));
+  // loja/fidelidade
+  let lojaId     = parseInt(localStorage.getItem("bgHouse_lojaId"));
+  let programaId = parseInt(localStorage.getItem("bgHouse_fidelidadeId"));
   if (!lojaId || !programaId) {
     try {
       const info = await fetchInfoLoja();
@@ -61,83 +61,33 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let subtotal = 0, desconto = 0;
 
-  // Fecha todos os popovers
-  const fecharPopovers = () =>
-    document.querySelectorAll(".popover").forEach(p => p.classList.add("hidden"));
-
-  // Fecha popover ao clicar fora
+  // fecha popovers ao clicar fora
   document.addEventListener("click", e => {
-    if (!e.target.closest(".item-info")) fecharPopovers();
+    if (!e.target.closest(".item-info")) {
+      document.querySelectorAll(".popover").forEach(p => p.classList.add("hidden"));
+    }
   });
 
-  // Função principal: (re)renderiza o carrinho
-  // async function carregarCarrinho() {
-  //   loading.classList.remove("hidden");
-  //   try {
-  //     const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
-  //     if (!resp.ok) throw new Error();
-  //     const cart = await resp.json();
-
-  //     if (!cart.items.length) {
-  //       localStorage.removeItem("bgHouse_appliedCoupon");
-  //       return window.location.href = "index.html";
-  //     }
-
-  //     cartList.innerHTML = "";
-  //     subtotal = 0;
-  //     for (const item of cart.items) {
-  //       subtotal += item.precoUnitario * item.quantidade;
-  //       const tr = document.createElement("tr");
-  //       tr.className  = "item-row";
-  //       tr.dataset.id = item.itemId;
-  //       tr.innerHTML = `
-  //         <td>
-  //           <div class="item-info">
-  //             <span class="item-label">
-  //               <button class="qty-btn decrease" data-id="${item.itemId}">−</button>
-  //               <span class="qty">${item.quantidade}</span>
-  //               <button class="qty-btn increase" data-id="${item.itemId}">+</button>
-  //               × <span class="product-name">${item.produtoNome}</span>
-  //             </span>
-  //             <button class="edit-btn" data-id="${item.itemId}">
-  //               <i class="fas fa-pencil-alt"></i>
-  //             </button>
-  //             <div class="popover hidden" data-id="${item.itemId}">
-  //               <button class="confirm-remove">
-  //                 <i class="fas fa-trash-alt"></i> Excluir
-  //               </button>
-  //             </div>
-  //           </div>
-  //         </td>
-  //         <td>R$ ${item.precoUnitario.toFixed(2).replace(".",",")}</td>`;
-  //       cartList.appendChild(tr);
-  //     }
-  //     atualizarResumo();
-  //   } catch {
-  //     swal("Erro", "Não foi possível carregar seu carrinho.", "error");
-  //   } finally {
-  //     loading.classList.add("hidden");
-  //   }
-  // }
+  // renderiza o carrinho
   async function carregarCarrinho() {
     loading.classList.remove("hidden");
     try {
       const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
       if (!resp.ok) throw new Error();
       const cart = await resp.json();
-  
+
       if (!cart.items.length) {
         localStorage.removeItem("bgHouse_appliedCoupon");
         return window.location.href = "index.html";
       }
-  
+
       cartList.innerHTML = "";
       subtotal = 0;
-  
+
       for (const item of cart.items) {
         subtotal += item.precoUnitario * item.quantidade;
-  
-        // Linha principal do item
+
+        // linha do item
         const tr = document.createElement("tr");
         tr.className  = "item-row";
         tr.dataset.id = item.itemId;
@@ -166,11 +116,11 @@ document.addEventListener("DOMContentLoaded", async () => {
           </td>
           <td>R$ ${item.precoUnitario.toFixed(2).replace(".",",")}</td>`;
         cartList.appendChild(tr);
-  
-        // Linha adicional para mostrar os adicionais, se existirem
+
+        // linha de adicionais
         if (item.adicionais && item.adicionais.length > 0) {
           const adTr = document.createElement("tr");
-          adTr.className    = "item-additionals hidden";
+          adTr.className     = "item-additionals hidden";
           adTr.dataset.parent = item.itemId;
           const adHtml = item.adicionais.map(ad => `
             <div class="additional-row">
@@ -181,19 +131,11 @@ document.addEventListener("DOMContentLoaded", async () => {
           cartList.appendChild(adTr);
         }
       }
-  
-      // Adiciona listener para expandir/recolher adicionais
-      cartList.querySelectorAll(".expand-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const id = btn.dataset.id;
-          const adRow = cartList.querySelector(`tr.item-additionals[data-parent="${id}"]`);
-          if (!adRow) return;
-          adRow.classList.toggle("hidden");
-          btn.textContent = adRow.classList.contains("hidden") ? "+" : "−";
-        });
-      });
-  
+
+      // após renderizar: resumo, cupom e fidelidade
       atualizarResumo();
+      await aplicarCupomSalvo();
+      await carregarFidelidade();
     } catch {
       swal("Erro", "Não foi possível carregar seu carrinho.", "error");
     } finally {
@@ -201,14 +143,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  
   function atualizarResumo() {
     subtotalEl.textContent = `+ R$ ${fmt(subtotal)}`;
     totalEl.textContent    = `R$ ${fmt(subtotal - desconto)}`;
   }
 
-  // Eventos dentro do carrinho: quantidade, popover e remoção
+  // delegação de eventos no cartList
   cartList.addEventListener("click", async e => {
+    // aumentar/diminuir
     const dec = e.target.closest(".qty-btn.decrease");
     const inc = e.target.closest(".qty-btn.increase");
     if (dec || inc) {
@@ -228,8 +170,6 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
         );
         await carregarCarrinho();
-        await aplicarCupomSalvo();
-        await carregarFidelidade();
       } catch {
         swal("Erro", "Não foi possível atualizar a quantidade.", "error");
       } finally {
@@ -238,6 +178,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
+    // expandir/recolher adicionais
+    const exp = e.target.closest(".expand-btn");
+    if (exp) {
+      const id = exp.dataset.id;
+      const adRow = cartList.querySelector(`tr.item-additionals[data-parent="${id}"]`);
+      if (adRow) {
+        adRow.classList.toggle("hidden");
+        exp.textContent = adRow.classList.contains("hidden") ? "+" : "−";
+      }
+      return;
+    }
+
+    // editar / popover
     const editBtn = e.target.closest(".edit-btn");
     if (editBtn) {
       e.stopPropagation();
@@ -246,19 +199,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
+    // remover item
     const rem = e.target.closest(".confirm-remove");
     if (rem) {
       const pop    = rem.closest(".popover");
       const itemId = pop.dataset.id;
       pop.classList.add("hidden");
-      const willDelete = await swal({
+      const will = await swal({
         title: "Remover item?",
         text:  "Deseja mesmo apagar este item do carrinho?",
         icon:  "warning",
         buttons:["Não","Sim"],
         dangerMode:true
       });
-      if (!willDelete) return;
+      if (!will) return;
 
       loading.classList.remove("hidden");
       try {
@@ -268,18 +222,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         );
         if (!del.ok) throw new Error();
         await carregarCarrinho();
-        await aplicarCupomSalvo();
-        await carregarFidelidade();
       } catch {
         swal("Erro", "Não foi possível remover o item.", "error");
       } finally {
         loading.classList.add("hidden");
       }
+      return;
     }
   });
 
-  // Aplica cupom salvo
+  // aplica cupom salvo
   async function aplicarCupomSalvo() {
+    desconto = 0;
     const codigo = localStorage.getItem("bgHouse_appliedCoupon");
     if (!codigo) return;
     try {
@@ -294,16 +248,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         couponInput.value    = codigo;
         couponInput.disabled = true;
         applyBtn.disabled    = true;
-        atualizarResumo();
       } else {
         localStorage.removeItem("bgHouse_appliedCoupon");
       }
-    } catch {
-      // silencioso
-    }
+    } catch {}
   }
 
-  // Verificar cupom novo
+  // aplicar cupom novo
   applyBtn.onclick = async () => {
     const codigo = couponInput.value.trim();
     if (!codigo) {
@@ -311,7 +262,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
     loading.classList.remove("hidden");
-    desconto = 0;
     try {
       const resp = await fetch("/api/Cupom/CalcularDesconto", {
         method: "POST",
@@ -321,22 +271,21 @@ document.addEventListener("DOMContentLoaded", async () => {
       const data = await resp.json();
       if (!data.sucesso) {
         swal("Erro", data.mensagem, "error");
-        return;
+      } else {
+        desconto = data.dados;
+        couponInput.disabled = true;
+        applyBtn.disabled    = true;
+        localStorage.setItem("bgHouse_appliedCoupon", codigo);
       }
-      desconto = data.dados;
-      atualizarResumo();
-      swal("Sucesso", `Cupom aplicado: R$ ${fmt(desconto)}`, "success");
-      couponInput.disabled = true;
-      applyBtn.disabled    = true;
-      localStorage.setItem("bgHouse_appliedCoupon", codigo);
     } catch {
       swal("Erro","Não foi possível validar o cupom.","error");
     } finally {
       loading.classList.add("hidden");
+      atualizarResumo();
     }
   };
 
-  // Progresso de fidelidade
+  // programa de fidelidade
   async function carregarFidelidade() {
     try {
       const resp = await fetch(
@@ -348,11 +297,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch {}
   }
 
-  nextBtn.onclick = () => { 
-    window.location.href = "entrega.html";
-  };
+  // próximo
+  nextBtn.onclick = () => window.location.href = "entrega.html";
 
-  // Inicialização
+  // inicializa
   await carregarCarrinho();
   await aplicarCupomSalvo();
   await carregarFidelidade();
