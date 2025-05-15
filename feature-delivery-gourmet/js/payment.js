@@ -31,6 +31,7 @@ function fmtBRL(v) {
 document.addEventListener('DOMContentLoaded', async () => {
   showLoader();
   try {
+    // --- Elementos da Tela ---
     const backBtn       = document.getElementById('backBtn');
     const deliverySec   = document.getElementById('deliverySection');
     const delivName     = document.getElementById('delivName');
@@ -52,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     backBtn.onclick = () => history.back();
 
-    // 1) Dados de Entrega: lemos sempre do localStorage
+    // --- 1) Dados de Entrega ---
     const rawAddress = localStorage.getItem('bgHouse_selectedAddress');
     const rawFrete   = localStorage.getItem('bgHouse_frete');
 
@@ -61,6 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       storedFrete = parseFloat(rawFrete);
       if (storedFrete > 0) {
         freteEl.textContent = fmtBRL(storedFrete);
+        fretLine.style.display = '';  // mostra linha de frete
       }
     }
 
@@ -74,26 +76,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                                     (addr.referencia ? ` (${addr.referencia})` : '');
         deliverySec.style.display = '';
       } catch {
-        // se JSON inválido, remove a key
         localStorage.removeItem('bgHouse_selectedAddress');
       }
     }
 
-    // 2) Carrinho & Subtotal
+    // --- 2) Carrinho & Subtotal ---
     const whatsapp = localStorage.getItem('bgHouse_whatsapp');
     let cart = { items: [] }, subtotal = 0;
     try {
       cart = await fetchCart(whatsapp);
-      subtotal = cart.items.reduce((s,i)=>s + i.precoUnitario*i.quantidade, 0);
-    } catch {}
+      subtotal = cart.items.reduce((s,i) => s + i.precoUnitario * i.quantidade, 0);
+    } catch {
+      // keep subtotal = 0
+    }
     subEl.textContent = fmtBRL(subtotal);
 
-    // 3) Se não tiver frete válido escondemos a linha
-    if (!rawFrete || storedFrete === 0) {
-      fretLine.style.display = 'none';
-    }
-
-    // 4) Cupom
+    // --- 3) Cupom ---
     let desconto = 0;
     const cupomCode = localStorage.getItem('bgHouse_appliedCoupon');
     if (cupomCode) {
@@ -101,17 +99,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       const storeId = parseInt(localStorage.getItem('bgHouse_lojaId'));
       desconto = await calcularCupom(cupomCode, userId, storeId, subtotal);
     }
+    // sempre exibe a linha do cupom; só esconde quando valor é zero
     if (desconto > 0) {
       descEl.textContent = '- ' + fmtBRL(desconto);
+      cupLine.style.display = '';
     } else {
-      cupLine.style.display = 'none';
+      descEl.textContent = '- ' + fmtBRL(0);
+      cupLine.style.display = ''; 
     }
 
-    // 5) Total
+    // --- 4) Total geral ---
     const total = Math.max(0, subtotal - desconto + storedFrete);
     totalEl.textContent = fmtBRL(total);
 
-    // 6) Controle de Troco
+    // --- 5) Controle de Troco ---
     Array.from(form.method).forEach(radio => {
       radio.addEventListener('change', () => {
         changeSec.style.display = radio.value === 'Dinheiro' ? 'flex' : 'none';
@@ -125,12 +126,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (noChangeChk.checked) changeInp.value = '0,00';
     });
 
-    // 7) Finalizar pedido
+    // --- 6) Finalizar Pedido ---
     finishBtn.onclick = () => {
       const method = form.method.value;
       let changeFor = 0;
       if (method === 'Dinheiro' && !noChangeChk.checked) {
-        changeFor = parseFloat(changeInp.value.replace(',','.'))||0;
+        changeFor = parseFloat(changeInp.value.replace(',','.')) || 0;
         if (changeFor < total) {
           return swal('Atenção','Troco abaixo do valor da compra.','warning');
         }
