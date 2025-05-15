@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           adTr.dataset.parent = item.itemId;
           const adHtml = item.adicionais.map(ad => `
             <div class="additional-row">
-              <small>+ ${ad.quantidade} × ${ad.nome} (R$ ${ad.preco.toFixed(2).replace(".",",")})</small>
+              <small>+ ${ad.quantidade} × ${ad.produtoNome} (R$ ${ad.preco.toFixed(2).replace(".",",")})</small>
             </div>
           `).join("");
           adTr.innerHTML = `<td colspan="2" class="additionals-cell">${adHtml}</td>`;
