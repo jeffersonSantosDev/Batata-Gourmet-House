@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const programId  = parseInt(localStorage.getItem("bgHouse_fidelidadeId"));
     const cupomCode  = localStorage.getItem('bgHouse_appliedCoupon');
     const rawAddress = localStorage.getItem('bgHouse_selectedAddress');
-    const rawFrete   = localStorage.getItem('bgHouse_frete');
+    const rawFrete   = localStorage.getItem('bgHouse_frete'); 
 
     if (!whatsapp || !userId) {
       swal("Ops!", "Identifique-se para continuar.", "warning")
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         changeFor,
         usuarioId: userId,
         lojaId:    storeId,
-        programaId,
+        programId,
         cartItems: cart.items,
         subtotal,
         frete: storedFrete,
