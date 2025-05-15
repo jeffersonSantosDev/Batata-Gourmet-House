@@ -342,3 +342,47 @@ body {
 
 /* expander */
 
+/* Evita overflow horizontal indesejado */
+.detail-main {
+  padding: 1rem;
+  overflow-x: hidden;
+}
+
+/* Botão de expandir */
+.expand-btn {
+  background: var(--bg-light);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  line-height: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background .2s, transform .2s;
+}
+.expand-btn:hover {
+  background: var(--accent);
+  color: #fff;
+  transform: scale(1.1);
+}
+
+/* Linha de adicionais oculta/exibida */
+.item-additionals.hidden {
+  display: none;
+}
+
+/* Célula que agrupa os adicionais */
+.additionals-cell {
+  background: #f9f9f9;
+  padding: 0.5rem 1rem;
+}
+
+/* Cada adicional */
+.additional-row {
+  padding: 4px 0;
+  font-size: 0.9rem;
+  color: #555;
+}

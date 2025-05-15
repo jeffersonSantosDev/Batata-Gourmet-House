@@ -122,11 +122,17 @@ document.addEventListener("DOMContentLoaded", async () => {
           const adTr = document.createElement("tr");
           adTr.className     = "item-additionals hidden";
           adTr.dataset.parent = item.itemId;
-          const adHtml = item.adicionais.map(ad => `
-            <div class="additional-row">
-              <small>+ ${ad.quantidade} × ${ad.produtoNome} (R$ ${ad.preco.toFixed(2).replace(".",",")})</small>
-            </div>
-          `).join("");
+          const adHtml = item.adicionais.map(ad => {
+            // se nome for vazio ou só espaços, usa "Adicional #" + ID
+            const nome = ad.nome && ad.nome.trim()
+              ? ad.nome.trim()
+              : `Adicional #${ad.adicionalId}`;
+            return `
+              <div class="additional-row">
+                <small>+ ${ad.quantidade} × ${nome} (R$ ${ad.preco.toFixed(2).replace(".",",")})</small>
+              </div>
+            `;
+          }).join("");
           adTr.innerHTML = `<td colspan="2" class="additionals-cell">${adHtml}</td>`;
           cartList.appendChild(adTr);
         }
