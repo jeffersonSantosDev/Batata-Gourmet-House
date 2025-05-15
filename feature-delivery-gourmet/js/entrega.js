@@ -12,7 +12,7 @@ async function fetchUserAddresses(whatsapp) {
   try {
     const resp = await fetch('/api/Usuario/GetAddressesByWhatsApp', {
       method: 'POST',
-      headers:{ 'Content-Type':'application/json' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ numero: whatsapp })
     });
     if (resp.status === 204) return [];
@@ -20,7 +20,7 @@ async function fetchUserAddresses(whatsapp) {
     return await resp.json();
   } catch (err) {
     console.error(err);
-    await swal("Erro","Não foi possível carregar seus endereços.","error");
+    await swal("Erro", "Não foi possível carregar seus endereços.", "error");
     window.location.href = 'identify.html?return=entrega.html';
     return [];
   } finally {
@@ -36,11 +36,11 @@ async function fetchCart(whatsapp) {
 
 async function calcularCupom(codigo, usuarioId, lojaId, subtotal) {
   const resp = await fetch('/api/Cupom/CalcularDesconto', {
-    method:'POST',
-    headers:{'Content-Type':'application/json','Accept':'application/json'},
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
     body: JSON.stringify({ codigo, usuarioId, lojaId, valorOriginal: subtotal })
   });
-  if (!resp.ok) return { sucesso:false };
+  if (!resp.ok) return { sucesso: false };
   return resp.json();
 }
 
@@ -69,21 +69,21 @@ document.addEventListener("DOMContentLoaded", async () => {
                      : null;
 
   if (!whatsapp || !usuarioId) {
-    await swal("Ops!","Identifique-se.","warning");
+    await swal("Ops!", "Identifique-se.", "warning");
     return window.location.href = 'identify.html?return=entrega.html';
   }
   userNameEl.textContent  = nome;
   userPhoneEl.textContent = whatsapp.replace(/(\d{2})(\d{5})(\d{4})/, '+$1 $2-$3');
 
-  // 1) Carrinho com adicionais
+  // 1) Carrinho (com adicionais)
   let cart, subtotal = 0, desconto = 0, frete = 0;
   try {
     cart = await fetchCart(whatsapp);
     subtotal = cart.items.reduce((sum, item) => {
       const base = item.precoUnitario * item.quantidade;
-      const adicionalTotal = (item.adicionais || [])
+      const adicionaisTotal = (item.adicionais || [])
         .reduce((s2, ad) => s2 + ad.preco * ad.quantidade, 0);
-      return sum + base + adicionalTotal;
+      return sum + base + adicionaisTotal;
     }, 0);
     subtotalEl.textContent = `R$ ${fmt(subtotal)}`;
   } catch {
@@ -91,6 +91,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // 2) Cupom
+  cupomLine.style.display = "none";
   const savedCupom = localStorage.getItem("bgHouse_appliedCoupon");
   if (savedCupom) {
     const res = await calcularCupom(savedCupom, usuarioId, lojaId, subtotal);
@@ -151,20 +152,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     const sel = addresses.find(a => a.id === +selId);
     if (sel) {
       frete = sel.frete;
-      freteEl.textContent    = `R$ ${fmt(frete)}`;
+      freteEl.textContent    = frete > 0 ? `R$ ${fmt(frete)}` : '–';
       finalTotal.textContent = `R$ ${fmt(subtotal - desconto + frete)}`;
-      // === salva no localStorage ===
+      // salva
       localStorage.setItem("bgHouse_frete", frete.toFixed(2));
       localStorage.setItem("bgHouse_selectedAddress", JSON.stringify(sel));
     }
   });
 
-  // dispara se houver padrão, para já salvar
+  // dispara se houver padrão
   if (hasDefault) {
     form.dispatchEvent(new Event("change"));
   }
 
-  // 7) Próximo
+  // 7) Próximo → pagamento
   nextBtn.onclick = () => {
     if (!addresses.length) {
       return swal("Atenção","Cadastre um endereço primeiro.","warning");
