@@ -74,7 +74,7 @@ body {
 }
 .cart-items th,
 .cart-items td {
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.2rem;
   text-align: left;
   border-bottom: 1px solid var(--border);
 }
