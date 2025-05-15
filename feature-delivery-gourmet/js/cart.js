@@ -75,19 +75,25 @@ document.addEventListener("DOMContentLoaded", async () => {
       const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
       if (!resp.ok) throw new Error();
       const cart = await resp.json();
-
+  
       if (!cart.items.length) {
         localStorage.removeItem("bgHouse_appliedCoupon");
         return window.location.href = "index.html";
       }
-
+  
       cartList.innerHTML = "";
       subtotal = 0;
-
+  
       for (const item of cart.items) {
-        subtotal += item.precoUnitario * item.quantidade;
-
-        // linha do item
+        // 1) calcula total dos adicionais deste item
+        const adicionaisTotal = (item.adicionais || [])
+          .reduce((sum, ad) => sum + ad.preco * ad.quantidade, 0);
+  
+        // 2) total da linha (base + adicionais)
+        const lineTotal = (item.precoUnitario * item.quantidade) + adicionaisTotal;
+        subtotal += lineTotal;
+  
+        // 3) monta a tr principal
         const tr = document.createElement("tr");
         tr.className  = "item-row";
         tr.dataset.id = item.itemId;
@@ -114,33 +120,29 @@ document.addEventListener("DOMContentLoaded", async () => {
               </div>
             </div>
           </td>
-          <td>R$ ${item.precoUnitario.toFixed(2).replace(".",",")}</td>`;
+          <td>R$ ${lineTotal.toFixed(2).replace(".",",")}</td>`;
         cartList.appendChild(tr);
-
-        // linha de adicionais
+  
+        // 4) monta a tr de detalhes de adicionais
         if (item.adicionais && item.adicionais.length > 0) {
           const adTr = document.createElement("tr");
-          adTr.className     = "item-additionals hidden";
+          adTr.className      = "item-additionals hidden";
           adTr.dataset.parent = item.itemId;
           const adHtml = item.adicionais.map(ad => {
-            // se nome for vazio ou só espaços, usa "Adicional #" + ID
-            const nome = ad.nome && ad.nome.trim()
-              ? ad.nome.trim()
-              : `Adicional #${ad.adicionalId}`;
+            const nome = ad.nome?.trim() || `Adicional #${ad.adicionalId}`;
             return `
               <div class="additional-row">
                 <small>+ ${ad.quantidade} × ${nome} (R$ ${ad.preco.toFixed(2).replace(".",",")})</small>
-              </div>
-            `;
+              </div>`;
           }).join("");
           adTr.innerHTML = `<td colspan="2" class="additionals-cell">${adHtml}</td>`;
           cartList.appendChild(adTr);
         }
       }
-
-      // após renderizar: resumo, cupom e fidelidade
-      atualizarResumo();
-      await aplicarCupomSalvo();
+  
+      // Atualiza resumo e reaplica cupom/fidelidade
+      atualizarResumo();      
+      await aplicarCupomSalvo();  
       await carregarFidelidade();
     } catch {
       swal("Erro", "Não foi possível carregar seu carrinho.", "error");
@@ -148,7 +150,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       loading.classList.add("hidden");
     }
   }
-
+  
   function atualizarResumo() {
     subtotalEl.textContent = `+ R$ ${fmt(subtotal)}`;
     totalEl.textContent    = `R$ ${fmt(subtotal - desconto)}`;
