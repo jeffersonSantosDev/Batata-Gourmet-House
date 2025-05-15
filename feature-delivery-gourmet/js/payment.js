@@ -103,11 +103,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     /** 3) Cupom **/
     let desconto = 0;
     const cupomCode = localStorage.getItem('bgHouse_appliedCoupon');
+    const userId  = parseInt(atob(localStorage.getItem('bgHouse_id')));
+    const storeId = parseInt(localStorage.getItem('bgHouse_lojaId'));
+    let programaId = parseInt(localStorage.getItem("bgHouse_fidelidadeId"));
+
     if (cupomCode) {
-      const userId  = parseInt(atob(localStorage.getItem('bgHouse_id')));
-      const storeId = parseInt(localStorage.getItem('bgHouse_lojaId'));
       desconto = await calcularCupom(cupomCode, userId, storeId, subtotal);
     }
+ 
     // sempre exibe a linha, mas ajusta o valor
     descEl.textContent = '- ' + fmtBRL(desconto);
     cupLine.style.display = '';
@@ -145,6 +148,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         addressId: rawAddress ? JSON.parse(rawAddress).id : null,
         paymentMethod: method,
         changeFor,
+        usuarioId: userId,
+        lojaId: storeId,
+        programaId: programaId,
         cartItems: cart.items,
         subtotal,
         frete: storedFrete,
