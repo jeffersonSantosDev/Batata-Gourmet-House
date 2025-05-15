@@ -71,22 +71,73 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   // Função principal: (re)renderiza o carrinho
+  // async function carregarCarrinho() {
+  //   loading.classList.remove("hidden");
+  //   try {
+  //     const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
+  //     if (!resp.ok) throw new Error();
+  //     const cart = await resp.json();
+
+  //     if (!cart.items.length) {
+  //       localStorage.removeItem("bgHouse_appliedCoupon");
+  //       return window.location.href = "index.html";
+  //     }
+
+  //     cartList.innerHTML = "";
+  //     subtotal = 0;
+  //     for (const item of cart.items) {
+  //       subtotal += item.precoUnitario * item.quantidade;
+  //       const tr = document.createElement("tr");
+  //       tr.className  = "item-row";
+  //       tr.dataset.id = item.itemId;
+  //       tr.innerHTML = `
+  //         <td>
+  //           <div class="item-info">
+  //             <span class="item-label">
+  //               <button class="qty-btn decrease" data-id="${item.itemId}">−</button>
+  //               <span class="qty">${item.quantidade}</span>
+  //               <button class="qty-btn increase" data-id="${item.itemId}">+</button>
+  //               × <span class="product-name">${item.produtoNome}</span>
+  //             </span>
+  //             <button class="edit-btn" data-id="${item.itemId}">
+  //               <i class="fas fa-pencil-alt"></i>
+  //             </button>
+  //             <div class="popover hidden" data-id="${item.itemId}">
+  //               <button class="confirm-remove">
+  //                 <i class="fas fa-trash-alt"></i> Excluir
+  //               </button>
+  //             </div>
+  //           </div>
+  //         </td>
+  //         <td>R$ ${item.precoUnitario.toFixed(2).replace(".",",")}</td>`;
+  //       cartList.appendChild(tr);
+  //     }
+  //     atualizarResumo();
+  //   } catch {
+  //     swal("Erro", "Não foi possível carregar seu carrinho.", "error");
+  //   } finally {
+  //     loading.classList.add("hidden");
+  //   }
+  // }
   async function carregarCarrinho() {
     loading.classList.remove("hidden");
     try {
       const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
       if (!resp.ok) throw new Error();
       const cart = await resp.json();
-
+  
       if (!cart.items.length) {
         localStorage.removeItem("bgHouse_appliedCoupon");
         return window.location.href = "index.html";
       }
-
+  
       cartList.innerHTML = "";
       subtotal = 0;
+  
       for (const item of cart.items) {
         subtotal += item.precoUnitario * item.quantidade;
+  
+        // Linha principal do item
         const tr = document.createElement("tr");
         tr.className  = "item-row";
         tr.dataset.id = item.itemId;
@@ -99,6 +150,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <button class="qty-btn increase" data-id="${item.itemId}">+</button>
                 × <span class="product-name">${item.produtoNome}</span>
               </span>
+              ${item.adicionais && item.adicionais.length > 0
+                ? `<button class="expand-btn" data-id="${item.itemId}">+</button>`
+                : ""
+              }
               <button class="edit-btn" data-id="${item.itemId}">
                 <i class="fas fa-pencil-alt"></i>
               </button>
@@ -111,7 +166,33 @@ document.addEventListener("DOMContentLoaded", async () => {
           </td>
           <td>R$ ${item.precoUnitario.toFixed(2).replace(".",",")}</td>`;
         cartList.appendChild(tr);
+  
+        // Linha adicional para mostrar os adicionais, se existirem
+        if (item.adicionais && item.adicionais.length > 0) {
+          const adTr = document.createElement("tr");
+          adTr.className    = "item-additionals hidden";
+          adTr.dataset.parent = item.itemId;
+          const adHtml = item.adicionais.map(ad => `
+            <div class="additional-row">
+              <small>+ ${ad.quantidade} × ${ad.nome} (R$ ${ad.preco.toFixed(2).replace(".",",")})</small>
+            </div>
+          `).join("");
+          adTr.innerHTML = `<td colspan="2" class="additionals-cell">${adHtml}</td>`;
+          cartList.appendChild(adTr);
+        }
       }
+  
+      // Adiciona listener para expandir/recolher adicionais
+      cartList.querySelectorAll(".expand-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.dataset.id;
+          const adRow = cartList.querySelector(`tr.item-additionals[data-parent="${id}"]`);
+          if (!adRow) return;
+          adRow.classList.toggle("hidden");
+          btn.textContent = adRow.classList.contains("hidden") ? "+" : "−";
+        });
+      });
+  
       atualizarResumo();
     } catch {
       swal("Erro", "Não foi possível carregar seu carrinho.", "error");
@@ -120,6 +201,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  
   function atualizarResumo() {
     subtotalEl.textContent = `+ R$ ${fmt(subtotal)}`;
     totalEl.textContent    = `R$ ${fmt(subtotal - desconto)}`;
