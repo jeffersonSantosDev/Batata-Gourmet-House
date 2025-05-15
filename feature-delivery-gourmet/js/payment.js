@@ -15,8 +15,8 @@ async function fetchCart(whatsapp) {
 
 async function calcularCupom(code, userId, storeId, sub) {
   const r = await fetch('/api/Cupom/CalcularDesconto', {
-    method:'POST',
-    headers:{ 'Content-Type':'application/json' },
+    method: 'POST',
+    headers: { 'Content-Type':'application/json' },
     body: JSON.stringify({ codigo: code, usuarioId: userId, lojaId: storeId, valorOriginal: sub })
   });
   if (!r.ok) return 0;
@@ -38,30 +38,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     const delivPhone  = document.getElementById('delivPhone');
     const delivAddr   = document.getElementById('delivAddress');
 
-    const subEl   = document.getElementById('subtotal');
-    const cupLine = document.getElementById('cupomLine');
-    const descEl  = document.getElementById('desconto');
-    const fretLine= document.getElementById('freteLine');
-    const freteEl = document.getElementById('frete');
-    const totalEl = document.getElementById('total');
+    const subEl    = document.getElementById('subtotal');
+    const cupLine  = document.getElementById('cupomLine');
+    const descEl   = document.getElementById('desconto');
+    const fretLine = document.getElementById('freteLine');
+    const freteEl  = document.getElementById('frete');
+    const totalEl  = document.getElementById('total');
 
     const form        = document.getElementById('paymentForm');
-    const radios      = form.elements['method'];    // RadioNodeList
+    const radios      = form.elements['method']; // RadioNodeList
     const changeSec   = document.getElementById('changeSection');
     const changeInp   = document.getElementById('changeAmount');
     const noChangeChk = document.getElementById('noChange');
     const finishBtn   = document.getElementById('finishBtn');
 
+    // força type=button para evitar submit
+    finishBtn.setAttribute('type','button');
+
     backBtn.onclick = () => history.back();
 
-    // --- Variáveis de contexto, definidas no topo para uso em qualquer bloco ---
+    // --- Contexto ---
     const whatsapp   = localStorage.getItem('bgHouse_whatsapp');
     const userId     = whatsapp ? parseInt(atob(localStorage.getItem('bgHouse_id'))) : null;
     const storeId    = parseInt(localStorage.getItem('bgHouse_lojaId'));
-    const programId  = parseInt(localStorage.getItem("bgHouse_fidelidadeId"));
+    const programId  = parseInt(localStorage.getItem('bgHouse_fidelidadeId'));
     const cupomCode  = localStorage.getItem('bgHouse_appliedCoupon');
     const rawAddress = localStorage.getItem('bgHouse_selectedAddress');
-    const rawFrete   = localStorage.getItem('bgHouse_frete'); 
+    const rawFrete   = localStorage.getItem('bgHouse_frete');
 
     if (!whatsapp || !userId) {
       swal("Ops!", "Identifique-se para continuar.", "warning")
@@ -69,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // --- 1) Dados de entrega ---
+    // --- 1) Entrega ---
     let storedFrete = 0;
     if (rawFrete) {
       storedFrete = parseFloat(rawFrete);
@@ -81,26 +84,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (rawAddress) {
       try {
         const addr = JSON.parse(rawAddress);
-        delivName.textContent   = localStorage.getItem('bgHouse_name') || 'Você';
-        delivPhone.textContent  = localStorage.getItem('bgHouse_whatsapp')
-                                    .replace(/(\d{2})(\d{5})(\d{4})/,'+$1 $2-$3');
-        delivAddr.textContent   = `${addr.rua}, ${addr.numero}` +
-                                  (addr.referencia ? ` (${addr.referencia})` : '');
+        delivName.textContent  = localStorage.getItem('bgHouse_name') || 'Você';
+        delivPhone.textContent = localStorage.getItem('bgHouse_whatsapp')
+                                   .replace(/(\d{2})(\d{5})(\d{4})/,'+$1 $2-$3');
+        delivAddr.textContent  = `${addr.rua}, ${addr.numero}` +
+                                 (addr.referencia ? ` (${addr.referencia})` : '');
         deliverySec.style.display = '';
       } catch {
         localStorage.removeItem('bgHouse_selectedAddress');
       }
     }
 
-    // --- 2) Carrinho & Subtotal (incluindo adicionais) ---
+    // --- 2) Carrinho & Subtotal (c/ adicionais) ---
     let cart = { items: [] }, subtotal = 0;
     try {
       cart = await fetchCart(whatsapp);
       subtotal = cart.items.reduce((sum, item) => {
         const base   = item.precoUnitario * item.quantidade;
         const addons = (item.adicionais || []).reduce(
-          (s, ad) => s + ad.preco * ad.quantidade,
-          0
+          (s, ad) => s + ad.preco * ad.quantidade, 0
         );
         return sum + base + addons;
       }, 0);
@@ -121,7 +123,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const total = Math.max(0, subtotal - desconto + storedFrete);
     totalEl.textContent = fmtBRL(total);
 
-    // --- 5) Controle de Troco ---
+    // --- 5) Troco ---
     Array.from(radios).forEach(radio => {
       radio.addEventListener('change', () => {
         if (radio.value === 'Dinheiro') {
@@ -147,19 +149,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       else changeInp.focus();
     });
 
+    // limita a formato NNN,NN
     changeInp.addEventListener('input', e => {
       e.target.value = e.target.value
         .replace(/[^\d,]/g, '')
         .replace(/,(\d{2}).+/, ',$1');
     });
 
-    // --- 6) Finalizar pedido ---
+    // --- 6) Finalizar ---
     finishBtn.addEventListener('click', () => {
+      console.log("click finishBtn"); // confirma que o handler chegou
       const method = form.elements['method'].value;
       let changeFor = 0;
 
       if (method === 'Dinheiro' && !noChangeChk.checked) {
         changeFor = parseFloat(changeInp.value.replace(',', '.')) || 0;
+        console.log("troco:", changeFor, "total:", total);
         if (changeFor < total) {
           swal('Atenção', 'Troco abaixo do valor da compra.', 'warning');
           return;
@@ -176,12 +181,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         programId,
         cartItems: cart.items,
         subtotal,
-        frete: storedFrete,
+        frete:     storedFrete,
         desconto,
         total
       };
-      console.log('Pedido:', order);
-      swal('Sucesso', 'Pedido finalizado! Veja o console.', 'success');
+      console.log('Pedido final:', order);
+      swal('Sucesso','Pedido finalizado! Veja o console.','success');
     });
 
   } finally {
