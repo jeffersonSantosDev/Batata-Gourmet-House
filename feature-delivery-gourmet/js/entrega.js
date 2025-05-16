@@ -1,3 +1,5 @@
+// js/entrega.js
+
 function showLoader() {
   document.getElementById("loadingOverlay").classList.remove("hidden");
 }
@@ -32,25 +34,14 @@ async function fetchCart(whatsapp) {
   return resp.json();
 }
 
-async function calcularCupomAplicado(codigo, usuarioId, lojaId, valorOriginal, carrinhoId) {
-  const resp = await fetch('/api/Cupom/Aplicar', {
+async function calcularCupom(codigo, usuarioId, lojaId, subtotal) {
+  const resp = await fetch('/api/Cupom/CalcularDesconto', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: JSON.stringify({ codigo, usuarioId, lojaId, valorOriginal, carrinhoId })
+    body: JSON.stringify({ codigo, usuarioId, lojaId, valorOriginal: subtotal })
   });
   if (!resp.ok) return { sucesso: false };
-  return await resp.json();
-}
-
-async function buscarCupomDoCarrinho(carrinhoId) {
-  try {
-    const resp = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${carrinhoId}`);
-    if (!resp.ok) return null;
-    const codigo = await resp.text();
-    return codigo || null;
-  } catch {
-    return null;
-  }
+  return resp.json();
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -69,27 +60,23 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   backBtn.onclick = () => history.back();
 
-  // Credenciais
   const whatsapp  = localStorage.getItem("bgHouse_whatsapp");
   const nome      = localStorage.getItem("bgHouse_name")  || "Você";
   const lojaId    = parseInt(localStorage.getItem("bgHouse_lojaId"));
-  const usuarioId = localStorage.getItem("bgHouse_id")
-                     ? parseInt(atob(localStorage.getItem("bgHouse_id")))
-                     : null;
+  const usuarioIdEnc = localStorage.getItem("bgHouse_id");
+  const usuarioId = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
 
-  if (!whatsapp || !usuarioId) {
-    await swal("Ops!", "Identifique-se.", "warning");
-    return window.location.href = 'identify.html?return=entrega.html';
+  if (!whatsapp || !usuarioId || !lojaId) {
+    await swal("Sessão expirada", "Por favor, identifique-se novamente.", "warning");
+    return window.location.href = "identify.html?return=entrega.html";
   }
 
   userNameEl.textContent  = nome;
   userPhoneEl.textContent = whatsapp.replace(/(\d{2})(\d{5})(\d{4})/, '+$1 $2-$3');
 
-  // 1) Carrinho (com adicionais)
-  let cart, carrinhoId = null, subtotal = 0, desconto = 0, frete = 0;
+  let cart, subtotal = 0, desconto = 0, frete = 0;
   try {
     cart = await fetchCart(whatsapp);
-    carrinhoId = cart.cartId;
     subtotal = cart.items.reduce((sum, item) => {
       const base = item.precoUnitario * item.quantidade;
       const adicionaisTotal = (item.adicionais || [])
@@ -101,19 +88,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     subtotalEl.textContent = `R$ 0,00`;
   }
 
-  // 2) Cupom do banco
+  // Cupom
   cupomLine.style.display = "none";
-  const codigoCupom = await buscarCupomDoCarrinho(carrinhoId);
-  if (codigoCupom) {
-    const res = await calcularCupomAplicado(codigoCupom, usuarioId, lojaId, subtotal, carrinhoId);
+  const savedCupom = localStorage.getItem("bgHouse_appliedCoupon");
+  if (savedCupom && usuarioId && lojaId && subtotal > 0) {
+    const res = await calcularCupom(savedCupom, usuarioId, lojaId, subtotal);
     if (res.sucesso) {
       desconto = res.dados;
       cupomLine.style.display = "flex";
       cupomValue.textContent  = `- R$ ${fmt(desconto)}`;
+    } else {
+      localStorage.removeItem("bgHouse_appliedCoupon");
     }
   }
 
-  // 3) Endereços
+  // Endereços
   const addresses = await fetchUserAddresses(whatsapp);
   form.innerHTML = "";
   addresses.forEach(addr => {
@@ -130,13 +119,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     form.appendChild(lbl);
   });
 
-  // 4) Estado inicial botão
   const hasDefault = addresses.some(a => a.padrao);
   nextBtn.textContent = hasDefault ? "Ir Para Pagamento" : "Escolha a Entrega!";
   nextBtn.disabled    = !hasDefault;
   nextBtn.classList.toggle("disabled", !hasDefault);
 
-  // 5) Adicionar endereço
   if (addresses.length >= 2) addBtn.classList.add("disabled");
   addBtn.onclick = () => {
     if (addresses.length >= 2) {
@@ -146,11 +133,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   };
 
-  // 6) Seleção de endereço: recalcula total
   form.addEventListener("change", () => {
     const selId = form.addressId.value;
     document.querySelectorAll(".address-option").forEach(l => {
-      l.classList.toggle("selected", l.querySelector("input").value === selId);
+      l.classList.toggle("selected",
+        l.querySelector("input").value === selId
+      );
     });
     nextBtn.disabled = false;
     nextBtn.classList.remove("disabled");
@@ -170,7 +158,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     form.dispatchEvent(new Event("change"));
   }
 
-  // 7) Próximo → pagamento
   nextBtn.onclick = () => {
     if (!addresses.length) {
       return swal("Atenção","Cadastre um endereço primeiro.","warning");
