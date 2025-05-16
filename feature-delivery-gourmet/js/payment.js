@@ -103,9 +103,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let cart = { items: [] }, carrinhoId = null, subtotal = 0;
     try {
-      cart = await fetchCart(whatsapp);
-      carrinhoId = cart.cartId;
-      subtotal = cart.items.reduce((sum, item) => {
+      const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
+      const data = await resp.json();
+      cart = data;
+      carrinhoId = data.cartId;
+
+      subtotal = data.items.reduce((sum, item) => {
         const base   = item.precoUnitario * item.quantidade;
         const addons = (item.adicionais || []).reduce(
           (s, ad) => s + ad.preco * ad.quantidade, 0
@@ -117,24 +120,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     subEl.textContent = fmtBRL(subtotal);
 
-    // CUPOM (busca no banco e aplica)
+    // Buscar cupom do banco
     let desconto = 0;
-    let cupomCode = await buscarCupomDoCarrinho(carrinhoId);
+    let cupomCode = null;
+    try {
+      const res = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${carrinhoId}`);
+      if (res.ok) cupomCode = await res.text();
+    } catch {}
+
     if (cupomCode) {
-      const res = await calcularCupomAplicado(cupomCode, userId, storeId, subtotal, carrinhoId);
-      if (res.sucesso) {
-        desconto = res.dados;
+      const cupomResp = await fetch('/api/Cupom/Aplicar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          codigo: cupomCode,
+          usuarioId: userId,
+          lojaId: storeId,
+          valorOriginal: subtotal,
+          carrinhoId
+        })
+      });
+      const json = await cupomResp.json();
+      if (json.sucesso) {
+        desconto = json.dados;
         descEl.textContent = '- ' + fmtBRL(desconto);
         cupLine.style.display = '';
       }
     }
 
-    // TOTAL
     const total = Math.max(0, subtotal - desconto + storedFrete);
     totalEl.textContent = fmtBRL(total);
 
     Array.from(radios).forEach(radio => {
-      radio.addEventListener('change', () => {
+      radio.addEventListener('change', async () => {
         if (radio.value === 'Dinheiro') {
           changeSec.style.display = 'flex';
           changeInp.disabled = noChangeChk.checked;
@@ -143,6 +161,56 @@ document.addEventListener('DOMContentLoaded', async () => {
           noChangeChk.checked = false;
           changeInp.disabled = true;
           changeInp.value = '';
+        }
+
+        if (radio.value === 'Pix') {
+          showLoader();
+          try {
+            const resp = await fetch("/api/Pix/GerarQrCode", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                usuarioId: userId,
+                valor: total,
+                jsonCarrinho: JSON.stringify({
+                  cartItems: cart.items,
+                  endereco: rawAddress ? JSON.parse(rawAddress) : null,
+                  pagamento: "Pix"
+                })
+              })
+            });
+
+            const data = await resp.json();
+            if (data.sucesso) {
+              const qrcodeUrl = data.qrCodeUrl;
+              const txid = data.txid;
+
+              Swal.fire({
+                title: 'Escaneie o QR Code para pagar com Pix',
+                html: `<img src="${qrcodeUrl}" alt="QR Code Pix" style="width: 250px; height: 250px;">`,
+                confirmButtonText: 'Aguardando pagamento...',
+                showConfirmButton: false,
+                allowOutsideClick: false
+              });
+
+              const interval = setInterval(async () => {
+                const check = await fetch(`/api/Pix/StatusPagamento?txid=${txid}`);
+                const res = await check.json();
+                if (res.status === 'confirmado') {
+                  clearInterval(interval);
+                  Swal.close();
+                  swal("Pix Aprovado", "Pagamento confirmado!", "success")
+                    .then(() => finishBtn.click());
+                }
+              }, 5000);
+            } else {
+              swal("Erro", data.mensagem || "Erro ao gerar QR Code", "error");
+            }
+          } catch {
+            swal("Erro", "Erro ao gerar QR Code Pix", "error");
+          } finally {
+            hideLoader();
+          }
         }
       });
     });
@@ -164,7 +232,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         .replace(/,(\d{2}).+/, ',$1');
     });
 
-    // FINALIZAR PEDIDO
     finishBtn.addEventListener('click', () => {
       const method = form.elements['method'].value;
       let changeFor = 0;
