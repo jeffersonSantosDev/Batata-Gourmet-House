@@ -1,5 +1,3 @@
-// js/cart.js
-
 async function fetchInfoLoja() {
   const resp = await fetch('/api/Loja/GetInfoLoja', {
     method: 'GET',
@@ -24,10 +22,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const loyaltyDots = document.querySelectorAll(".loyalty-progress .dot");
   const fmt         = v => v.toFixed(2).replace(".",",");
 
-  // voltar
+  let carrinhoId = null;
+  let subtotal = 0, desconto = 0;
+
   backBtn.onclick = () => window.location.href = "index.html";
 
-  // cupom em maiúsculo
   if (couponInput) {
     couponInput.addEventListener("input", e => {
       const tgt = e.target,
@@ -37,7 +36,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // credenciais
   const whatsapp     = localStorage.getItem("bgHouse_whatsapp");
   const usuarioIdEnc = localStorage.getItem("bgHouse_id");
   const usuarioId    = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
@@ -46,7 +44,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       .then(() => window.location.href = "identify.html?return=cart.html");
   }
 
-  // loja/fidelidade
   let lojaId     = parseInt(localStorage.getItem("bgHouse_lojaId"));
   let programaId = parseInt(localStorage.getItem("bgHouse_fidelidadeId"));
   if (!lojaId || !programaId) {
@@ -59,41 +56,34 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  let subtotal = 0, desconto = 0;
-
-  // fecha popovers ao clicar fora
   document.addEventListener("click", e => {
     if (!e.target.closest(".item-info")) {
       document.querySelectorAll(".popover").forEach(p => p.classList.add("hidden"));
     }
   });
 
-  // renderiza o carrinho
   async function carregarCarrinho() {
     loading.classList.remove("hidden");
     try {
       const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
       if (!resp.ok) throw new Error();
       const cart = await resp.json();
-  
+      carrinhoId = cart.carrinhoId;
+
       if (!cart.items.length) {
-        localStorage.removeItem("bgHouse_appliedCoupon");
         return window.location.href = "index.html";
       }
-  
+
       cartList.innerHTML = "";
       subtotal = 0;
-  
+
       for (const item of cart.items) {
-        // 1) calcula total dos adicionais deste item
         const adicionaisTotal = (item.adicionais || [])
           .reduce((sum, ad) => sum + ad.preco * ad.quantidade, 0);
-  
-        // 2) total da linha (base + adicionais)
+
         const lineTotal = (item.precoUnitario * item.quantidade) + adicionaisTotal;
         subtotal += lineTotal;
-  
-        // 3) monta a tr principal
+
         const tr = document.createElement("tr");
         tr.className  = "item-row";
         tr.dataset.id = item.itemId;
@@ -107,9 +97,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 × <span class="product-name">${item.produtoNome}</span>
               </span>
               ${item.adicionais && item.adicionais.length > 0
-                ? `<button class="expand-btn" data-id="${item.itemId}">+</button>`
-                : ""
-              }
+                ? `<button class="expand-btn" data-id="${item.itemId}">+</button>` : ""}
               <button class="edit-btn" data-id="${item.itemId}">
                 <i class="fas fa-pencil-alt"></i>
               </button>
@@ -122,11 +110,10 @@ document.addEventListener("DOMContentLoaded", async () => {
           </td>
           <td>R$ ${lineTotal.toFixed(2).replace(".",",")}</td>`;
         cartList.appendChild(tr);
-  
-        // 4) monta a tr de detalhes de adicionais
+
         if (item.adicionais && item.adicionais.length > 0) {
           const adTr = document.createElement("tr");
-          adTr.className      = "item-additionals hidden";
+          adTr.className = "item-additionals hidden";
           adTr.dataset.parent = item.itemId;
           const adHtml = item.adicionais.map(ad => {
             const nome = ad.nome?.trim() || `Adicional #${ad.adicionalId}`;
@@ -139,10 +126,9 @@ document.addEventListener("DOMContentLoaded", async () => {
           cartList.appendChild(adTr);
         }
       }
-  
-      // Atualiza resumo e reaplica cupom/fidelidade
+
       atualizarResumo();      
-      await aplicarCupomSalvo();  
+      await aplicarCupomDoBanco();
       await carregarFidelidade();
     } catch {
       swal("Erro", "Não foi possível carregar seu carrinho.", "error");
@@ -150,15 +136,37 @@ document.addEventListener("DOMContentLoaded", async () => {
       loading.classList.add("hidden");
     }
   }
-  
+
   function atualizarResumo() {
     subtotalEl.textContent = `+ R$ ${fmt(subtotal)}`;
     totalEl.textContent    = `R$ ${fmt(subtotal - desconto)}`;
   }
 
-  // delegação de eventos no cartList
+  async function aplicarCupomDoBanco() {
+    desconto = 0;
+    try {
+      const resp = await fetch("/api/Cupom/Aplicar", {
+        method: "POST",
+        headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({
+          codigo: couponInput.value.trim(),
+          usuarioId,
+          lojaId,
+          valorOriginal: subtotal,
+          carrinhoId
+        })
+      });
+      const data = await resp.json();
+      if (data.sucesso) {
+        desconto = data.dados;
+        couponInput.disabled = true;
+        applyBtn.disabled = true;
+        atualizarResumo();
+      }
+    } catch {}
+  }
+
   cartList.addEventListener("click", async e => {
-    // aumentar/diminuir
     const dec = e.target.closest(".qty-btn.decrease");
     const inc = e.target.closest(".qty-btn.increase");
     if (dec || inc) {
@@ -186,7 +194,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // expandir/recolher adicionais
     const exp = e.target.closest(".expand-btn");
     if (exp) {
       const id = exp.dataset.id;
@@ -198,7 +205,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // editar / popover
     const editBtn = e.target.closest(".edit-btn");
     if (editBtn) {
       e.stopPropagation();
@@ -207,7 +213,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // remover item
     const rem = e.target.closest(".confirm-remove");
     if (rem) {
       const pop    = rem.closest(".popover");
@@ -239,30 +244,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // aplica cupom salvo
-  async function aplicarCupomSalvo() {
-    desconto = 0;
-    const codigo = localStorage.getItem("bgHouse_appliedCoupon");
-    if (!codigo) return;
-    try {
-      const resp = await fetch("/api/Cupom/CalcularDesconto", {
-        method: "POST",
-        headers:{"Accept":"application/json","Content-Type":"application/json"},
-        body: JSON.stringify({ codigo, usuarioId, lojaId, valorOriginal: subtotal })
-      });
-      const data = await resp.json();
-      if (data.sucesso) {
-        desconto             = data.dados;
-        couponInput.value    = codigo;
-        couponInput.disabled = true;
-        applyBtn.disabled    = true;
-      } else {
-        localStorage.removeItem("bgHouse_appliedCoupon");
-      }
-    } catch {}
-  }
-
-  // aplicar cupom novo
   applyBtn.onclick = async () => {
     const codigo = couponInput.value.trim();
     if (!codigo) {
@@ -271,10 +252,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     loading.classList.remove("hidden");
     try {
-      const resp = await fetch("/api/Cupom/CalcularDesconto", {
+      const resp = await fetch("/api/Cupom/Aplicar", {
         method: "POST",
-        headers:{"Accept":"application/json","Content-Type":"application/json"},
-        body: JSON.stringify({ codigo, usuarioId, lojaId, valorOriginal: subtotal })
+        headers: { "Accept":"application/json", "Content-Type":"application/json" },
+        body: JSON.stringify({
+          codigo,
+          usuarioId,
+          lojaId,
+          valorOriginal: subtotal,
+          carrinhoId
+        })
       });
       const data = await resp.json();
       if (!data.sucesso) {
@@ -283,17 +270,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         desconto = data.dados;
         couponInput.disabled = true;
         applyBtn.disabled    = true;
-        localStorage.setItem("bgHouse_appliedCoupon", codigo);
+        atualizarResumo();
       }
     } catch {
       swal("Erro","Não foi possível validar o cupom.","error");
     } finally {
       loading.classList.add("hidden");
-      atualizarResumo();
     }
   };
 
-  // programa de fidelidade
   async function carregarFidelidade() {
     try {
       const resp = await fetch(
@@ -305,11 +290,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch {}
   }
 
-  // próximo
   nextBtn.onclick = () => window.location.href = "entrega.html";
 
-  // inicializa
   await carregarCarrinho();
-  await aplicarCupomSalvo();
+  await aplicarCupomDoBanco();
   await carregarFidelidade();
 });
