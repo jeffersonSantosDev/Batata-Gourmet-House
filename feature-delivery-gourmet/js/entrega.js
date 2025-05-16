@@ -44,6 +44,52 @@ async function calcularCupom(codigo, usuarioId, lojaId, subtotal) {
   return resp.json();
 }
 
+ // js/entrega.js
+
+function showLoader() {
+  document.getElementById("loadingOverlay").classList.remove("hidden");
+}
+function hideLoader() {
+  document.getElementById("loadingOverlay").classList.add("hidden");
+}
+
+async function fetchUserAddresses(whatsapp) {
+  showLoader();
+  try {
+    const resp = await fetch('/api/Usuario/GetAddressesByWhatsApp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ numero: whatsapp })
+    });
+    if (resp.status === 204) return [];
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    return await resp.json();
+  } catch (err) {
+    console.error(err);
+    await swal("Erro", "Não foi possível carregar seus endereços.", "error");
+    window.location.href = 'identify.html?return=entrega.html';
+    return [];
+  } finally {
+    hideLoader();
+  }
+}
+
+async function fetchCart(whatsapp) {
+  const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
+  if (!resp.ok) throw new Error('Erro ao carregar carrinho');
+  return resp.json();
+}
+
+async function calcularCupom(codigo, usuarioId, lojaId, subtotal) {
+  const resp = await fetch('/api/Cupom/CalcularDesconto', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({ codigo, usuarioId, lojaId, valorOriginal: subtotal })
+  });
+  if (!resp.ok) return { sucesso: false };
+  return resp.json();
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   const backBtn     = document.getElementById("backBtn");
   const userNameEl  = document.getElementById("userName");
@@ -60,16 +106,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   backBtn.onclick = () => history.back();
 
-  const whatsapp  = localStorage.getItem("bgHouse_whatsapp");
-  const nome      = localStorage.getItem("bgHouse_name")  || "Você";
-  const lojaId    = parseInt(localStorage.getItem("bgHouse_lojaId"));
+  const whatsapp     = localStorage.getItem("bgHouse_whatsapp");
   const usuarioIdEnc = localStorage.getItem("bgHouse_id");
-  const usuarioId = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
+  const lojaIdRaw    = localStorage.getItem("bgHouse_lojaId");
+  const nome         = localStorage.getItem("bgHouse_name") || "Você";
 
-  if (!whatsapp || !usuarioId || !lojaId) {
-    await swal("Sessão expirada", "Por favor, identifique-se novamente.", "warning");
+  if (!whatsapp || !usuarioIdEnc || !lojaIdRaw) {
     return window.location.href = "identify.html?return=entrega.html";
   }
+
+  const usuarioId = parseInt(atob(usuarioIdEnc));
+  const lojaId    = parseInt(lojaIdRaw);
 
   userNameEl.textContent  = nome;
   userPhoneEl.textContent = whatsapp.replace(/(\d{2})(\d{5})(\d{4})/, '+$1 $2-$3');
@@ -88,18 +135,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     subtotalEl.textContent = `R$ 0,00`;
   }
 
-  // Cupom
+  // Cupom salvo no banco
   cupomLine.style.display = "none";
-  const savedCupom = localStorage.getItem("bgHouse_appliedCoupon");
-  if (savedCupom && usuarioId && lojaId && subtotal > 0) {
-    const res = await calcularCupom(savedCupom, usuarioId, lojaId, subtotal);
-    if (res.sucesso) {
-      desconto = res.dados;
-      cupomLine.style.display = "flex";
-      cupomValue.textContent  = `- R$ ${fmt(desconto)}`;
-    } else {
-      localStorage.removeItem("bgHouse_appliedCoupon");
+  try {
+    const resCupom = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${cart.cartId}`);
+    if (resCupom.ok) {
+      const codigo = await resCupom.text();
+      if (codigo) {
+        const res = await calcularCupom(codigo, usuarioId, lojaId, subtotal);
+        if (res.sucesso) {
+          desconto = res.dados;
+          cupomLine.style.display = "flex";
+          cupomValue.textContent  = `- R$ ${fmt(desconto)}`;
+        }
+      }
     }
+  } catch {
+    console.warn("Erro ao buscar cupom do carrinho.");
   }
 
   // Endereços
