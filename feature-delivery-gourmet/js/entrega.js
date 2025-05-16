@@ -64,13 +64,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   const whatsapp     = localStorage.getItem("bgHouse_whatsapp");
   const usuarioIdEnc = localStorage.getItem("bgHouse_id");
   const lojaIdRaw    = localStorage.getItem("bgHouse_lojaId");
-  const nome         = localStorage.getItem("bgHouse_name") || "Você";
+  const nome         = localStorage.getItem("bgHouse_name");
 
-  const usuarioId = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
-  const lojaId    = lojaIdRaw ? parseInt(lojaIdRaw) : null;
-
-  if (!whatsapp || !usuarioId || !lojaId) {
-    return window.location.href = "identify.html?return=entrega.html";
+ 
+  const usuarioId    = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
+  if (!whatsapp || !usuarioId) {
+    return swal("Ops!", "Identifique-se para ver o carrinho.", "warning")
+      .then(() => window.location.href = "identify.html?return=cart.html");
   }
 
   userNameEl.textContent  = nome;
