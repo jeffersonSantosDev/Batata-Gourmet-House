@@ -143,27 +143,38 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function aplicarCupomDoBanco() {
-    desconto = 0;
-    try {
-      const resp = await fetch("/api/Cupom/Aplicar", {
-        method: "POST",
-        headers: { "Accept": "application/json", "Content-Type": "application/json" },
-        body: JSON.stringify({
-          codigo: couponInput.value.trim(),
-          usuarioId,
-          lojaId,
-          valorOriginal: subtotal,
-          carrinhoId
-        })
-      });
-      const data = await resp.json();
-      if (data.sucesso) {
-        desconto = data.dados;
-        couponInput.disabled = true;
-        applyBtn.disabled = true;
-        atualizarResumo();
-      }
-    } catch {}
+
+    var teste  = JSON.stringify({
+      codigo: couponInput.value.trim(),
+      usuarioId,
+      lojaId,
+      valorOriginal: subtotal,
+      carrinhoId
+    }); 
+
+    console.log("teste",teste);
+
+    // desconto = 0;
+    // try {
+    //   const resp = await fetch("/api/Cupom/Aplicar", {
+    //     method: "POST",
+    //     headers: { "Accept": "application/json", "Content-Type": "application/json" },
+    //     body: JSON.stringify({
+    //       codigo: couponInput.value.trim(),
+    //       usuarioId,
+    //       lojaId,
+    //       valorOriginal: subtotal,
+    //       carrinhoId
+    //     })
+    //   });
+    //   const data = await resp.json();
+    //   if (data.sucesso) {
+    //     desconto = data.dados;
+    //     couponInput.disabled = true;
+    //     applyBtn.disabled = true;
+    //     atualizarResumo();
+    //   }
+    // } catch {}
   }
 
   cartList.addEventListener("click", async e => {
