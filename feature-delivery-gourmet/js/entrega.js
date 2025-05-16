@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const usuarioId    = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
   if (!whatsapp || !usuarioId) {
     return swal("Ops!", "Identifique-se para ver o carrinho.", "warning")
-      .then(() => window.location.href = "identify.html?return=cart.html");
+      .then(() => window.location.href = "identify.html?return=entrega.html");
   }
 
   userNameEl.textContent  = nome;
