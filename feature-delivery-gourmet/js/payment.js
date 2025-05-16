@@ -1,5 +1,3 @@
-// js/payment.js
-
 function showLoader() {
   document.getElementById("loadingOverlay").classList.remove("hidden");
 }
@@ -13,15 +11,31 @@ async function fetchCart(whatsapp) {
   return r.json();
 }
 
-async function calcularCupom(code, userId, storeId, sub) {
-  const r = await fetch('/api/Cupom/CalcularDesconto', {
+async function calcularCupomAplicado(code, userId, storeId, sub, carrinhoId) {
+  const r = await fetch('/api/Cupom/Aplicar', {
     method: 'POST',
     headers: { 'Content-Type':'application/json' },
-    body: JSON.stringify({ codigo: code, usuarioId: userId, lojaId: storeId, valorOriginal: sub })
+    body: JSON.stringify({
+      codigo: code,
+      usuarioId: userId,
+      lojaId: storeId,
+      valorOriginal: sub,
+      carrinhoId
+    })
   });
-  if (!r.ok) return 0;
-  const j = await r.json();
-  return j.sucesso ? j.dados : 0;
+  if (!r.ok) return { sucesso: false };
+  return await r.json();
+}
+
+async function buscarCupomDoCarrinho(carrinhoId) {
+  try {
+    const r = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${carrinhoId}`);
+    if (!r.ok) return null;
+    const codigo = await r.text();
+    return codigo || null;
+  } catch {
+    return null;
+  }
 }
 
 function fmtBRL(v) {
@@ -31,38 +45,31 @@ function fmtBRL(v) {
 document.addEventListener('DOMContentLoaded', async () => {
   showLoader();
   try {
-    // --- Elementos da tela ---
     const backBtn     = document.getElementById('backBtn');
     const deliverySec = document.getElementById('deliverySection');
     const delivName   = document.getElementById('delivName');
     const delivPhone  = document.getElementById('delivPhone');
     const delivAddr   = document.getElementById('delivAddress');
-
     const subEl    = document.getElementById('subtotal');
     const cupLine  = document.getElementById('cupomLine');
     const descEl   = document.getElementById('desconto');
     const fretLine = document.getElementById('freteLine');
     const freteEl  = document.getElementById('frete');
     const totalEl  = document.getElementById('total');
-
     const form        = document.getElementById('paymentForm');
-    const radios      = form.elements['method']; // RadioNodeList
+    const radios      = form.elements['method'];
     const changeSec   = document.getElementById('changeSection');
     const changeInp   = document.getElementById('changeAmount');
     const noChangeChk = document.getElementById('noChange');
     const finishBtn   = document.getElementById('finishBtn');
 
-    // força type=button para evitar submit
     finishBtn.setAttribute('type','button');
-
     backBtn.onclick = () => history.back();
 
-    // --- Contexto ---
     const whatsapp   = localStorage.getItem('bgHouse_whatsapp');
     const userId     = whatsapp ? parseInt(atob(localStorage.getItem('bgHouse_id'))) : null;
     const storeId    = parseInt(localStorage.getItem('bgHouse_lojaId'));
     const programId  = parseInt(localStorage.getItem('bgHouse_fidelidadeId'));
-    const cupomCode  = localStorage.getItem('bgHouse_appliedCoupon');
     const rawAddress = localStorage.getItem('bgHouse_selectedAddress');
     const rawFrete   = localStorage.getItem('bgHouse_frete');
 
@@ -72,7 +79,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // --- 1) Entrega ---
     let storedFrete = 0;
     if (rawFrete) {
       storedFrete = parseFloat(rawFrete);
@@ -95,10 +101,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
-    // --- 2) Carrinho & Subtotal (c/ adicionais) ---
-    let cart = { items: [] }, subtotal = 0;
+    let cart = { items: [] }, carrinhoId = null, subtotal = 0;
     try {
       cart = await fetchCart(whatsapp);
+      carrinhoId = cart.cartId;
       subtotal = cart.items.reduce((sum, item) => {
         const base   = item.precoUnitario * item.quantidade;
         const addons = (item.adicionais || []).reduce(
@@ -111,19 +117,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     subEl.textContent = fmtBRL(subtotal);
 
-    // --- 3) Cupom ---
+    // CUPOM (busca no banco e aplica)
     let desconto = 0;
+    let cupomCode = await buscarCupomDoCarrinho(carrinhoId);
     if (cupomCode) {
-      desconto = await calcularCupom(cupomCode, userId, storeId, subtotal);
+      const res = await calcularCupomAplicado(cupomCode, userId, storeId, subtotal, carrinhoId);
+      if (res.sucesso) {
+        desconto = res.dados;
+        descEl.textContent = '- ' + fmtBRL(desconto);
+        cupLine.style.display = '';
+      }
     }
-    descEl.textContent = '- ' + fmtBRL(desconto);
-    cupLine.style.display = '';
 
-    // --- 4) Total geral ---
+    // TOTAL
     const total = Math.max(0, subtotal - desconto + storedFrete);
     totalEl.textContent = fmtBRL(total);
 
-    // --- 5) Troco ---
     Array.from(radios).forEach(radio => {
       radio.addEventListener('change', () => {
         if (radio.value === 'Dinheiro') {
@@ -137,7 +146,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       });
     });
-    // estado inicial
+
     if (form.elements['method'].value !== 'Dinheiro') {
       changeSec.style.display = 'none';
       changeInp.disabled      = true;
@@ -149,52 +158,44 @@ document.addEventListener('DOMContentLoaded', async () => {
       else changeInp.focus();
     });
 
-    // limita a formato NNN,NN
     changeInp.addEventListener('input', e => {
       e.target.value = e.target.value
         .replace(/[^\d,]/g, '')
         .replace(/,(\d{2}).+/, ',$1');
     });
 
-    // --- 6) Finalizar ---
-     // --- 6) Finalizar pedido ---
-// dentro do seu DOMContentLoaded, substitua apenas a parte do finishBtn pelo código abaixo:
+    // FINALIZAR PEDIDO
+    finishBtn.addEventListener('click', () => {
+      const method = form.elements['method'].value;
+      let changeFor = 0;
 
-finishBtn.addEventListener('click', () => {
-  const method = form.elements['method'].value;
-  let changeFor = 0;
-
-  if (method === 'Dinheiro') {
-    // se não marcou "Não preciso de troco", obriga digitar um valor
-    if (!noChangeChk.checked) {
-      if (!changeInp.value.trim()) {
-        swal('Atenção', 'Informe o valor do troco.', 'warning');
-        return;
+      if (method === 'Dinheiro') {
+        if (!noChangeChk.checked && !changeInp.value.trim()) {
+          swal('Atenção', 'Informe o valor do troco.', 'warning');
+          return;
+        }
+        changeFor = parseFloat(changeInp.value.replace(',', '.')) || 0;
       }
-      changeFor = parseFloat(changeInp.value.replace(',', '.')) || 0; 
-    } 
-  } 
-  
-  const order = {
-    whatsapp,
-    addressId: rawAddress ? JSON.parse(rawAddress).id : null,
-    paymentMethod: method,
-    changeFor,
-    usuarioId: userId,
-    lojaId:    storeId,
-    couponCode: cupomCode || null, 
-    programId,
-    cartItems: cart.items,
-    subtotal,
-    frete:     storedFrete,
-    desconto,
-    total      
-  };
 
-  console.log('Pedido final:', order);
-  swal('Sucesso', 'Pedido finalizado! Veja o console.', 'success');
-});
+      const order = {
+        whatsapp,
+        addressId: rawAddress ? JSON.parse(rawAddress).id : null,
+        paymentMethod: method,
+        changeFor,
+        usuarioId: userId,
+        lojaId:    storeId,
+        couponCode: cupomCode || null,
+        programId,
+        cartItems: cart.items,
+        subtotal,
+        frete:     storedFrete,
+        desconto,
+        total
+      };
 
+      console.log('Pedido final:', order);
+      swal('Sucesso', 'Pedido finalizado! Veja o console.', 'success');
+    });
 
   } finally {
     hideLoader();
