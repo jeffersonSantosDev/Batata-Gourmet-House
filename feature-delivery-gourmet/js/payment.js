@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                   endereco: rawAddress ? JSON.parse(rawAddress) : null,
                   pagamento: "Pix"
                 })
-              })
+              }) 
             });
 
             const data = await resp.json();
