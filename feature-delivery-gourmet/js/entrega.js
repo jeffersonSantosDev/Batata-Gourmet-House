@@ -1,5 +1,3 @@
-// js/entrega.js
-
 function showLoader() {
   document.getElementById("loadingOverlay").classList.remove("hidden");
 }
@@ -34,14 +32,25 @@ async function fetchCart(whatsapp) {
   return resp.json();
 }
 
-async function calcularCupom(codigo, usuarioId, lojaId, subtotal) {
-  const resp = await fetch('/api/Cupom/CalcularDesconto', {
+async function calcularCupomAplicado(codigo, usuarioId, lojaId, valorOriginal, carrinhoId) {
+  const resp = await fetch('/api/Cupom/Aplicar', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: JSON.stringify({ codigo, usuarioId, lojaId, valorOriginal: subtotal })
+    body: JSON.stringify({ codigo, usuarioId, lojaId, valorOriginal, carrinhoId })
   });
   if (!resp.ok) return { sucesso: false };
-  return resp.json();
+  return await resp.json();
+}
+
+async function buscarCupomDoCarrinho(carrinhoId) {
+  try {
+    const resp = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${carrinhoId}`);
+    if (!resp.ok) return null;
+    const codigo = await resp.text();
+    return codigo || null;
+  } catch {
+    return null;
+  }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -72,13 +81,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     await swal("Ops!", "Identifique-se.", "warning");
     return window.location.href = 'identify.html?return=entrega.html';
   }
+
   userNameEl.textContent  = nome;
   userPhoneEl.textContent = whatsapp.replace(/(\d{2})(\d{5})(\d{4})/, '+$1 $2-$3');
 
   // 1) Carrinho (com adicionais)
-  let cart, subtotal = 0, desconto = 0, frete = 0;
+  let cart, carrinhoId = null, subtotal = 0, desconto = 0, frete = 0;
   try {
     cart = await fetchCart(whatsapp);
+    carrinhoId = cart.cartId;
     subtotal = cart.items.reduce((sum, item) => {
       const base = item.precoUnitario * item.quantidade;
       const adicionaisTotal = (item.adicionais || [])
@@ -90,17 +101,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     subtotalEl.textContent = `R$ 0,00`;
   }
 
-  // 2) Cupom
+  // 2) Cupom do banco
   cupomLine.style.display = "none";
-  const savedCupom = localStorage.getItem("bgHouse_appliedCoupon");
-  if (savedCupom) {
-    const res = await calcularCupom(savedCupom, usuarioId, lojaId, subtotal);
+  const codigoCupom = await buscarCupomDoCarrinho(carrinhoId);
+  if (codigoCupom) {
+    const res = await calcularCupomAplicado(codigoCupom, usuarioId, lojaId, subtotal, carrinhoId);
     if (res.sucesso) {
       desconto = res.dados;
       cupomLine.style.display = "flex";
       cupomValue.textContent  = `- R$ ${fmt(desconto)}`;
-    } else {
-      localStorage.removeItem("bgHouse_appliedCoupon");
     }
   }
 
@@ -137,13 +146,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   };
 
-  // 6) Seleção de rádio: recalcula total, salva frete e endereço
+  // 6) Seleção de endereço: recalcula total
   form.addEventListener("change", () => {
     const selId = form.addressId.value;
     document.querySelectorAll(".address-option").forEach(l => {
-      l.classList.toggle("selected",
-        l.querySelector("input").value === selId
-      );
+      l.classList.toggle("selected", l.querySelector("input").value === selId);
     });
     nextBtn.disabled = false;
     nextBtn.classList.remove("disabled");
@@ -154,13 +161,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       frete = sel.frete;
       freteEl.textContent    = frete > 0 ? `R$ ${fmt(frete)}` : '–';
       finalTotal.textContent = `R$ ${fmt(subtotal - desconto + frete)}`;
-      // salva
       localStorage.setItem("bgHouse_frete", frete.toFixed(2));
       localStorage.setItem("bgHouse_selectedAddress", JSON.stringify(sel));
     }
   });
 
-  // dispara se houver padrão
   if (hasDefault) {
     form.dispatchEvent(new Event("change"));
   }
