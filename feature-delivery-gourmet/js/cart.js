@@ -145,17 +145,26 @@ document.addEventListener("DOMContentLoaded", async () => {
   async function aplicarCupomDoBanco() {
     desconto = 0;
     try {
+      const respCupom = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${carrinhoId}`);
+      if (!respCupom.ok) return;
+  
+      const codigo = await respCupom.text(); // resposta é string simples
+      if (!codigo) return;
+  
+      couponInput.value = codigo;
+  
       const resp = await fetch("/api/Cupom/Aplicar", {
         method: "POST",
         headers: { "Accept": "application/json", "Content-Type": "application/json" },
         body: JSON.stringify({
-          codigo: couponInput.value.trim(),
+          codigo,
           usuarioId,
           lojaId,
           valorOriginal: subtotal,
           carrinhoId
         })
       });
+  
       const data = await resp.json();
       if (data.sucesso) {
         desconto = data.dados;
@@ -163,8 +172,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         applyBtn.disabled = true;
         atualizarResumo();
       }
-    } catch {}
+    } catch (err) {
+      console.error("Erro ao reaplicar cupom do banco:", err);
+    }
   }
+  
 
   cartList.addEventListener("click", async e => {
     const dec = e.target.closest(".qty-btn.decrease");
