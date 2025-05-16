@@ -261,28 +261,36 @@ document.addEventListener("DOMContentLoaded", async () => {
       swal("Atenção","Informe o código do cupom.","warning");
       return;
     }
+
+    console.log("log: ",  JSON.stringify({
+           codigo,
+           usuarioId,
+           lojaId,
+           valorOriginal: subtotal,
+           carrinhoId
+         }));
     loading.classList.remove("hidden");
     try {
-      const resp = await fetch("/api/Cupom/Aplicar", {
-        method: "POST",
-        headers: { "Accept":"application/json", "Content-Type":"application/json" },
-        body: JSON.stringify({
-          codigo,
-          usuarioId,
-          lojaId,
-          valorOriginal: subtotal,
-          carrinhoId
-        })
-      });
-      const data = await resp.json();
-      if (!data.sucesso) {
-        swal("Erro", data.mensagem, "error");
-      } else {
-        desconto = data.dados;
-        couponInput.disabled = true;
-        applyBtn.disabled    = true;
-        atualizarResumo();
-      }
+      // const resp = await fetch("/api/Cupom/Aplicar", {
+      //   method: "POST",
+      //   headers: { "Accept":"application/json", "Content-Type":"application/json" },
+      //   body: JSON.stringify({
+      //     codigo,
+      //     usuarioId,
+      //     lojaId,
+      //     valorOriginal: subtotal,
+      //     carrinhoId
+      //   })
+      // });
+      // const data = await resp.json();
+      // if (!data.sucesso) {
+      //   swal("Erro", data.mensagem, "error");
+      // } else {
+      //   desconto = data.dados;
+      //   couponInput.disabled = true;
+      //   applyBtn.disabled    = true;
+      //   atualizarResumo();
+      // }
     } catch {
       swal("Erro","Não foi possível validar o cupom.","error");
     } finally {
