@@ -6,7 +6,6 @@ function hideLoader() {
 }
 
 async function fetchUserAddresses(whatsapp) {
-  showLoader();
   try {
     const resp = await fetch('/api/Usuario/GetAddressesByWhatsApp', {
       method: 'POST',
@@ -21,28 +20,42 @@ async function fetchUserAddresses(whatsapp) {
     await swal("Erro", "Não foi possível carregar seus endereços.", "error");
     window.location.href = 'identify.html?return=entrega.html';
     return [];
-  } finally {
-    hideLoader();
   }
 }
 
-async function fetchCart(whatsapp) {
-  const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
-  if (!resp.ok) throw new Error('Erro ao carregar carrinho');
-  return resp.json();
+function fmt(v) {
+  return v.toFixed(2).replace(".", ",");
 }
 
-async function calcularCupom(codigo, usuarioId, lojaId, subtotal) {
-  const resp = await fetch('/api/Cupom/CalcularDesconto', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: JSON.stringify({ codigo, usuarioId, lojaId, valorOriginal: subtotal })
-  });
-  if (!resp.ok) return { sucesso: false };
-  return resp.json();
+async function tentarAplicarCupomDoBanco(carrinhoId, usuarioId, lojaId, subtotal) {
+  try {
+    const resCupom = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${carrinhoId}`);
+    if (!resCupom.ok) return { sucesso: false };
+    const codigo = await resCupom.text();
+    if (!codigo) return { sucesso: false };
+
+    const aplicar = await fetch("/api/Cupom/Aplicar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        codigo,
+        usuarioId,
+        lojaId,
+        valorOriginal: subtotal,
+        carrinhoId
+      })
+    });
+    if (!aplicar.ok) return { sucesso: false };
+    return await aplicar.json();
+  } catch (e) {
+    console.warn("Erro ao aplicar cupom:", e);
+    return { sucesso: false };
+  }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  showLoader();
+
   const backBtn     = document.getElementById("backBtn");
   const userNameEl  = document.getElementById("userName");
   const userPhoneEl = document.getElementById("userPhone");
@@ -55,30 +68,28 @@ document.addEventListener("DOMContentLoaded", async () => {
   const freteEl     = document.getElementById("frete");
   const finalTotal  = document.getElementById("finalTotal");
 
-  const fmt = v => v.toFixed(2).replace(".", ",");
+  backBtn.onclick = () => history.back();
 
-  // Verifica se está voltando da identificação
-  const urlParams = new URLSearchParams(window.location.search);
-  const fromReturn = urlParams.get("return");
-
-  // Dados do usuário
   const whatsapp     = localStorage.getItem("bgHouse_whatsapp");
   const usuarioIdEnc = localStorage.getItem("bgHouse_id");
   const lojaIdRaw    = localStorage.getItem("bgHouse_lojaId");
   const nome         = localStorage.getItem("bgHouse_name");
-  const usuarioId    = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
 
-  if (!whatsapp || !usuarioId) {
+  const usuarioId    = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
+  const lojaId       = lojaIdRaw ? parseInt(lojaIdRaw) : null;
+
+  if (!whatsapp || !usuarioId || !lojaId) {
     return window.location.href = "identify.html?return=entrega.html";
   }
 
   userNameEl.textContent  = nome || "Você";
   userPhoneEl.textContent = whatsapp.replace(/(\d{2})(\d{5})(\d{4})/, '+$1 $2-$3');
 
-  // Carrinho
   let cart, carrinhoId = null, subtotal = 0, desconto = 0, frete = 0;
+
   try {
     const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
+    if (!resp.ok) throw new Error();
     cart = await resp.json();
     carrinhoId = cart.cartId;
 
@@ -91,57 +102,24 @@ document.addEventListener("DOMContentLoaded", async () => {
       const addons = (item.adicionais || []).reduce((s, ad) => s + ad.preco * ad.quantidade, 0);
       return sum + base + addons;
     }, 0);
+
     subtotalEl.textContent = `R$ ${fmt(subtotal)}`;
   } catch {
-    return swal("Erro", "Não foi possível carregar o carrinho.", "error")
+    return swal("Erro", "Não foi possível carregar seu carrinho.", "error")
       .then(() => window.location.href = "identify.html?return=entrega.html");
   }
 
   // Cupom
   cupomLine.style.display = "none";
-  if (carrinhoId && subtotal > 0 && usuarioId && lojaIdRaw) {
-    try {
-      const resCupom = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${carrinhoId}`);
-      if (resCupom.ok) {
-        const codigo = await resCupom.text();
-        if (codigo) {
-          const cupomResp = await fetch('/api/Cupom/Aplicar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              codigo,
-              usuarioId,
-              lojaId: parseInt(lojaIdRaw),
-              valorOriginal: subtotal,
-              carrinhoId
-            })
-          });
-          const json = await cupomResp.json();
-          if (json.sucesso) {
-            desconto = json.dados;
-            cupomLine.style.display = "flex";
-            cupomValue.textContent  = `- R$ ${fmt(desconto)}`;
-          }
-        }
-      }
-    } catch (err) {
-      console.warn("Erro ao reaplicar cupom:", err);
-    }
+  const resultadoCupom = await tentarAplicarCupomDoBanco(carrinhoId, usuarioId, lojaId, subtotal);
+  if (resultadoCupom.sucesso) {
+    desconto = resultadoCupom.dados;
+    cupomValue.textContent = `- R$ ${fmt(desconto)}`;
+    cupomLine.style.display = "flex";
   }
 
   // Endereços
-  let addresses = [];
-  try {
-    const resp = await fetch('/api/Usuario/GetAddressesByWhatsApp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ numero: whatsapp })
-    });
-    if (resp.ok) addresses = await resp.json();
-  } catch {
-    return swal("Erro", "Não foi possível carregar os endereços.", "error");
-  }
-
+  const addresses = await fetchUserAddresses(whatsapp);
   const enderecoAtual = cart.endereco;
   let enderecoSelecionadoId = enderecoAtual?.id || null;
 
@@ -214,4 +192,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     window.location.href = `payment.html?addressId=${enderecoSelecionadoId}`;
   };
+
+  hideLoader();
 });
