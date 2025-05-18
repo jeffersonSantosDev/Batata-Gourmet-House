@@ -55,6 +55,7 @@ async function calcularCupom(codigo, usuarioId, lojaId, subtotal) {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  showLoader();
   const backBtn     = document.getElementById("backBtn");
   const userNameEl  = document.getElementById("userName");
   const userPhoneEl = document.getElementById("userPhone");
@@ -212,8 +213,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           frete: sel.frete
         })
       });
-    } catch {
-      console.warn("Erro ao atualizar endereço/frete no backend.");
+    } finally {
+      hideLoader(); // ← Fim do carregamento
     }
   });
 
