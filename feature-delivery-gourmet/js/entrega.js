@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const finalTotal  = document.getElementById("finalTotal");
 
   const fmt = v => v.toFixed(2).replace(".", ",");
-
+  backBtn.onclick = () => window.location.href = "cart.html";
   // Verifica se está voltando da identificação
   const urlParams = new URLSearchParams(window.location.search);
   const fromReturn = urlParams.get("return");
