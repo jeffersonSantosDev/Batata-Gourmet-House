@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const finishBtn   = document.getElementById('finishBtn');
 
     finishBtn.setAttribute('type','button');
-    backBtn.onclick = () => window.location.href = "cart.html";
+    backBtn.onclick = () => window.location.href = "entrega.html";
 
     const whatsapp     = localStorage.getItem('bgHouse_whatsapp');
     const usuarioIdEnc = localStorage.getItem('bgHouse_id');
