@@ -60,23 +60,41 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const whatsapp     = localStorage.getItem("bgHouse_whatsapp");
   const usuarioIdEnc = localStorage.getItem("bgHouse_id");
-  const lojaIdRaw    = localStorage.getItem("bgHouse_lojaId");
   const nome         = localStorage.getItem("bgHouse_name");
+  let lojaId         = parseInt(localStorage.getItem("bgHouse_lojaId"));
+  let programaId     = parseInt(localStorage.getItem("bgHouse_fidelidadeId"));
   const usuarioId    = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
-  const lojaId       = lojaIdRaw ? parseInt(lojaIdRaw) : null;
 
   if (!whatsapp || !usuarioId) {
     return swal("Ops!", "Identifique-se para continuar.", "warning")
       .then(() => window.location.href = "identify.html?return=entrega.html");
   }
 
+  // Tenta buscar loja/fidelidade caso não esteja no localStorage
+  if (!lojaId || !programaId) {
+    try {
+      const info = await fetch('/api/Loja/GetInfoLoja', {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' }
+      });
+      if (!info.ok) throw new Error();
+      const data = await info.json();
+      lojaId     = data.lojaId;
+      programaId = data.programaFidelidadeId;
+      localStorage.setItem("bgHouse_lojaId", lojaId);
+      localStorage.setItem("bgHouse_fidelidadeId", programaId);
+    } catch {
+      return swal("Erro", "Não foi possível obter informações da loja.", "error")
+        .then(() => window.location.href = "index.html");
+    }
+  }
+
   userNameEl.textContent  = nome || "Você";
   userPhoneEl.textContent = whatsapp.replace(/(\d{2})(\d{5})(\d{4})/, '+$1 $2-$3');
 
-  // Carrinho
   let cart, subtotal = 0, desconto = 0, frete = 0;
   try {
-    cart = await fetchCart(whatsapp);
+    cart = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`).then(r => r.json());
     if (!cart.items.length) {
       return window.location.href = "index.html";
     }
@@ -89,6 +107,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     subtotalEl.textContent = `R$ ${fmt(subtotal)}`;
   } catch {
     subtotalEl.textContent = `R$ 0,00`;
+    return swal("Erro", "Erro ao carregar carrinho.", "error")
+      .then(() => window.location.href = "index.html");
   }
 
   // Cupom
@@ -98,7 +118,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (resCupom.ok) {
       const codigo = await resCupom.text();
       if (codigo) {
-        const res = await calcularCupom(codigo, usuarioId, lojaId, subtotal);
+        const res = await fetch('/api/Cupom/CalcularDesconto', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ codigo, usuarioId, lojaId, valorOriginal: subtotal })
+        }).then(r => r.json());
         if (res.sucesso) {
           desconto = res.dados;
           cupomLine.style.display = "flex";
@@ -117,10 +141,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const lbl = document.createElement("label");
     lbl.className = "address-option" + (addr.padrao ? " address-default" : "");
     lbl.innerHTML = `
-      <input type="radio" name="addressId" value="${addr.id}" ${addr.padrao ? "checked" : ""}/>
+      <input type="radio" name="addressId" value="${addr.id}" ${addr.padrao?"checked":""}/>
       <div class="address-label">
         <div>${addr.rua}, ${addr.numero}</div>
-        ${addr.referencia ? `<div><i>${addr.referencia}</i></div>` : ""}
+        ${addr.referencia?`<div><i>${addr.referencia}</i></div>`:""}
         <small>${addr.bairro} - ${addr.cidade}/${addr.uf}</small>
         <small>${addr.distanciaKm.toFixed(1)} km • ${addr.tempoMinutos} min • Frete R$ ${fmt(addr.frete)}</small>
       </div>`;
@@ -135,9 +159,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (addresses.length >= 2) addBtn.classList.add("disabled");
   addBtn.onclick = () => {
     if (addresses.length >= 2) {
-      swal("Atenção", "Você já cadastrou 2 endereços. Edite-os na sua conta.", "info");
+      swal("Atenção","Você já cadastrou 2 endereços. Edite-os na sua conta.","info");
     } else {
-      window.location.href = "register-address.html";
+      window.location.href="register-address.html";
     }
   };
 
@@ -168,12 +192,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   nextBtn.onclick = () => {
     if (!addresses.length) {
-      return swal("Atenção", "Cadastre um endereço primeiro.", "warning");
+      return swal("Atenção","Cadastre um endereço primeiro.","warning");
     }
     const selId = form.addressId.value;
     if (!selId && !hasDefault) {
-      return swal("Atenção", "Selecione um endereço de entrega.", "warning");
+      return swal("Atenção","Selecione um endereço de entrega.","warning");
     }
-    window.location.href = `payment.html?addressId=${selId || addresses.find(a => a.padrao).id}`;
+    window.location.href = `payment.html?addressId=${selId || addresses.find(a=>a.padrao).id}`;
   };
 });
