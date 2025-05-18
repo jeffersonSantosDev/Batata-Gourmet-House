@@ -151,7 +151,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     let storedFrete = 0;
-    if (!isNaN(parseFloat(rawFrete))) {
+
+    if (cart.endereco && cart.frete !== undefined) {
+      storedFrete = parseFloat(cart.frete);
+      freteEl.textContent = storedFrete > 0 ? fmtBRL(storedFrete) : "–";
+      fretLine.style.display = '';
+      localStorage.setItem("bgHouse_frete", storedFrete.toFixed(2));
+      localStorage.setItem("bgHouse_selectedAddress", JSON.stringify(cart.endereco));
+    } else if (!isNaN(parseFloat(rawFrete))) {
       storedFrete = parseFloat(rawFrete);
       freteEl.textContent = storedFrete > 0 ? fmtBRL(storedFrete) : "–";
       fretLine.style.display = '';
