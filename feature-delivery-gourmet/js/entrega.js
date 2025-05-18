@@ -57,52 +57,55 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const fmt = v => v.toFixed(2).replace(".", ",");
 
+  // Dados do usuário
   const whatsapp     = localStorage.getItem("bgHouse_whatsapp");
   const usuarioIdEnc = localStorage.getItem("bgHouse_id");
   const lojaIdRaw    = localStorage.getItem("bgHouse_lojaId");
   const nome         = localStorage.getItem("bgHouse_name");
+  const usuarioId    = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
 
-  const usuarioId = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
   if (!whatsapp || !usuarioId) {
-    return swal("Ops!", "Identifique-se para ver o carrinho.", "warning")
+    return swal("Ops!", "Identifique-se para continuar.", "warning")
       .then(() => window.location.href = "identify.html?return=entrega.html");
   }
 
-  userNameEl.textContent  = nome;
+  userNameEl.textContent  = nome || "Você";
   userPhoneEl.textContent = whatsapp.replace(/(\d{2})(\d{5})(\d{4})/, '+$1 $2-$3');
 
-  // Fetch carrinho atualizado
-  let cart, subtotal = 0, desconto = 0, frete = 0;
+  // Carrinho
+  let cart, carrinhoId = null, subtotal = 0, desconto = 0, frete = 0;
   try {
     const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
     cart = await resp.json();
+    carrinhoId = cart.cartId;
+
     subtotal = cart.items.reduce((sum, item) => {
       const base = item.precoUnitario * item.quantidade;
-      const adicionaisTotal = (item.adicionais || [])
-        .reduce((s2, ad) => s2 + ad.preco * ad.quantidade, 0);
-      return sum + base + adicionaisTotal;
+      const addons = (item.adicionais || []).reduce((s, ad) => s + ad.preco * ad.quantidade, 0);
+      return sum + base + addons;
     }, 0);
     subtotalEl.textContent = `R$ ${fmt(subtotal)}`;
   } catch {
-    subtotalEl.textContent = `R$ 0,00`;
-    return swal("Erro", "Não foi possível carregar o carrinho.", "error");
+    return swal("Erro", "Não foi possível carregar o carrinho.", "error")
+      .then(() => window.location.href = "identify.html?return=entrega.html");
   }
 
-  // Cupom (buscar no banco)
+  // Cupom
   cupomLine.style.display = "none";
   try {
-    const resCupom = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${cart.cartId}`);
+    const resCupom = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${carrinhoId}`);
     if (resCupom.ok) {
       const codigo = await resCupom.text();
       if (codigo) {
-        const res = await fetch('/api/Cupom/CalcularDesconto', {
+        const res = await fetch('/api/Cupom/Aplicar', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             codigo,
             usuarioId,
             lojaId: parseInt(lojaIdRaw),
-            valorOriginal: subtotal
+            valorOriginal: subtotal,
+            carrinhoId
           })
         });
         const json = await res.json();
@@ -114,22 +117,32 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
   } catch {
-    console.warn("Erro ao buscar cupom do carrinho.");
+    console.warn("Erro ao aplicar cupom.");
   }
 
   // Endereços
+  let addresses = [];
+  try {
+    const resp = await fetch('/api/Usuario/GetAddressesByWhatsApp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ numero: whatsapp })
+    });
+    if (resp.ok) addresses = await resp.json();
+  } catch {
+    return swal("Erro", "Não foi possível carregar os endereços.", "error");
+  }
+
+  const enderecoAtual = cart.endereco;
+  let enderecoSelecionadoId = enderecoAtual?.id || null;
+
   form.innerHTML = "";
-  let selectedAddressId = null;
-
-  const addresses = cart.endereco ? [cart.endereco] : [];
-
   addresses.forEach(addr => {
+    const isChecked = addr.id === enderecoSelecionadoId;
     const lbl = document.createElement("label");
-    lbl.className = "address-option selected";
-    selectedAddressId = addr.id;
-
+    lbl.className = "address-option" + (isChecked ? " selected" : "");
     lbl.innerHTML = `
-      <input type="radio" name="addressId" value="${addr.id}" checked />
+      <input type="radio" name="addressId" value="${addr.id}" ${isChecked ? "checked" : ""}/>
       <div class="address-label">
         <div>${addr.rua}, ${addr.numero}</div>
         ${addr.referencia ? `<div><i>${addr.referencia}</i></div>` : ""}
@@ -139,52 +152,57 @@ document.addEventListener("DOMContentLoaded", async () => {
     form.appendChild(lbl);
   });
 
-  if (addresses.length) {
-    frete = addresses[0].frete || cart.frete || 0;
+  function aplicarFrete(addr) {
+    enderecoSelecionadoId = addr.id;
+    frete = addr.frete;
     freteEl.textContent = `R$ ${fmt(frete)}`;
     finalTotal.textContent = `R$ ${fmt(subtotal - desconto + frete)}`;
-    nextBtn.disabled = false;
-    nextBtn.classList.remove("disabled");
     localStorage.setItem("bgHouse_frete", frete.toFixed(2));
-    localStorage.setItem("bgHouse_selectedAddress", JSON.stringify(addresses[0]));
-  } else {
-    nextBtn.disabled = true;
-    nextBtn.classList.add("disabled");
+    localStorage.setItem("bgHouse_selectedAddress", JSON.stringify(addr));
   }
 
-  // Ao mudar endereço (futuramente expandir para múltiplos endereços)
+  if (enderecoSelecionadoId) {
+    const end = addresses.find(a => a.id === enderecoSelecionadoId);
+    if (end) aplicarFrete(end);
+  }
+
   form.addEventListener("change", async () => {
     const selId = parseInt(form.addressId.value);
-    const selected = addresses.find(a => a.id === selId);
-    if (!selected) return;
+    const sel = addresses.find(a => a.id === selId);
+    if (!sel) return;
+    aplicarFrete(sel);
 
-    selectedAddressId = selected.id;
-    frete = selected.frete;
-    freteEl.textContent = `R$ ${fmt(frete)}`;
-    finalTotal.textContent = `R$ ${fmt(subtotal - desconto + frete)}`;
-    localStorage.setItem("bgHouse_frete", frete.toFixed(2));
-    localStorage.setItem("bgHouse_selectedAddress", JSON.stringify(selected));
-
-    // Atualiza o frete no banco (se já tiver carrinhoId)
     try {
-      await fetch('/api/Cart/AtualizarEnderecoEFrete', {
+      await fetch("/api/Cart/AtualizarEnderecoEFrete", {
         method: "POST",
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          carrinhoId: cart.cartId,
-          enderecoId: selected.id,
-          frete
+          carrinhoId,
+          enderecoId: sel.id,
+          frete: sel.frete
         })
       });
-    } catch (e) {
-      console.warn("Erro ao salvar endereço e frete no carrinho");
+    } catch {
+      console.warn("Erro ao atualizar endereço/frete no backend.");
     }
   });
 
+  if (addresses.length >= 2) addBtn.classList.add("disabled");
+  addBtn.onclick = () => {
+    if (addresses.length >= 2) {
+      swal("Atenção", "Você já cadastrou 2 endereços. Edite-os na sua conta.", "info");
+    } else {
+      window.location.href = "register-address.html";
+    }
+  };
+
+  const hasDefault = addresses.some(a => a.padrao);
+  if (hasDefault) form.dispatchEvent(new Event("change"));
+
   nextBtn.onclick = () => {
-    if (!selectedAddressId) {
+    if (!enderecoSelecionadoId) {
       return swal("Atenção", "Selecione um endereço de entrega.", "warning");
     }
-    window.location.href = `payment.html?addressId=${selectedAddressId}`;
+    window.location.href = `payment.html?addressId=${enderecoSelecionadoId}`;
   };
 });
