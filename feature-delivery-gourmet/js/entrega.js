@@ -57,6 +57,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const fmt = v => v.toFixed(2).replace(".", ",");
 
+  // Verifica se está voltando da identificação
+  const urlParams = new URLSearchParams(window.location.search);
+  const fromReturn = urlParams.get("return");
+
   // Dados do usuário
   const whatsapp     = localStorage.getItem("bgHouse_whatsapp");
   const usuarioIdEnc = localStorage.getItem("bgHouse_id");
@@ -65,8 +69,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const usuarioId    = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
 
   if (!whatsapp || !usuarioId) {
-    return swal("Ops!", "Identifique-se para continuar.", "warning")
-      .then(() => window.location.href = "identify.html?return=entrega.html");
+    return window.location.href = "identify.html?return=entrega.html";
   }
 
   userNameEl.textContent  = nome || "Você";
@@ -78,6 +81,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
     cart = await resp.json();
     carrinhoId = cart.cartId;
+
+    if (!cart.items?.length) {
+      return window.location.href = "index.html";
+    }
 
     subtotal = cart.items.reduce((sum, item) => {
       const base = item.precoUnitario * item.quantidade;
@@ -197,7 +204,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   const hasDefault = addresses.some(a => a.padrao);
-  if (hasDefault) form.dispatchEvent(new Event("change"));
+  if (hasDefault || enderecoSelecionadoId) form.dispatchEvent(new Event("change"));
 
   nextBtn.onclick = () => {
     if (!enderecoSelecionadoId) {
