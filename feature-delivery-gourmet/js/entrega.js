@@ -27,32 +27,6 @@ function fmt(v) {
   return v.toFixed(2).replace(".", ",");
 }
 
-async function tentarAplicarCupomDoBanco(carrinhoId, usuarioId, lojaId, subtotal) {
-  try {
-    const resCupom = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${carrinhoId}`);
-    if (!resCupom.ok) return { sucesso: false };
-    const codigo = await resCupom.text();
-    if (!codigo) return { sucesso: false };
-
-    const aplicar = await fetch("/api/Cupom/Aplicar", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        codigo,
-        usuarioId,
-        lojaId,
-        valorOriginal: subtotal,
-        carrinhoId
-      })
-    });
-    if (!aplicar.ok) return { sucesso: false };
-    return await aplicar.json();
-  } catch (e) {
-    console.warn("Erro ao aplicar cupom:", e);
-    return { sucesso: false };
-  }
-}
-
 document.addEventListener("DOMContentLoaded", async () => {
   showLoader();
 
@@ -68,13 +42,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const freteEl     = document.getElementById("frete");
   const finalTotal  = document.getElementById("finalTotal");
 
-  backBtn.onclick = () => history.back();
-
   const whatsapp     = localStorage.getItem("bgHouse_whatsapp");
   const usuarioIdEnc = localStorage.getItem("bgHouse_id");
   const lojaIdRaw    = localStorage.getItem("bgHouse_lojaId");
   const nome         = localStorage.getItem("bgHouse_name");
-
   const usuarioId    = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
   const lojaId       = lojaIdRaw ? parseInt(lojaIdRaw) : null;
 
@@ -85,11 +56,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   userNameEl.textContent  = nome || "Você";
   userPhoneEl.textContent = whatsapp.replace(/(\d{2})(\d{5})(\d{4})/, '+$1 $2-$3');
 
+  // Carrinho
   let cart, carrinhoId = null, subtotal = 0, desconto = 0, frete = 0;
-
   try {
     const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
-    if (!resp.ok) throw new Error();
     cart = await resp.json();
     carrinhoId = cart.cartId;
 
@@ -102,20 +72,40 @@ document.addEventListener("DOMContentLoaded", async () => {
       const addons = (item.adicionais || []).reduce((s, ad) => s + ad.preco * ad.quantidade, 0);
       return sum + base + addons;
     }, 0);
-
     subtotalEl.textContent = `R$ ${fmt(subtotal)}`;
   } catch {
-    return swal("Erro", "Não foi possível carregar seu carrinho.", "error")
+    return swal("Erro", "Não foi possível carregar o carrinho.", "error")
       .then(() => window.location.href = "identify.html?return=entrega.html");
   }
 
   // Cupom
   cupomLine.style.display = "none";
-  const resultadoCupom = await tentarAplicarCupomDoBanco(carrinhoId, usuarioId, lojaId, subtotal);
-  if (resultadoCupom.sucesso) {
-    desconto = resultadoCupom.dados;
-    cupomValue.textContent = `- R$ ${fmt(desconto)}`;
-    cupomLine.style.display = "flex";
+  try {
+    const resCupom = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${carrinhoId}`);
+    if (resCupom.ok) {
+      const codigo = await resCupom.text();
+      if (codigo) {
+        const cupomResp = await fetch('/api/Cupom/Aplicar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            codigo,
+            usuarioId,
+            lojaId,
+            valorOriginal: subtotal,
+            carrinhoId
+          })
+        });
+        const json = await cupomResp.json();
+        if (json.sucesso) {
+          desconto = json.dados;
+          cupomLine.style.display = "flex";
+          cupomValue.textContent  = `- R$ ${fmt(desconto)}`;
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("Erro ao reaplicar cupom:", err);
   }
 
   // Endereços
