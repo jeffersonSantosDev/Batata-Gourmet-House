@@ -151,17 +151,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     let storedFrete = 0;
-    if (rawFrete) {
+    if (!isNaN(parseFloat(rawFrete))) {
       storedFrete = parseFloat(rawFrete);
-      if (storedFrete > 0) {
-        freteEl.textContent = fmtBRL(storedFrete);
-        fretLine.style.display = '';
-      }
+      freteEl.textContent = storedFrete > 0 ? fmtBRL(storedFrete) : "–";
+      fretLine.style.display = '';
+    } else {
+      freteEl.textContent = "–";
+      fretLine.style.display = "none";
     }
 
     const total = Math.max(0, subtotal - desconto + storedFrete);
     totalEl.textContent = fmtBRL(total);
-
     // Pagamento Dinheiro/Pix
     Array.from(radios).forEach(radio => {
       radio.addEventListener('change', async () => {
