@@ -1,8 +1,8 @@
 function showLoader() {
-  document.getElementById("loadingOverlay").classList.remove("hidden");
+  document.getElementById("loadingOverlay")?.classList.remove("hidden");
 }
 function hideLoader() {
-  document.getElementById("loadingOverlay").classList.add("hidden");
+  document.getElementById("loadingOverlay")?.classList.add("hidden");
 }
 
 async function fetchCart(whatsapp) {
@@ -64,14 +64,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const finishBtn   = document.getElementById('finishBtn');
 
     finishBtn.setAttribute('type','button');
-    backBtn.onclick = () => history.back();
+    backBtn.onclick = () => window.location.href = "cart.html";
 
     const whatsapp     = localStorage.getItem('bgHouse_whatsapp');
     const usuarioIdEnc = localStorage.getItem('bgHouse_id');
     const rawAddress   = localStorage.getItem('bgHouse_selectedAddress');
     const rawFrete     = localStorage.getItem('bgHouse_frete');
     const nome         = localStorage.getItem('bgHouse_name');
-    
+
     let lojaId     = parseInt(localStorage.getItem("bgHouse_lojaId"));
     let programaId = parseInt(localStorage.getItem("bgHouse_fidelidadeId"));
     const userId   = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const total = Math.max(0, subtotal - desconto + storedFrete);
     totalEl.textContent = fmtBRL(total);
-    // Pagamento Dinheiro/Pix
+
     Array.from(radios).forEach(radio => {
       radio.addEventListener('change', async () => {
         if (radio.value === 'Dinheiro') {
@@ -223,7 +223,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     });
 
-    // Estado inicial
     if (form.elements['method'].value !== 'Dinheiro') {
       changeSec.style.display = 'none';
       changeInp.disabled = true;
