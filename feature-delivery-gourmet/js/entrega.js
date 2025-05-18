@@ -60,69 +60,40 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const whatsapp     = localStorage.getItem("bgHouse_whatsapp");
   const usuarioIdEnc = localStorage.getItem("bgHouse_id");
+  const lojaIdRaw    = localStorage.getItem("bgHouse_lojaId");
   const nome         = localStorage.getItem("bgHouse_name");
-  let lojaId         = parseInt(localStorage.getItem("bgHouse_lojaId"));
-  let programaId     = parseInt(localStorage.getItem("bgHouse_fidelidadeId"));
   const usuarioId    = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
 
   if (!whatsapp || !usuarioId) {
-    return swal("Ops!", "Identifique-se para continuar.", "warning")
+    return swal("Ops!", "Identifique-se para ver o carrinho.", "warning")
       .then(() => window.location.href = "identify.html?return=entrega.html");
   }
 
-  // Tenta buscar loja/fidelidade caso não esteja no localStorage
-  if (!lojaId || !programaId) {
-    try {
-      const info = await fetch('/api/Loja/GetInfoLoja', {
-        method: 'GET',
-        headers: { 'Accept': 'application/json' }
-      });
-      if (!info.ok) throw new Error();
-      const data = await info.json();
-      lojaId     = data.lojaId;
-      programaId = data.programaFidelidadeId;
-      localStorage.setItem("bgHouse_lojaId", lojaId);
-      localStorage.setItem("bgHouse_fidelidadeId", programaId);
-    } catch {
-      return swal("Erro", "Não foi possível obter informações da loja.", "error")
-        .then(() => window.location.href = "index.html");
-    }
-  }
-
-  userNameEl.textContent  = nome || "Você";
+  userNameEl.textContent  = nome;
   userPhoneEl.textContent = whatsapp.replace(/(\d{2})(\d{5})(\d{4})/, '+$1 $2-$3');
 
-  let cart, subtotal = 0, desconto = 0, frete = 0;
+  let cart, carrinhoId = null, subtotal = 0, desconto = 0, frete = 0;
+
   try {
-    cart = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`).then(r => r.json());
-    if (!cart.items.length) {
-      return window.location.href = "index.html";
-    }
+    cart = await fetchCart(whatsapp);
+    carrinhoId = cart.cartId;
     subtotal = cart.items.reduce((sum, item) => {
       const base = item.precoUnitario * item.quantidade;
-      const adicionaisTotal = (item.adicionais || [])
-        .reduce((s2, ad) => s2 + ad.preco * ad.quantidade, 0);
+      const adicionaisTotal = (item.adicionais || []).reduce((s2, ad) => s2 + ad.preco * ad.quantidade, 0);
       return sum + base + adicionaisTotal;
     }, 0);
     subtotalEl.textContent = `R$ ${fmt(subtotal)}`;
   } catch {
     subtotalEl.textContent = `R$ 0,00`;
-    return swal("Erro", "Erro ao carregar carrinho.", "error")
-      .then(() => window.location.href = "index.html");
   }
 
-  // Cupom
   cupomLine.style.display = "none";
   try {
-    const resCupom = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${cart.cartId}`);
+    const resCupom = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${carrinhoId}`);
     if (resCupom.ok) {
       const codigo = await resCupom.text();
       if (codigo) {
-        const res = await fetch('/api/Cupom/CalcularDesconto', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({ codigo, usuarioId, lojaId, valorOriginal: subtotal })
-        }).then(r => r.json());
+        const res = await calcularCupom(codigo, usuarioId, lojaIdRaw, subtotal);
         if (res.sucesso) {
           desconto = res.dados;
           cupomLine.style.display = "flex";
@@ -134,17 +105,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.warn("Erro ao buscar cupom do carrinho.");
   }
 
-  // Endereços
   const addresses = await fetchUserAddresses(whatsapp);
   form.innerHTML = "";
   addresses.forEach(addr => {
     const lbl = document.createElement("label");
     lbl.className = "address-option" + (addr.padrao ? " address-default" : "");
     lbl.innerHTML = `
-      <input type="radio" name="addressId" value="${addr.id}" ${addr.padrao?"checked":""}/>
+      <input type="radio" name="addressId" value="${addr.id}" ${addr.padrao ? "checked" : ""}/>
       <div class="address-label">
         <div>${addr.rua}, ${addr.numero}</div>
-        ${addr.referencia?`<div><i>${addr.referencia}</i></div>`:""}
+        ${addr.referencia ? `<div><i>${addr.referencia}</i></div>` : ""}
         <small>${addr.bairro} - ${addr.cidade}/${addr.uf}</small>
         <small>${addr.distanciaKm.toFixed(1)} km • ${addr.tempoMinutos} min • Frete R$ ${fmt(addr.frete)}</small>
       </div>`;
@@ -159,18 +129,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (addresses.length >= 2) addBtn.classList.add("disabled");
   addBtn.onclick = () => {
     if (addresses.length >= 2) {
-      swal("Atenção","Você já cadastrou 2 endereços. Edite-os na sua conta.","info");
+      swal("Atenção", "Você já cadastrou 2 endereços. Edite-os na sua conta.", "info");
     } else {
-      window.location.href="register-address.html";
+      window.location.href = "register-address.html";
     }
   };
 
-  form.addEventListener("change", () => {
+  form.addEventListener("change", async () => {
     const selId = form.addressId.value;
     document.querySelectorAll(".address-option").forEach(l => {
-      l.classList.toggle("selected",
-        l.querySelector("input").value === selId
-      );
+      l.classList.toggle("selected", l.querySelector("input").value === selId);
     });
     nextBtn.disabled = false;
     nextBtn.classList.remove("disabled");
@@ -179,25 +147,38 @@ document.addEventListener("DOMContentLoaded", async () => {
     const sel = addresses.find(a => a.id === +selId);
     if (sel) {
       frete = sel.frete;
-      freteEl.textContent    = frete > 0 ? `R$ ${fmt(frete)}` : '–';
+      freteEl.textContent = frete > 0 ? `R$ ${fmt(frete)}` : '–';
       finalTotal.textContent = `R$ ${fmt(subtotal - desconto + frete)}`;
       localStorage.setItem("bgHouse_frete", frete.toFixed(2));
       localStorage.setItem("bgHouse_selectedAddress", JSON.stringify(sel));
+
+      // Atualizar no banco
+      try {
+        await fetch('/api/Cart/AtualizarEnderecoEFrete', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            carrinhoId,
+            enderecoId: sel.id,
+            frete
+          })
+        });
+      } catch (err) {
+        console.warn("Erro ao salvar endereço/frete no carrinho:", err);
+      }
     }
   });
 
-  if (hasDefault) {
-    form.dispatchEvent(new Event("change"));
-  }
+  if (hasDefault) form.dispatchEvent(new Event("change"));
 
   nextBtn.onclick = () => {
     if (!addresses.length) {
-      return swal("Atenção","Cadastre um endereço primeiro.","warning");
+      return swal("Atenção", "Cadastre um endereço primeiro.", "warning");
     }
     const selId = form.addressId.value;
     if (!selId && !hasDefault) {
-      return swal("Atenção","Selecione um endereço de entrega.","warning");
+      return swal("Atenção", "Selecione um endereço de entrega.", "warning");
     }
-    window.location.href = `payment.html?addressId=${selId || addresses.find(a=>a.padrao).id}`;
+    window.location.href = `payment.html?addressId=${selId || addresses.find(a => a.padrao).id}`;
   };
 });
