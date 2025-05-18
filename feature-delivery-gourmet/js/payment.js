@@ -50,12 +50,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const delivName   = document.getElementById('delivName');
     const delivPhone  = document.getElementById('delivPhone');
     const delivAddr   = document.getElementById('delivAddress');
-    const subEl    = document.getElementById('subtotal');
-    const cupLine  = document.getElementById('cupomLine');
-    const descEl   = document.getElementById('desconto');
-    const fretLine = document.getElementById('freteLine');
-    const freteEl  = document.getElementById('frete');
-    const totalEl  = document.getElementById('total');
+    const subEl       = document.getElementById('subtotal');
+    const cupLine     = document.getElementById('cupomLine');
+    const descEl      = document.getElementById('desconto');
+    const fretLine    = document.getElementById('freteLine');
+    const freteEl     = document.getElementById('frete');
+    const totalEl     = document.getElementById('total');
     const form        = document.getElementById('paymentForm');
     const radios      = form.elements['method'];
     const changeSec   = document.getElementById('changeSection');
@@ -66,33 +66,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     finishBtn.setAttribute('type','button');
     backBtn.onclick = () => history.back();
 
-    const whatsapp   = localStorage.getItem('bgHouse_whatsapp');
-    const userId     = whatsapp ? parseInt(atob(localStorage.getItem('bgHouse_id'))) : null;
-    const storeId    = parseInt(localStorage.getItem('bgHouse_lojaId'));
-    const programId  = parseInt(localStorage.getItem('bgHouse_fidelidadeId'));
-    const rawAddress = localStorage.getItem('bgHouse_selectedAddress');
-    const rawFrete   = localStorage.getItem('bgHouse_frete');
+    const whatsapp     = localStorage.getItem('bgHouse_whatsapp');
+    const usuarioIdEnc = localStorage.getItem('bgHouse_id');
+    const rawAddress   = localStorage.getItem('bgHouse_selectedAddress');
+    const rawFrete     = localStorage.getItem('bgHouse_frete');
+    const nome         = localStorage.getItem('bgHouse_name');
+    
+    let lojaId     = parseInt(localStorage.getItem("bgHouse_lojaId"));
+    let programaId = parseInt(localStorage.getItem("bgHouse_fidelidadeId"));
+    const userId   = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
 
     if (!whatsapp || !userId) {
-      swal("Ops!", "Identifique-se para continuar.", "warning")
+      return swal("Ops!", "Identifique-se para continuar.", "warning")
         .then(() => window.location.href = "identify.html?return=payment.html");
-      return;
     }
 
-    let storedFrete = 0;
-    if (rawFrete) {
-      storedFrete = parseFloat(rawFrete);
-      if (storedFrete > 0) {
-        freteEl.textContent = fmtBRL(storedFrete);
-        fretLine.style.display = '';
+    if (!lojaId || !programaId) {
+      try {
+        const resp = await fetch('/api/Loja/GetInfoLoja', {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' }
+        });
+        const data = await resp.json();
+        lojaId     = data.lojaId;
+        programaId = data.programaFidelidadeId;
+        localStorage.setItem("bgHouse_lojaId", lojaId);
+        localStorage.setItem("bgHouse_fidelidadeId", programaId);
+      } catch {
+        return swal("Erro", "Não foi possível obter dados da loja.", "error")
+          .then(() => window.location.href = "index.html");
       }
     }
+
+    // Preenche endereço
     if (rawAddress) {
       try {
         const addr = JSON.parse(rawAddress);
-        delivName.textContent  = localStorage.getItem('bgHouse_name') || 'Você';
-        delivPhone.textContent = localStorage.getItem('bgHouse_whatsapp')
-                                   .replace(/(\d{2})(\d{5})(\d{4})/,'+$1 $2-$3');
+        delivName.textContent  = nome || 'Você';
+        delivPhone.textContent = whatsapp.replace(/(\d{2})(\d{5})(\d{4})/, '+$1 $2-$3');
         delivAddr.textContent  = `${addr.rua}, ${addr.numero}` +
                                  (addr.referencia ? ` (${addr.referencia})` : '');
         deliverySec.style.display = '';
@@ -103,54 +114,55 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let cart = { items: [] }, carrinhoId = null, subtotal = 0;
     try {
-      const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
-      const data = await resp.json();
+      const data = await fetchCart(whatsapp);
       cart = data;
       carrinhoId = data.cartId;
 
+      if (!cart.items.length) {
+        return swal("Carrinho vazio", "Você será redirecionado.", "info")
+          .then(() => window.location.href = "index.html");
+      }
+
       subtotal = data.items.reduce((sum, item) => {
         const base   = item.precoUnitario * item.quantidade;
-        const addons = (item.adicionais || []).reduce(
-          (s, ad) => s + ad.preco * ad.quantidade, 0
-        );
+        const addons = (item.adicionais || []).reduce((s, ad) => s + ad.preco * ad.quantidade, 0);
         return sum + base + addons;
       }, 0);
     } catch {
-      subtotal = 0;
+      return swal("Erro", "Não foi possível carregar o carrinho.", "error")
+        .then(() => window.location.href = "index.html");
     }
     subEl.textContent = fmtBRL(subtotal);
 
-    // Buscar cupom do banco
     let desconto = 0;
     let cupomCode = null;
     try {
-      const res = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${carrinhoId}`);
-      if (res.ok) cupomCode = await res.text();
-    } catch {}
+      cupomCode = await buscarCupomDoCarrinho(carrinhoId);
+      if (cupomCode) {
+        const json = await calcularCupomAplicado(cupomCode, userId, lojaId, subtotal, carrinhoId);
+        if (json.sucesso) {
+          desconto = json.dados;
+          descEl.textContent = '- ' + fmtBRL(desconto);
+          cupLine.style.display = '';
+        }
+      }
+    } catch {
+      console.warn("Não foi possível reaplicar o cupom.");
+    }
 
-    if (cupomCode) {
-      const cupomResp = await fetch('/api/Cupom/Aplicar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          codigo: cupomCode,
-          usuarioId: userId,
-          lojaId: storeId,
-          valorOriginal: subtotal,
-          carrinhoId
-        })
-      });
-      const json = await cupomResp.json();
-      if (json.sucesso) {
-        desconto = json.dados;
-        descEl.textContent = '- ' + fmtBRL(desconto);
-        cupLine.style.display = '';
+    let storedFrete = 0;
+    if (rawFrete) {
+      storedFrete = parseFloat(rawFrete);
+      if (storedFrete > 0) {
+        freteEl.textContent = fmtBRL(storedFrete);
+        fretLine.style.display = '';
       }
     }
 
     const total = Math.max(0, subtotal - desconto + storedFrete);
     totalEl.textContent = fmtBRL(total);
 
+    // Pagamento Dinheiro/Pix
     Array.from(radios).forEach(radio => {
       radio.addEventListener('change', async () => {
         if (radio.value === 'Dinheiro') {
@@ -177,24 +189,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                   endereco: rawAddress ? JSON.parse(rawAddress) : null,
                   pagamento: "Pix"
                 })
-              }) 
+              })
             });
 
             const data = await resp.json();
             if (data.sucesso) {
-              const qrcodeUrl = data.qrCodeUrl;
-              const txid = data.txid;
-
               Swal.fire({
                 title: 'Escaneie o QR Code para pagar com Pix',
-                html: `<img src="${qrcodeUrl}" alt="QR Code Pix" style="width: 250px; height: 250px;">`,
-                confirmButtonText: 'Aguardando pagamento...',
+                html: `<img src="${data.qrCodeUrl}" style="width:250px;height:250px;">`,
                 showConfirmButton: false,
                 allowOutsideClick: false
               });
 
               const interval = setInterval(async () => {
-                const check = await fetch(`/api/Pix/StatusPagamento?txid=${txid}`);
+                const check = await fetch(`/api/Pix/StatusPagamento?txid=${data.txid}`);
                 const res = await check.json();
                 if (res.status === 'confirmado') {
                   clearInterval(interval);
@@ -215,9 +223,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     });
 
+    // Estado inicial
     if (form.elements['method'].value !== 'Dinheiro') {
       changeSec.style.display = 'none';
-      changeInp.disabled      = true;
+      changeInp.disabled = true;
     }
 
     noChangeChk.addEventListener('change', () => {
@@ -227,9 +236,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     changeInp.addEventListener('input', e => {
-      e.target.value = e.target.value
-        .replace(/[^\d,]/g, '')
-        .replace(/,(\d{2}).+/, ',$1');
+      e.target.value = e.target.value.replace(/[^\d,]/g, '').replace(/,(\d{2}).+/, ',$1');
     });
 
     finishBtn.addEventListener('click', () => {
@@ -250,12 +257,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         paymentMethod: method,
         changeFor,
         usuarioId: userId,
-        lojaId:    storeId,
+        lojaId,
         couponCode: cupomCode || null,
         programId,
         cartItems: cart.items,
         subtotal,
-        frete:     storedFrete,
+        frete: storedFrete,
         desconto,
         total
       };
