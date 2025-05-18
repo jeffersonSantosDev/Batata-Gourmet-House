@@ -99,32 +99,34 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Cupom
   cupomLine.style.display = "none";
-  try {
-    const resCupom = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${carrinhoId}`);
-    if (resCupom.ok) {
-      const codigo = await resCupom.text();
-      if (codigo) {
-        const res = await fetch('/api/Cupom/Aplicar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            codigo,
-            usuarioId,
-            lojaId: parseInt(lojaIdRaw),
-            valorOriginal: subtotal,
-            carrinhoId
-          })
-        });
-        const json = await res.json();
-        if (json.sucesso) {
-          desconto = json.dados;
-          cupomLine.style.display = "flex";
-          cupomValue.textContent  = `- R$ ${fmt(desconto)}`;
+  if (carrinhoId && subtotal > 0 && usuarioId && lojaIdRaw) {
+    try {
+      const resCupom = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${carrinhoId}`);
+      if (resCupom.ok) {
+        const codigo = await resCupom.text();
+        if (codigo) {
+          const cupomResp = await fetch('/api/Cupom/Aplicar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              codigo,
+              usuarioId,
+              lojaId: parseInt(lojaIdRaw),
+              valorOriginal: subtotal,
+              carrinhoId
+            })
+          });
+          const json = await cupomResp.json();
+          if (json.sucesso) {
+            desconto = json.dados;
+            cupomLine.style.display = "flex";
+            cupomValue.textContent  = `- R$ ${fmt(desconto)}`;
+          }
         }
       }
+    } catch (err) {
+      console.warn("Erro ao reaplicar cupom:", err);
     }
-  } catch {
-    console.warn("Erro ao aplicar cupom.");
   }
 
   // Endereços
