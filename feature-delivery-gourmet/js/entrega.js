@@ -54,16 +54,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   const cupomValue  = document.getElementById("cupomValue");
   const freteEl     = document.getElementById("frete");
   const finalTotal  = document.getElementById("finalTotal");
-  const fmt         = v => v.toFixed(2).replace(".",",");
 
-  backBtn.onclick = () => history.back();
+  const fmt = v => v.toFixed(2).replace(".", ",");
 
   const whatsapp     = localStorage.getItem("bgHouse_whatsapp");
   const usuarioIdEnc = localStorage.getItem("bgHouse_id");
   const lojaIdRaw    = localStorage.getItem("bgHouse_lojaId");
   const nome         = localStorage.getItem("bgHouse_name");
-  const usuarioId    = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
 
+  const usuarioId = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
   if (!whatsapp || !usuarioId) {
     return swal("Ops!", "Identifique-se para ver o carrinho.", "warning")
       .then(() => window.location.href = "identify.html?return=entrega.html");
@@ -72,30 +71,43 @@ document.addEventListener("DOMContentLoaded", async () => {
   userNameEl.textContent  = nome;
   userPhoneEl.textContent = whatsapp.replace(/(\d{2})(\d{5})(\d{4})/, '+$1 $2-$3');
 
-  let cart, carrinhoId = null, subtotal = 0, desconto = 0, frete = 0;
-
+  // Fetch carrinho atualizado
+  let cart, subtotal = 0, desconto = 0, frete = 0;
   try {
-    cart = await fetchCart(whatsapp);
-    carrinhoId = cart.cartId;
+    const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
+    cart = await resp.json();
     subtotal = cart.items.reduce((sum, item) => {
       const base = item.precoUnitario * item.quantidade;
-      const adicionaisTotal = (item.adicionais || []).reduce((s2, ad) => s2 + ad.preco * ad.quantidade, 0);
+      const adicionaisTotal = (item.adicionais || [])
+        .reduce((s2, ad) => s2 + ad.preco * ad.quantidade, 0);
       return sum + base + adicionaisTotal;
     }, 0);
     subtotalEl.textContent = `R$ ${fmt(subtotal)}`;
   } catch {
     subtotalEl.textContent = `R$ 0,00`;
+    return swal("Erro", "Não foi possível carregar o carrinho.", "error");
   }
 
+  // Cupom (buscar no banco)
   cupomLine.style.display = "none";
   try {
-    const resCupom = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${carrinhoId}`);
+    const resCupom = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${cart.cartId}`);
     if (resCupom.ok) {
       const codigo = await resCupom.text();
       if (codigo) {
-        const res = await calcularCupom(codigo, usuarioId, lojaIdRaw, subtotal);
-        if (res.sucesso) {
-          desconto = res.dados;
+        const res = await fetch('/api/Cupom/CalcularDesconto', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            codigo,
+            usuarioId,
+            lojaId: parseInt(lojaIdRaw),
+            valorOriginal: subtotal
+          })
+        });
+        const json = await res.json();
+        if (json.sucesso) {
+          desconto = json.dados;
           cupomLine.style.display = "flex";
           cupomValue.textContent  = `- R$ ${fmt(desconto)}`;
         }
@@ -105,13 +117,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.warn("Erro ao buscar cupom do carrinho.");
   }
 
-  const addresses = await fetchUserAddresses(whatsapp);
+  // Endereços
   form.innerHTML = "";
+  let selectedAddressId = null;
+
+  const addresses = cart.endereco ? [cart.endereco] : [];
+
   addresses.forEach(addr => {
     const lbl = document.createElement("label");
-    lbl.className = "address-option" + (addr.padrao ? " address-default" : "");
+    lbl.className = "address-option selected";
+    selectedAddressId = addr.id;
+
     lbl.innerHTML = `
-      <input type="radio" name="addressId" value="${addr.id}" ${addr.padrao ? "checked" : ""}/>
+      <input type="radio" name="addressId" value="${addr.id}" checked />
       <div class="address-label">
         <div>${addr.rua}, ${addr.numero}</div>
         ${addr.referencia ? `<div><i>${addr.referencia}</i></div>` : ""}
@@ -121,64 +139,52 @@ document.addEventListener("DOMContentLoaded", async () => {
     form.appendChild(lbl);
   });
 
-  const hasDefault = addresses.some(a => a.padrao);
-  nextBtn.textContent = hasDefault ? "Ir Para Pagamento" : "Escolha a Entrega!";
-  nextBtn.disabled    = !hasDefault;
-  nextBtn.classList.toggle("disabled", !hasDefault);
-
-  if (addresses.length >= 2) addBtn.classList.add("disabled");
-  addBtn.onclick = () => {
-    if (addresses.length >= 2) {
-      swal("Atenção", "Você já cadastrou 2 endereços. Edite-os na sua conta.", "info");
-    } else {
-      window.location.href = "register-address.html";
-    }
-  };
-
-  form.addEventListener("change", async () => {
-    const selId = form.addressId.value;
-    document.querySelectorAll(".address-option").forEach(l => {
-      l.classList.toggle("selected", l.querySelector("input").value === selId);
-    });
+  if (addresses.length) {
+    frete = addresses[0].frete || cart.frete || 0;
+    freteEl.textContent = `R$ ${fmt(frete)}`;
+    finalTotal.textContent = `R$ ${fmt(subtotal - desconto + frete)}`;
     nextBtn.disabled = false;
     nextBtn.classList.remove("disabled");
-    nextBtn.textContent = "Ir Para Pagamento";
+    localStorage.setItem("bgHouse_frete", frete.toFixed(2));
+    localStorage.setItem("bgHouse_selectedAddress", JSON.stringify(addresses[0]));
+  } else {
+    nextBtn.disabled = true;
+    nextBtn.classList.add("disabled");
+  }
 
-    const sel = addresses.find(a => a.id === +selId);
-    if (sel) {
-      frete = sel.frete;
-      freteEl.textContent = frete > 0 ? `R$ ${fmt(frete)}` : '–';
-      finalTotal.textContent = `R$ ${fmt(subtotal - desconto + frete)}`;
-      localStorage.setItem("bgHouse_frete", frete.toFixed(2));
-      localStorage.setItem("bgHouse_selectedAddress", JSON.stringify(sel));
+  // Ao mudar endereço (futuramente expandir para múltiplos endereços)
+  form.addEventListener("change", async () => {
+    const selId = parseInt(form.addressId.value);
+    const selected = addresses.find(a => a.id === selId);
+    if (!selected) return;
 
-      // Atualizar no banco
-      try {
-        await fetch('/api/Cart/AtualizarEnderecoEFrete', {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            carrinhoId,
-            enderecoId: sel.id,
-            frete
-          })
-        });
-      } catch (err) {
-        console.warn("Erro ao salvar endereço/frete no carrinho:", err);
-      }
+    selectedAddressId = selected.id;
+    frete = selected.frete;
+    freteEl.textContent = `R$ ${fmt(frete)}`;
+    finalTotal.textContent = `R$ ${fmt(subtotal - desconto + frete)}`;
+    localStorage.setItem("bgHouse_frete", frete.toFixed(2));
+    localStorage.setItem("bgHouse_selectedAddress", JSON.stringify(selected));
+
+    // Atualiza o frete no banco (se já tiver carrinhoId)
+    try {
+      await fetch('/api/Cart/AtualizarEnderecoEFrete', {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          carrinhoId: cart.cartId,
+          enderecoId: selected.id,
+          frete
+        })
+      });
+    } catch (e) {
+      console.warn("Erro ao salvar endereço e frete no carrinho");
     }
   });
 
-  if (hasDefault) form.dispatchEvent(new Event("change"));
-
   nextBtn.onclick = () => {
-    if (!addresses.length) {
-      return swal("Atenção", "Cadastre um endereço primeiro.", "warning");
-    }
-    const selId = form.addressId.value;
-    if (!selId && !hasDefault) {
+    if (!selectedAddressId) {
       return swal("Atenção", "Selecione um endereço de entrega.", "warning");
     }
-    window.location.href = `payment.html?addressId=${selId || addresses.find(a => a.padrao).id}`;
+    window.location.href = `payment.html?addressId=${selectedAddressId}`;
   };
 });
