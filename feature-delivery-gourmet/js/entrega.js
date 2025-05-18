@@ -1,5 +1,3 @@
-// js/entrega.js
-
 function showLoader() {
   document.getElementById("loadingOverlay").classList.remove("hidden");
 }
@@ -60,26 +58,28 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   backBtn.onclick = () => history.back();
 
-  // Recupera credenciais e valida sessão
   const whatsapp     = localStorage.getItem("bgHouse_whatsapp");
   const usuarioIdEnc = localStorage.getItem("bgHouse_id");
   const lojaIdRaw    = localStorage.getItem("bgHouse_lojaId");
   const nome         = localStorage.getItem("bgHouse_name");
-
- 
   const usuarioId    = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
+  const lojaId       = lojaIdRaw ? parseInt(lojaIdRaw) : null;
+
   if (!whatsapp || !usuarioId) {
-    return swal("Ops!", "Identifique-se para ver o carrinho.", "warning")
+    return swal("Ops!", "Identifique-se para continuar.", "warning")
       .then(() => window.location.href = "identify.html?return=entrega.html");
   }
 
-  userNameEl.textContent  = nome;
+  userNameEl.textContent  = nome || "Você";
   userPhoneEl.textContent = whatsapp.replace(/(\d{2})(\d{5})(\d{4})/, '+$1 $2-$3');
 
   // Carrinho
   let cart, subtotal = 0, desconto = 0, frete = 0;
   try {
     cart = await fetchCart(whatsapp);
+    if (!cart.items.length) {
+      return window.location.href = "index.html";
+    }
     subtotal = cart.items.reduce((sum, item) => {
       const base = item.precoUnitario * item.quantidade;
       const adicionaisTotal = (item.adicionais || [])
@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     subtotalEl.textContent = `R$ 0,00`;
   }
 
-  // Cupom (buscar no banco)
+  // Cupom
   cupomLine.style.display = "none";
   try {
     const resCupom = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${cart.cartId}`);
@@ -117,10 +117,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const lbl = document.createElement("label");
     lbl.className = "address-option" + (addr.padrao ? " address-default" : "");
     lbl.innerHTML = `
-      <input type="radio" name="addressId" value="${addr.id}" ${addr.padrao?"checked":""}/>
+      <input type="radio" name="addressId" value="${addr.id}" ${addr.padrao ? "checked" : ""}/>
       <div class="address-label">
         <div>${addr.rua}, ${addr.numero}</div>
-        ${addr.referencia?`<div><i>${addr.referencia}</i></div>`:""}
+        ${addr.referencia ? `<div><i>${addr.referencia}</i></div>` : ""}
         <small>${addr.bairro} - ${addr.cidade}/${addr.uf}</small>
         <small>${addr.distanciaKm.toFixed(1)} km • ${addr.tempoMinutos} min • Frete R$ ${fmt(addr.frete)}</small>
       </div>`;
@@ -135,9 +135,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (addresses.length >= 2) addBtn.classList.add("disabled");
   addBtn.onclick = () => {
     if (addresses.length >= 2) {
-      swal("Atenção","Você já cadastrou 2 endereços. Edite-os na sua conta.","info");
+      swal("Atenção", "Você já cadastrou 2 endereços. Edite-os na sua conta.", "info");
     } else {
-      window.location.href="register-address.html";
+      window.location.href = "register-address.html";
     }
   };
 
@@ -168,12 +168,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   nextBtn.onclick = () => {
     if (!addresses.length) {
-      return swal("Atenção","Cadastre um endereço primeiro.","warning");
+      return swal("Atenção", "Cadastre um endereço primeiro.", "warning");
     }
     const selId = form.addressId.value;
     if (!selId && !hasDefault) {
-      return swal("Atenção","Selecione um endereço de entrega.","warning");
+      return swal("Atenção", "Selecione um endereço de entrega.", "warning");
     }
-    window.location.href = `payment.html?addressId=${selId || addresses.find(a=>a.padrao).id}`;
+    window.location.href = `payment.html?addressId=${selId || addresses.find(a => a.padrao).id}`;
   };
 });
