@@ -5,7 +5,20 @@ function hideLoader() {
   document.getElementById("loadingOverlay").classList.add("hidden");
 }
 
+async function fetchInfoLoja() {
+  const resp = await fetch('/api/Loja/GetInfoLoja', {
+    method: 'GET',
+    headers: { 'Accept': 'application/json' }
+  });
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  const data = await resp.json();
+  localStorage.setItem('bgHouse_lojaId', data.lojaId);
+  localStorage.setItem('bgHouse_fidelidadeId', data.programaFidelidadeId);
+  return data;
+}
+
 async function fetchUserAddresses(whatsapp) {
+  showLoader();
   try {
     const resp = await fetch('/api/Usuario/GetAddressesByWhatsApp', {
       method: 'POST',
@@ -20,16 +33,28 @@ async function fetchUserAddresses(whatsapp) {
     await swal("Erro", "Não foi possível carregar seus endereços.", "error");
     window.location.href = 'identify.html?return=entrega.html';
     return [];
+  } finally {
+    hideLoader();
   }
 }
 
-function fmt(v) {
-  return v.toFixed(2).replace(".", ",");
+async function fetchCart(whatsapp) {
+  const resp = await fetch(`/api/Cart?whatsapp=${encodeURIComponent(whatsapp)}`);
+  if (!resp.ok) throw new Error('Erro ao carregar carrinho');
+  return resp.json();
+}
+
+async function calcularCupom(codigo, usuarioId, lojaId, subtotal) {
+  const resp = await fetch('/api/Cupom/CalcularDesconto', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({ codigo, usuarioId, lojaId, valorOriginal: subtotal })
+  });
+  if (!resp.ok) return { sucesso: false };
+  return resp.json();
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  showLoader();
-
   const backBtn     = document.getElementById("backBtn");
   const userNameEl  = document.getElementById("userName");
   const userPhoneEl = document.getElementById("userPhone");
@@ -42,14 +67,29 @@ document.addEventListener("DOMContentLoaded", async () => {
   const freteEl     = document.getElementById("frete");
   const finalTotal  = document.getElementById("finalTotal");
 
+  const fmt = v => v.toFixed(2).replace(".", ",");
+
+  // Verifica se está voltando da identificação
+  const urlParams = new URLSearchParams(window.location.search);
+  const fromReturn = urlParams.get("return");
+
+  // Dados do usuário
   const whatsapp     = localStorage.getItem("bgHouse_whatsapp");
   const usuarioIdEnc = localStorage.getItem("bgHouse_id");
-  const lojaIdRaw    = localStorage.getItem("bgHouse_lojaId");
+  let lojaIdRaw = localStorage.getItem("bgHouse_lojaId");
+  if (!lojaIdRaw) {
+    try {
+      const lojaInfo = await fetchInfoLoja();
+      lojaIdRaw = lojaInfo.lojaId;
+    } catch {
+      return swal("Erro", "Não foi possível obter os dados da loja.", "error")
+        .then(() => window.location.href = "identify.html?return=entrega.html");
+    }
+  }
   const nome         = localStorage.getItem("bgHouse_name");
   const usuarioId    = usuarioIdEnc ? parseInt(atob(usuarioIdEnc)) : null;
-  const lojaId       = lojaIdRaw ? parseInt(lojaIdRaw) : null;
 
-  if (!whatsapp || !usuarioId || !lojaId) {
+  if (!whatsapp || !usuarioId) {
     return window.location.href = "identify.html?return=entrega.html";
   }
 
@@ -80,36 +120,49 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Cupom
   cupomLine.style.display = "none";
-  try {
-    const resCupom = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${carrinhoId}`);
-    if (resCupom.ok) {
-      const codigo = await resCupom.text();
-      if (codigo) {
-        const cupomResp = await fetch('/api/Cupom/Aplicar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            codigo,
-            usuarioId,
-            lojaId,
-            valorOriginal: subtotal,
-            carrinhoId
-          })
-        });
-        const json = await cupomResp.json();
-        if (json.sucesso) {
-          desconto = json.dados;
-          cupomLine.style.display = "flex";
-          cupomValue.textContent  = `- R$ ${fmt(desconto)}`;
+  if (carrinhoId && subtotal > 0 && usuarioId && lojaIdRaw) {
+    try {
+      const resCupom = await fetch(`/api/Cupom/GetCupomCarrinho?carrinhoId=${carrinhoId}`);
+      if (resCupom.ok) {
+        const codigo = await resCupom.text();
+        if (codigo) {
+          const cupomResp = await fetch('/api/Cupom/Aplicar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              codigo,
+              usuarioId,
+              lojaId: parseInt(lojaIdRaw),
+              valorOriginal: subtotal,
+              carrinhoId
+            })
+          });
+          const json = await cupomResp.json();
+          if (json.sucesso) {
+            desconto = json.dados;
+            cupomLine.style.display = "flex";
+            cupomValue.textContent  = `- R$ ${fmt(desconto)}`;
+          }
         }
       }
+    } catch (err) {
+      console.warn("Erro ao reaplicar cupom:", err);
     }
-  } catch (err) {
-    console.warn("Erro ao reaplicar cupom:", err);
   }
 
   // Endereços
-  const addresses = await fetchUserAddresses(whatsapp);
+  let addresses = [];
+  try {
+    const resp = await fetch('/api/Usuario/GetAddressesByWhatsApp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ numero: whatsapp })
+    });
+    if (resp.ok) addresses = await resp.json();
+  } catch {
+    return swal("Erro", "Não foi possível carregar os endereços.", "error");
+  }
+
   const enderecoAtual = cart.endereco;
   let enderecoSelecionadoId = enderecoAtual?.id || null;
 
@@ -182,6 +235,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     window.location.href = `payment.html?addressId=${enderecoSelecionadoId}`;
   };
-
-  hideLoader();
 });
