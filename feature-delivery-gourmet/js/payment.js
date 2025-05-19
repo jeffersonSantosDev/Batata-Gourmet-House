@@ -204,36 +204,57 @@ document.addEventListener('DOMContentLoaded', async () => {
             const data = await resp.json();
         
             if (data.sucesso && data.qrCodeUrl && data.txid) {
-              swal.fire({
+              swal({
                 title: 'Escaneie o QR Code para pagar com Pix',
-                html: `
-                  <img src="${data.qrCodeUrl}" style="width:250px;height:250px;"><br>
-                  <button id="copyPix" style="margin-top: 15px; padding: 8px 12px; background-color: #2c7be5; color: white; border: none; border-radius: 4px; cursor: pointer;">Copiar código Pix</button>
-                `,
-                showCloseButton: true,
-                showConfirmButton: false,
-                allowOutsideClick: false,
-                didOpen: () => {
-                  document.getElementById('copyPix')?.addEventListener('click', async () => {
+                content: (() => {
+                  const container = document.createElement("div");
+        
+                  const img = document.createElement("img");
+                  img.src = data.qrCodeUrl;
+                  img.style.width = "250px";
+                  img.style.height = "250px";
+                  img.style.display = "block";
+                  img.style.margin = "0 auto";
+        
+                  const btn = document.createElement("button");
+                  btn.textContent = "Copiar código Pix";
+                  btn.style.marginTop = "15px";
+                  btn.style.padding = "8px 12px";
+                  btn.style.backgroundColor = "#2c7be5";
+                  btn.style.color = "white";
+                  btn.style.border = "none";
+                  btn.style.borderRadius = "4px";
+                  btn.style.cursor = "pointer";
+        
+                  btn.onclick = async () => {
                     try {
                       const res = await fetch(`/api/Pix/CopiaCola?txid=${data.txid}`);
                       const text = await res.text();
                       await navigator.clipboard.writeText(text);
-                      Swal.fire('Copiado!', 'O código Pix foi copiado para sua área de transferência.', 'success');
+                      swal("Copiado!", "Código Pix copiado para a área de transferência.", "success");
                     } catch {
-                      Swal.fire('Erro', 'Não foi possível copiar o código Pix.', 'error');
+                      swal("Erro", "Não foi possível copiar o código Pix.", "error");
                     }
-                  });
-                }
+                  };
+        
+                  container.appendChild(img);
+                  container.appendChild(btn);
+                  return container;
+                })(),
+                buttons: {
+                  cancel: {
+                    text: "Fechar",
+                    visible: true
+                  }
+                },
+                closeOnClickOutside: false
               });
-              
         
               const interval = setInterval(async () => {
                 const check = await fetch(`/api/Pix/StatusPagamento?txid=${data.txid}`);
                 const res = await check.json();
                 if (res.status === 'confirmado') {
                   clearInterval(interval);
-                  swal.close();
                   swal("Pix Aprovado", "Pagamento confirmado!", "success")
                     .then(() => finishBtn.click());
                 }
