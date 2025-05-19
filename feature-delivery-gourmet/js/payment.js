@@ -204,17 +204,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             const data = await resp.json();
         
             if (data.sucesso && data.qrCodeUrl && data.txid) {
-              Swal.fire({
+              swal({
                 title: 'Escaneie o QR Code para pagar com Pix',
-                html: `
-                  <div style="display: flex; flex-direction: column; align-items: center;">
-                    <img src="${data.qrCodeUrl}" alt="QR Code Pix" style="width: 250px; height: 250px; margin-bottom: 10px;">
-                    <small style="word-break: break-all; font-size: 13px; color: #666;">${data.txid}</small>
-                  </div>
-                `,
-                showConfirmButton: false,
-                allowOutsideClick: false
+                content: {
+                  element: "img",
+                  attributes: {
+                    src: data.qrCodeUrl,
+                    style: "width:250px;height:250px;"
+                  }
+                },
+                buttons: false,
+                closeOnClickOutside: false
               });
+              
         
               const interval = setInterval(async () => {
                 const check = await fetch(`/api/Pix/StatusPagamento?txid=${data.txid}`);
