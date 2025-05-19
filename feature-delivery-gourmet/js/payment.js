@@ -244,10 +244,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 buttons: {
                   cancel: {
                     text: "Fechar",
-                    visible: true
+                    visible: true,
+                    closeModal: true
                   }
                 },
                 closeOnClickOutside: false
+              }).then((val) => {
+                // Ao fechar o alerta, volta o método para Dinheiro
+                const dinheiroRadio = Array.from(radios).find(r => r.value === 'Dinheiro');
+                if (dinheiroRadio) {
+                  dinheiroRadio.checked = true;
+                  changeSec.style.display = 'flex';
+                  changeInp.disabled = noChangeChk.checked;
+                }
               });
         
               const interval = setInterval(async () => {
