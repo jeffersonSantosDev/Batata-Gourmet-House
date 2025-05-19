@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const data = await resp.json();
         
             if (data.sucesso && data.qrCodeUrl && data.txid) {
-              Swal.fire({
+              swal.fire({
                 title: 'Escaneie o QR Code para pagar com Pix',
                 html: `
                   <img src="${data.qrCodeUrl}" style="width:250px;height:250px;"><br>
@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const res = await check.json();
                 if (res.status === 'confirmado') {
                   clearInterval(interval);
-                  Swal.close();
+                  swal.close();
                   swal("Pix Aprovado", "Pagamento confirmado!", "success")
                     .then(() => finishBtn.click());
                 }
