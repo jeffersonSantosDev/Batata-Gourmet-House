@@ -182,6 +182,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           changeInp.value = '';
         }
 
+       
         if (radio.value === 'Pix') {
           showLoader();
           try {
@@ -190,6 +191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 usuarioId: userId,
+                carrinhoId: carrinhoId,
                 valor: total,
                 jsonCarrinho: JSON.stringify({
                   cartItems: cart.items,
@@ -198,7 +200,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 })
               })
             });
-
+        
             const data = await resp.json();
             if (data.sucesso) {
               Swal.fire({
@@ -207,7 +209,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 showConfirmButton: false,
                 allowOutsideClick: false
               });
-
+        
               const interval = setInterval(async () => {
                 const check = await fetch(`/api/Pix/StatusPagamento?txid=${data.txid}`);
                 const res = await check.json();
@@ -227,6 +229,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             hideLoader();
           }
         }
+
+
       });
     });
 
