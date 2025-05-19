@@ -204,17 +204,27 @@ document.addEventListener('DOMContentLoaded', async () => {
             const data = await resp.json();
         
             if (data.sucesso && data.qrCodeUrl && data.txid) {
-              swal({
+              Swal.fire({
                 title: 'Escaneie o QR Code para pagar com Pix',
-                content: {
-                  element: "img",
-                  attributes: {
-                    src: data.qrCodeUrl,
-                    style: "width:250px;height:250px;"
-                  }
-                },
-                buttons: false,
-                closeOnClickOutside: false
+                html: `
+                  <img src="${data.qrCodeUrl}" style="width:250px;height:250px;"><br>
+                  <button id="copyPix" style="margin-top: 15px; padding: 8px 12px; background-color: #2c7be5; color: white; border: none; border-radius: 4px; cursor: pointer;">Copiar código Pix</button>
+                `,
+                showCloseButton: true,
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                  document.getElementById('copyPix')?.addEventListener('click', async () => {
+                    try {
+                      const res = await fetch(`/api/Pix/CopiaCola?txid=${data.txid}`);
+                      const text = await res.text();
+                      await navigator.clipboard.writeText(text);
+                      Swal.fire('Copiado!', 'O código Pix foi copiado para sua área de transferência.', 'success');
+                    } catch {
+                      Swal.fire('Erro', 'Não foi possível copiar o código Pix.', 'error');
+                    }
+                  });
+                }
               });
               
         
