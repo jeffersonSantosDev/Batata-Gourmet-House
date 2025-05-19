@@ -202,10 +202,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         
             const data = await resp.json();
-            if (data.sucesso) {
+        
+            if (data.sucesso && data.qrCodeUrl && data.txid) {
               Swal.fire({
                 title: 'Escaneie o QR Code para pagar com Pix',
-                html: `<img src="${data.qrCodeUrl}" style="width:250px;height:250px;">`,
+                html: `
+                  <div style="display: flex; flex-direction: column; align-items: center;">
+                    <img src="${data.qrCodeUrl}" alt="QR Code Pix" style="width: 250px; height: 250px; margin-bottom: 10px;">
+                    <small style="word-break: break-all; font-size: 13px; color: #666;">${data.txid}</small>
+                  </div>
+                `,
                 showConfirmButton: false,
                 allowOutsideClick: false
               });
@@ -223,12 +229,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else {
               swal("Erro", data.mensagem || "Erro ao gerar QR Code", "error");
             }
-          } catch {
+          } catch (err) {
+            console.error(err);
             swal("Erro", "Erro ao gerar QR Code Pix", "error");
           } finally {
             hideLoader();
           }
         }
+        
 
 
       });
