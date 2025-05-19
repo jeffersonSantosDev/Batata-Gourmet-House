@@ -185,6 +185,8 @@ document.addEventListener('DOMContentLoaded', async () => {
        
         if (radio.value === 'Pix') {
           showLoader();
+          finishBtn.style.display = "none"; // Esconde o botão ao escolher Pix
+        
           try {
             const resp = await fetch("/api/Pix/GerarQrCode", {
               method: "POST",
@@ -250,13 +252,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 },
                 closeOnClickOutside: false
               }).then((val) => {
-                // Ao fechar o alerta, volta o método para Dinheiro
+                // Ao fechar o alerta, volta o método para Dinheiro e reexibe o botão
                 const dinheiroRadio = Array.from(radios).find(r => r.value === 'Dinheiro');
                 if (dinheiroRadio) {
                   dinheiroRadio.checked = true;
                   changeSec.style.display = 'flex';
                   changeInp.disabled = noChangeChk.checked;
                 }
+                finishBtn.style.display = ""; // Reexibe o botão
               });
         
               const interval = setInterval(async () => {
@@ -270,10 +273,12 @@ document.addEventListener('DOMContentLoaded', async () => {
               }, 5000);
             } else {
               swal("Erro", data.mensagem || "Erro ao gerar QR Code", "error");
+              finishBtn.style.display = ""; // Exibe de volta se falhar
             }
           } catch (err) {
             console.error(err);
             swal("Erro", "Erro ao gerar QR Code Pix", "error");
+            finishBtn.style.display = ""; // Exibe de volta se falhar
           } finally {
             hideLoader();
           }
