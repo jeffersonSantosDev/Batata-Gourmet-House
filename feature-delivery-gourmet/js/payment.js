@@ -200,7 +200,15 @@ document.addEventListener('DOMContentLoaded', async () => {
               })
             });
         
-            const data = await resp.json();
+            const text = await resp.text();
+            let data;
+            try {
+              data = JSON.parse(text);
+            } catch {
+              console.error("Resposta inválida da API:", text);
+              swal("Erro", "Resposta inválida do servidor ao gerar QR Code.", "error");
+              return;
+            }
         
             if (data.sucesso && data.qrCodeUrl && data.txid && data.copiaCola) {
               swal({
@@ -209,9 +217,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                   element: "div",
                   attributes: {
                     innerHTML: `
-                      <img src="${data.qrCodeUrl}" style="width:250px;height:250px;" /><br>
-                      <input id="pixCode" value="${data.copiaCola}" readonly style="width: 100%; margin-top: 10px; padding: 5px; font-size: 14px;" />
-                      <button id="copyPix" style="margin-top: 10px; padding: 8px 12px; background-color: #2c7be5; color: white; border: none; border-radius: 4px; cursor: pointer;">Copiar código Pix</button>
+                      <img src="${data.qrCodeUrl}" style="width:250px;height:250px;display:block;margin:0 auto;" />
+                      <button id="copyPix" style="margin-top: 15px; padding: 8px 12px; background-color: #2c7be5; color: white; border: none; border-radius: 4px; cursor: pointer;">Copiar código Pix</button>
                     `
                   }
                 },
@@ -221,20 +228,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 closeOnClickOutside: false
               });
         
-              setTimeout(() => {
-                const copyBtn = document.getElementById("copyPix");
-                const pixInput = document.getElementById("pixCode");
-                if (copyBtn && pixInput) {
-                  copyBtn.addEventListener("click", async () => {
-                    try {
-                      await navigator.clipboard.writeText(pixInput.value);
-                      swal("Copiado!", "Código Pix copiado com sucesso.", "success");
-                    } catch {
-                      swal("Erro", "Não foi possível copiar o código Pix.", "error");
-                    }
-                  });
+              document.getElementById('copyPix')?.addEventListener('click', async () => {
+                try {
+                  await navigator.clipboard.writeText(data.copiaCola);
+                  swal("Copiado!", "Código Pix copiado para sua área de transferência.", "success");
+                } catch {
+                  swal("Erro", "Não foi possível copiar o código Pix.", "error");
                 }
-              }, 500);
+              });
         
               const interval = setInterval(async () => {
                 const check = await fetch(`/api/Pix/StatusPagamento?txid=${data.txid}`);
@@ -242,16 +243,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (res.status === 'confirmado') {
                   clearInterval(interval);
                   swal.close();
-                  form.elements["method"].value = "Dinheiro"; // volta para dinheiro
-                  swal("Pix Aprovado", "Pagamento confirmado!", "success").then(() => finishBtn.click());
+                  swal("Pix Aprovado", "Pagamento confirmado!", "success")
+                    .then(() => finishBtn.click());
                 }
               }, 5000);
+        
             } else {
-              swal("Erro", data.mensagem || "Erro ao gerar QR Code", "error");
+              swal("Erro", data.mensagem || "Erro ao gerar QR Code Pix.", "error");
             }
+        
           } catch (err) {
             console.error(err);
-            swal("Erro", "Erro ao gerar QR Code Pix", "error");
+            swal("Erro", "Erro ao gerar QR Code Pix.", "error");
           } finally {
             hideLoader();
           }
