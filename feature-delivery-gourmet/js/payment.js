@@ -262,7 +262,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               });
         
               const interval = setInterval(async () => {
-                const check = await fetch(`https://localhost:62203/sapi/Pix/StatusPagamento?txid=${data.txid}`);
+                const check = await fetch(`https://localhost:62203/api/Pix/StatusPagamento?txid=${data.txid}`);
                 const res = await check.json();
                 if (res.status === 'confirmado') {
                   clearInterval(interval);
