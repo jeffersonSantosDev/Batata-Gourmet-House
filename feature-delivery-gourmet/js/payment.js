@@ -182,7 +182,108 @@ document.addEventListener('DOMContentLoaded', async () => {
           changeInp.value = '';
         }
 
-         
+        if (radio.value === 'Pix') {
+          showLoader();
+          finishBtn.style.display = "none"; // Esconde o botão ao escolher Pix
+        
+          try {
+            const resp = await fetch("/api/Pix/GerarQrCode", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                usuarioId: userId,
+                carrinhoId: carrinhoId,
+                valor: total,
+                jsonCarrinho: JSON.stringify({
+                  cartItems: cart.items,
+                  endereco: rawAddress ? JSON.parse(rawAddress) : null,
+                  pagamento: "Pix"
+                })
+              })
+            });
+        
+            const data = await resp.json();
+        
+            if (data.sucesso && data.qrCodeUrl && data.txid) {
+              swal({
+                title: 'Escaneie o QR Code para pagar com Pix',
+                content: (() => {
+                  const container = document.createElement("div");
+        
+                  const img = document.createElement("img");
+                  img.src = data.qrCodeUrl;
+                  img.style.width = "250px";
+                  img.style.height = "250px";
+                  img.style.display = "block";
+                  img.style.margin = "0 auto";
+        
+                  const btn = document.createElement("button");
+                  btn.textContent = "Copiar código Pix";
+                  btn.style.marginTop = "15px";
+                  btn.style.padding = "8px 12px";
+                  btn.style.backgroundColor = "#2c7be5";
+                  btn.style.color = "white";
+                  btn.style.border = "none";
+                  btn.style.borderRadius = "4px";
+                  btn.style.cursor = "pointer";
+        
+                  btn.onclick = async () => {
+                    try {
+                      const res = await fetch(`/api/Pix/CopiaCola?txid=${data.txid}`);
+                      const text = await res.text();
+                      await navigator.clipboard.writeText(text);
+                      swal("Copiado!", "Código Pix copiado para a área de transferência.", "success");
+                    } catch {
+                      swal("Erro", "Não foi possível copiar o código Pix.", "error");
+                    }
+                  };
+        
+                  container.appendChild(img);
+                  container.appendChild(btn);
+                  return container;
+                })(),
+                buttons: {
+                  cancel: {
+                    text: "Fechar",
+                    visible: true,
+                    closeModal: true
+                  }
+                },
+                closeOnClickOutside: false
+              }).then((val) => {
+                // Ao fechar o alerta, volta o método para Dinheiro e reexibe o botão
+                const dinheiroRadio = Array.from(radios).find(r => r.value === 'Dinheiro');
+                if (dinheiroRadio) {
+                  dinheiroRadio.checked = true;
+                  changeSec.style.display = 'flex';
+                  changeInp.disabled = noChangeChk.checked;
+                }
+                finishBtn.style.display = ""; // Reexibe o botão
+              });
+        
+              const interval = setInterval(async () => {
+                const check = await fetch(`/api/Pix/StatusPagamento?txid=${data.txid}`);
+                const res = await check.json();
+                if (res.status === 'confirmado') {
+                  clearInterval(interval);
+                  swal("Pix Aprovado", "Pagamento confirmado!", "success")
+                    .then(() => finishBtn.click());
+                }
+              }, 5000);
+            } else {
+              swal("Erro", data.mensagem || "Erro ao gerar QR Code", "error");
+              finishBtn.style.display = ""; // Exibe de volta se falhar
+            }
+          } catch (err) {
+            console.error(err);
+            swal("Erro", "Erro ao gerar QR Code Pix", "error");
+            finishBtn.style.display = ""; // Exibe de volta se falhar
+          } finally {
+            hideLoader();
+          }
+        }
+        
+
 
       });
     });
