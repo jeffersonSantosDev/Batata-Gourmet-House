@@ -182,11 +182,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           changeInp.value = '';
         }
 
-       
         if (radio.value === 'Pix') {
           showLoader();
-          finishBtn.style.display = "none"; // Esconde o botão ao escolher Pix
-        
           try {
             const resp = await fetch("/api/Pix/GerarQrCode", {
               method: "POST",
@@ -205,86 +202,61 @@ document.addEventListener('DOMContentLoaded', async () => {
         
             const data = await resp.json();
         
-            if (data.sucesso && data.qrCodeUrl && data.txid) {
+            if (data.sucesso && data.qrCodeUrl && data.txid && data.copiaCola) {
               swal({
                 title: 'Escaneie o QR Code para pagar com Pix',
-                content: (() => {
-                  const container = document.createElement("div");
+                content: {
+                  element: "div",
+                  attributes: {
+                    innerHTML: `
+                      <img src="${data.qrCodeUrl}" style="width:250px;height:250px;" /><br>
+                      <input id="pixCode" value="${data.copiaCola}" readonly style="width: 100%; margin-top: 10px; padding: 5px; font-size: 14px;" />
+                      <button id="copyPix" style="margin-top: 10px; padding: 8px 12px; background-color: #2c7be5; color: white; border: none; border-radius: 4px; cursor: pointer;">Copiar código Pix</button>
+                    `
+                  }
+                },
+                buttons: {
+                  cancel: "Fechar"
+                },
+                closeOnClickOutside: false
+              });
         
-                  const img = document.createElement("img");
-                  img.src = data.qrCodeUrl;
-                  img.style.width = "250px";
-                  img.style.height = "250px";
-                  img.style.display = "block";
-                  img.style.margin = "0 auto";
-        
-                  const btn = document.createElement("button");
-                  btn.textContent = "Copiar código Pix";
-                  btn.style.marginTop = "15px";
-                  btn.style.padding = "8px 12px";
-                  btn.style.backgroundColor = "#2c7be5";
-                  btn.style.color = "white";
-                  btn.style.border = "none";
-                  btn.style.borderRadius = "4px";
-                  btn.style.cursor = "pointer";
-        
-                  btn.onclick = async () => {
+              setTimeout(() => {
+                const copyBtn = document.getElementById("copyPix");
+                const pixInput = document.getElementById("pixCode");
+                if (copyBtn && pixInput) {
+                  copyBtn.addEventListener("click", async () => {
                     try {
-                      const res = await fetch(`/api/Pix/CopiaCola?txid=${data.txid}`);
-                      const text = await res.text();
-                      await navigator.clipboard.writeText(text);
-                      swal("Copiado!", "Código Pix copiado para a área de transferência.", "success");
+                      await navigator.clipboard.writeText(pixInput.value);
+                      swal("Copiado!", "Código Pix copiado com sucesso.", "success");
                     } catch {
                       swal("Erro", "Não foi possível copiar o código Pix.", "error");
                     }
-                  };
-        
-                  container.appendChild(img);
-                  container.appendChild(btn);
-                  return container;
-                })(),
-                buttons: {
-                  cancel: {
-                    text: "Fechar",
-                    visible: true,
-                    closeModal: true
-                  }
-                },
-                closeOnClickOutside: false
-              }).then((val) => {
-                // Ao fechar o alerta, volta o método para Dinheiro e reexibe o botão
-                const dinheiroRadio = Array.from(radios).find(r => r.value === 'Dinheiro');
-                if (dinheiroRadio) {
-                  dinheiroRadio.checked = true;
-                  changeSec.style.display = 'flex';
-                  changeInp.disabled = noChangeChk.checked;
+                  });
                 }
-                finishBtn.style.display = ""; // Reexibe o botão
-              });
+              }, 500);
         
               const interval = setInterval(async () => {
                 const check = await fetch(`/api/Pix/StatusPagamento?txid=${data.txid}`);
                 const res = await check.json();
                 if (res.status === 'confirmado') {
                   clearInterval(interval);
-                  swal("Pix Aprovado", "Pagamento confirmado!", "success")
-                    .then(() => finishBtn.click());
+                  swal.close();
+                  form.elements["method"].value = "Dinheiro"; // volta para dinheiro
+                  swal("Pix Aprovado", "Pagamento confirmado!", "success").then(() => finishBtn.click());
                 }
               }, 5000);
             } else {
               swal("Erro", data.mensagem || "Erro ao gerar QR Code", "error");
-              finishBtn.style.display = ""; // Exibe de volta se falhar
             }
           } catch (err) {
             console.error(err);
             swal("Erro", "Erro ao gerar QR Code Pix", "error");
-            finishBtn.style.display = ""; // Exibe de volta se falhar
           } finally {
             hideLoader();
           }
         }
         
-
 
       });
     });
