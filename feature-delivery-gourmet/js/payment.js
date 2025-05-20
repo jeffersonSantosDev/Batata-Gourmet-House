@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           finishBtn.style.display = "none"; // Esconde o botão ao escolher Pix
         
           try {
-            const resp = await fetch("https://localhost:62203/api/Pix/GerarQrCode", {
+            const resp = await fetch("/api/Pix/GerarQrCode", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -229,10 +229,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         
                   btn.onclick = async () => {
                     try {
-                      const res = await fetch(`https://localhost:62203/api/Pix/CopiaCola?txid=${data.txid}`);
+                      const res = await fetch(`/api/Pix/CopiaCola?txid=${data.txid}`);
                       const text = await res.text();
                       await navigator.clipboard.writeText(text);
-                      swal("Copiado!", "Código Pix copiado para a área de transferência.", "success");
+                      alert("Código Pix copiado para a área de transferência.");
                     } catch {
                       swal("Erro", "Não foi possível copiar o código Pix.", "error");
                     }
@@ -262,7 +262,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               });
         
               const interval = setInterval(async () => {
-                const check = await fetch(`https://localhost:62203/api/Pix/StatusPagamento?txid=${data.txid}`);
+                const check = await fetch(`/api/Pix/StatusPagamento?txid=${data.txid}`);
                 const res = await check.json();
                 if (res.status === 'confirmado') {
                   clearInterval(interval);
