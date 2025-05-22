@@ -69,8 +69,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const whatsapp     = localStorage.getItem('bgHouse_whatsapp');
     const usuarioIdEnc = localStorage.getItem('bgHouse_id');
     const rawAddress   = localStorage.getItem('bgHouse_selectedAddress');
+    const addressId = parseInt(localStorage.getItem("bgHouse_selectedAddressId"), 10) || null;
     const rawFrete     = localStorage.getItem('bgHouse_frete');
     const nome         = localStorage.getItem('bgHouse_name');
+
+  
 
     let lojaId     = parseInt(localStorage.getItem("bgHouse_lojaId"));
     let programaId = parseInt(localStorage.getItem("bgHouse_fidelidadeId"));
@@ -317,7 +320,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const order = {
         whatsapp,
-        addressId: rawAddress ? JSON.parse(rawAddress).id : null,
+        addressId:addressId,
         paymentMethod: method,
         changeFor,
         usuarioId: userId,

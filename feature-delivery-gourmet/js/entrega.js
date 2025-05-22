@@ -189,7 +189,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     freteEl.textContent = `R$ ${fmt(frete)}`;
     finalTotal.textContent = `R$ ${fmt(subtotal - desconto + frete)}`;
     localStorage.setItem("bgHouse_frete", frete.toFixed(2));
-    localStorage.setItem("bgHouse_selectedAddress", JSON.stringify(addr));
+    localStorage.setItem("bgHouse_selectedAddress", JSON.stringify(addr)); 
+    localStorage.setItem("bgHouse_selectedAddressId", addr.id);
   }
 
   if (enderecoSelecionadoId) {
